@@ -73,7 +73,6 @@ function OscillatorDisplay(model){
     }
 
     model.onUpdate((modelChanges)=>{
-        console.log(modelChanges);
         if(modelChanges.cachedValues){
             const {cachedValues}=modelChanges;
             let str = `M ${0},${mySettings.height/2}`;

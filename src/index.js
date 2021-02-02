@@ -22,3 +22,5 @@ let interface3 = new OscillatorDisplay(oscillator2);
 
 oscillator1.connectTo(mixer);
 oscillator2.connectTo(mixer);
+
+setTimeout(mixer.recalculate,2000);

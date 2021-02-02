@@ -12,7 +12,7 @@ function GenericDisplay(model){
 
     Lane.call(this,{
         width:mySettings.width,x:0,y:0,
-        name:"envelope lane"
+        name:"wave display"
     });
 
     //lane has a contents sprite.
@@ -29,7 +29,7 @@ function GenericDisplay(model){
     
     contents.add(oscLine);
     
-    this.update=function(changes){
+    model.onUpdate(function(changes){
         if(changes.cachedValues){
             const {cachedValues}=changes;
             let str = `M ${0},${mySettings.height/2}`;
@@ -46,9 +46,8 @@ function GenericDisplay(model){
                 prevTop=top;
             }
             oscLine.set('d',str);
-            
         }
-    }
+    });
     model.triggerInitialState();
 };
 

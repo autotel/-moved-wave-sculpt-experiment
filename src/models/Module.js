@@ -20,46 +20,46 @@ function Module(settings){
         this.outputs.delete(outputModule);
     }
 
-    this.ss=[];
-    //a module can be set to not recalculate, it's not expected to change.
-    //maybe I can do a "recalculate" flag propagation later, for example
+    //a module can be set to not useCache, it's not expected to change.
+    //maybe I can do a "useCache" flag propagation later, for example
     //to de-cache all outputs of an envelope when its changed
-    let recalculate=true;
+    let useCache=false;
 
     this.useCache=()=>{
-        recalculate=false;
-        this.changed({recalculate});
+        useCache=true;
+        this.changed({useCache});
     }
 
-    this.recalculate=()=>{
-        recalculate=true;
-        this.changed({recalculate});
+    this.inputChanged=()=>{
+
+        useCache=false;
+        this.changed({useCache});
         this.getValues();
     }
 
     //not to be changed
     this.getValues=(recursion = 0)=>{
         if(recursion > maxRecursion) throw new Error("max recursion reached");
-        if(recalculate){
-            this.calculate(recursion+1);
+        if(!useCache){
+            this.recalculate(recursion+1);
             this.changed({cachedValues:this.cachedValues});
             this.useCache();
             //if my cache changes, it means all my output modules need recalculation
-            this.outputs.forEach((outputModule)=>outputModule.recalculate());
+            this.outputs.forEach((outputModule)=>outputModule.inputChanged());
         }
         return this.cachedValues;
     }
 
     //to be overriden.
-    //a this.calculate has to fill the this.cachedValues array
-    this.calculate=(recursion = 0)=>{
+    //a this.recalculate has to fill the this.cachedValues array
+    this.recalculate=(recursion = 0)=>{
         this.cachedValues=[];
         this.changed({cachedValues:this.cachedValues});
     }
 
     this.triggerInitialState=()=>{
         this.getValues();
-        this.changed({recalculate});
+        this.changed({useCache});
     }
 }
 export default Module;

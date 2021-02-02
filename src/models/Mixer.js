@@ -1,7 +1,7 @@
 import Module from "./Module";
 
 const defaultSettings={
-    amplitude:0.25
+    amplitude:0.5
 };
 
 function Mixer(userSettings={}){
@@ -13,13 +13,19 @@ function Mixer(userSettings={}){
 
     const {amplitude}=settings;
     Module.call(this,settings);
-    this.calculate=(recursion = 0)=>{
-        console.log("mixer calculate");
+    
+    
+    this.recalculate=(recursion = 0)=>{
+        this.cachedValues=[];
+        let first=true;
         this.inputs.forEach((input)=>{
             const inputValues = input.getValues(recursion);
             inputValues.map((val,index)=>{
-                const currentVal=this.cachedValues[index]!==undefined?this.cachedValues[index]:0;
-                this.cachedValues[index] += currentVal * amplitude;
+                const currentVal=this.cachedValues[index]?this.cachedValues[index]:0;
+                this.cachedValues[index] = (val + currentVal) * amplitude;
+                // if(isNaN(this.cachedValues[index])){
+                //     throw new Error(`is NaN ${this.cachedValues[index]} += (${val} + ${currentVal}) * ${amplitude}`);
+                // }
             });
         });
 

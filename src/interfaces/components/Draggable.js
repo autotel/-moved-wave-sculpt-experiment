@@ -58,10 +58,8 @@ function Draggable(domElement){
     this.dragCallback=(mouse)=>{
     }
     this.dragStartCallback=(mouse)=>{
-        // console.log("dragStart",mouse);
     }
     this.dragEndCallback=(mouse)=>{
-        // console.log("dragEnd",mouse);
     }
     /** @param {Vector2} newPosition */
     this.positionChanged=(newPosition)=>{

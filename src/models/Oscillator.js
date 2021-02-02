@@ -4,7 +4,7 @@ import {sampleRate} from "./vars";
 const defaultSettings={
     amplitude:1,
     bias:0,
-    length:1.2,
+    length:0.2,
     frequency:220,
     shape:"sin",
 };
@@ -44,7 +44,7 @@ function Oscillator(userSettings={}){
         this.changed({
             frequency:to
         });
-        this.calculate();
+        this.inputChanged();
     }
     
     this.setAmplitude=(to)=>{
@@ -52,11 +52,10 @@ function Oscillator(userSettings={}){
         this.changed({
             amplitude:to
         });
-        this.calculate();
+        this.inputChanged();
     }
     
-    this.calculate=(recursion = 0)=>{
-
+    this.recalculate=(recursion = 0)=>{
         const lengthSamples = settings.length*sampleRate;
 
         if(!shapes[settings.shape]) throw new Error(`Wave shape function named ${settings.shape}, does not exist`);

@@ -12,7 +12,6 @@ function Canvas(){
     document.body.appendChild(element);
     /** @param {Component} elem */
     this.add=(elem)=>{
-        console.log("adding",elem);
         element.appendChild(elem.domElement);
     }
 }
