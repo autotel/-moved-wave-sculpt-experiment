@@ -1,0 +1,30 @@
+body{
+    margin:0px;
+}
+
+svg{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+svg *{
+    stroke: rgba(204, 0, 255, 0.151);
+    stroke-width: 1;
+    fill:transparent;
+    /* stroke-linecap: butt; */
+    /* stroke-dasharray: 2 2; */
+}
+svg *.active{
+
+    stroke: rgb(204, 0, 255);
+    stroke-width: 1;
+}
+svg svg{
+    overflow: visible;
+}
+svg text{
+    font: 10px sans-serif; 
+    fill: rgb(204, 0, 255);
+    stroke-width: 0;
+}
