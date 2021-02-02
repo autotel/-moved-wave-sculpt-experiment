@@ -1,23 +1,34 @@
 import {maxRecursion} from "./vars";
 import Model from "../scaffolding/Model";
+import InputNode from "./InputNode";
 
 function Module(settings){
     Model.call(this,settings);
 
     this.cachedValues=[];
 
-    this.inputs=new Set();
+    this.inputs={}
     this.outputs=new Set();
 
-    /** @param {Module} outputModule */
-    this.connectTo=(outputModule)=>{
-        outputModule.inputs.add(this);
-        this.outputs.add(outputModule);
+    this.hasInput=(inputName)=>{
+        this.inputs[inputName] = new InputNode(this);
     }
-    /** @param {Module} outputModule */
-    this.disconnect=(outputModule)=>{
-        outputModule.inputs.delete(this);
-        this.outputs.delete(outputModule);
+    this.eachInput=(callback)=>{
+        Object.keys(this.inputs).forEach((inputName,index)=>{
+            const input = this.inputs[inputName];
+            if(input.input) callback(input,index,inputName);
+        });
+    }
+    /** @param {InputNode} inputNode */
+    this.connectTo=(inputNode)=>{
+        inputNode.disconnect();
+        inputNode.input=this;
+        this.outputs.add(inputNode);
+    }
+    /** @param {InputNode} inputNode */
+    this.disconnect=(inputNode)=>{
+        inputNode.input=false;
+        this.outputs.delete(inputNode);
     }
 
     //a module can be set to not useCache, it's not expected to change.

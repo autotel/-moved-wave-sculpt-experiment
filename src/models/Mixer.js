@@ -13,12 +13,16 @@ function Mixer(userSettings={}){
 
     const {amplitude}=settings;
     Module.call(this,settings);
-    
+
+    this.hasInput("a");
+    this.hasInput("b");
+    this.hasInput("c");
+    this.hasInput("d");
     
     this.recalculate=(recursion = 0)=>{
         this.cachedValues=[];
         let first=true;
-        this.inputs.forEach((input)=>{
+        this.eachInput((input)=>{
             const inputValues = input.getValues(recursion);
             inputValues.map((val,index)=>{
                 const currentVal=this.cachedValues[index]?this.cachedValues[index]:0;
