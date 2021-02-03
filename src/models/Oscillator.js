@@ -17,27 +17,31 @@ function Oscillator(userSettings={}){
     Object.assign(settings,userSettings);
 
     let first=true;
+
+    let phaseAccumulator=0;
+
+    const accumulatePhase = (frequency)=>{
+        phaseAccumulator+=frequency / sampleRate;
+    }
+    
     const shapes={
-        sin:(sampleNumber)=>{
-            return Math.sin(
-                Math.PI * 2 
-                * settings.frequency * sampleNumber
-                / sampleRate
-            ) * settings.amplitude
-            + settings.bias
+        sin:(sampleNumber,frequency,amplitude)=>{
+            accumulatePhase(frequency);
+            return Math.sin(phaseAccumulator + Math.PI * 2) * amplitude
+                + settings.bias
         },
-        cos:(sampleNumber)=>{
-            return Math.cos(
-                Math.PI * 2 * 
-                settings.frequency * sampleNumber
-                / sampleRate
-            ) * settings.amplitude
-            + settings.bias
+        cos:(sampleNumber,frequency,amplitude)=>{
+            accumulatePhase(frequency);
+            return Math.cos(phaseAccumulator + Math.PI * 2) * amplitude
+                + settings.bias
         },
         //TODO: more shapes
     }
 
     Module.call(this,settings);
+
+    this.hasInput("frequency");
+    this.hasInput("amplitude");
     
     this.setFrequency=(to)=>{
         settings.frequency=to;
@@ -56,13 +60,19 @@ function Oscillator(userSettings={}){
     }
     
     this.recalculate=(recursion = 0)=>{
+        phaseAccumulator=0;
         const lengthSamples = settings.length*sampleRate;
-
-        if(!shapes[settings.shape]) throw new Error(`Wave shape function named ${settings.shape}, does not exist`);
+        if(!shapes[settings.shape]) throw new Error(
+            `Wave shape function named ${settings.shape}, does not exist`
+        );
         
-
+        const freqInputValues=this.inputs.frequency.getValues();
+        const ampInputValues=this.inputs.amplitude.getValues();
+        
         for(let a=0; a<lengthSamples; a++){
-            this.cachedValues[a]=shapes[settings.shape](a);
+            const freq = (freqInputValues[a]||0) + settings.frequency;
+            const amp = (ampInputValues[a]||0) + settings.amplitude;
+            this.cachedValues[a]=shapes[settings.shape](a,freq,amp);
         }
 
         this.changed({cachedValues:this.cachedValues});

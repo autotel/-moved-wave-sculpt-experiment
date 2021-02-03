@@ -6,46 +6,42 @@ import Draggable from "./components/Draggable";
 import Vector2 from "../scaffolding/Vector2";
 import Oscillator from "../models/Oscillator";
 import round from "../utils/round";
+import WaveDisplay from "./components/WaveDisplay";
+import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 /** @param {Oscillator} model */
 function OscillatorDisplay(model){
-    const mySettings={
-        width:800,height:100,
-    }
+
+    const translator=new ValuePixelTranslator({
+      centerValue:0,range:2, width:800, height:100,
+      model
+    })
 
     Lane.call(this,{
-        width:mySettings.width,x:0,y:0,
+        width:translator.width,x:0,y:0,
         name:"Oscillator"
     });
+
+    const xToFrequency = (x)=>{
+        return x;
+    }
+    const yToAmplitude = translator.yToAmplitude;
 
     //lane has a contents sprite.
     const contents=this.contents;
 
     Interface.call(this);
 
-    function xToFrequency(x){
-        return x;
-    }
-    function yToAmplitude(y){
-        return 1 - 2 * y / mySettings.height;
-    }
-
     const readoutText =  new Text({
         class:"freq-times-amp",
-        x:10, y:mySettings.height/2,
+        x:10, y:translator.height/2,
         text:"---",
     });
 
     contents.add(readoutText);
 
-    const oscLine = new Path({
-        d:`M ${0},${mySettings.height/2}
-        Q ${0},${mySettings.height/2} ${mySettings.width},${mySettings.height/2}`,
-        fill:"transparent",
-        stroke:"black"
-    });
+    const waveDisplay=new WaveDisplay(translator);
+    contents.add(waveDisplay);
     
-    contents.add(oscLine);
-
     //TODO: some knob or text field
     const frequencyHandle = new Circle({
         r:10
@@ -62,8 +58,8 @@ function OscillatorDisplay(model){
     }
 
     contents.add(frequencyHandle);
-    
-    frequencyDraggable.setPosition(new Vector2(mySettings));
+
+    frequencyDraggable.setPosition(new Vector2(translator));
 
     frequencyDraggable.dragStartCallback=(mouse)=>{
         frequencyHandle.set("r",1);
@@ -72,28 +68,14 @@ function OscillatorDisplay(model){
         frequencyHandle.set("r",10);
     }
 
-    model.onUpdate((modelChanges)=>{
-        if(modelChanges.cachedValues){
-            const {cachedValues}=modelChanges;
-            let str = `M ${0},${mySettings.height/2}`;
-            let valsPerPixel=Math.floor(cachedValues.length/mySettings.width);
-            let pixelsPerVal=mySettings.width/cachedValues.length;
-            let topOffset = mySettings.height/2;
-            let prevTop = topOffset;
-            //todo: take whichever has less: pixels or samples.
-            //when multi samples per pixel, use max and a filled area
-            //otherwise, it's a line
-            for(let pixelNumber=0; pixelNumber<mySettings.width; pixelNumber++){
-                const top = 0.5 * mySettings.height * cachedValues[pixelNumber * valsPerPixel] + topOffset;
-                if(pixelNumber>0) str +=`Q ${pixelNumber-1},${prevTop} ${pixelNumber},${top}`;
-                prevTop=top;
-            }
-            oscLine.set('d',str);
-            
+
+    model.onUpdate((changes)=>{
+        if(changes.cachedValues){
+            waveDisplay.set("wave",changes.cachedValues);
         }
         if(
-            modelChanges.frequency!==undefined ||
-            modelChanges.amplitude!==undefined 
+            changes.frequency!==undefined ||
+            changes.amplitude!==undefined
         ){
             readoutText.set("text",
                 `${
@@ -104,6 +86,7 @@ function OscillatorDisplay(model){
         }
 
     });
+
     model.triggerInitialState();
 };
 

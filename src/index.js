@@ -20,7 +20,7 @@ let interface3 = new OscillatorDisplay(oscillator2);
 
 ([interface1,interface2,interface3]).map((i)=>drawBoard.add(i));
 
-oscillator1.connectTo(mixer.inputs.a);
+oscillator1.connectTo(oscillator2.inputs.amplitude);
 oscillator2.connectTo(mixer.inputs.b);
 
 setTimeout(mixer.recalculate,2000);

@@ -8,8 +8,9 @@ const InputNode=function(owner){
         }
     }
     this.getValues=()=>{
-        if(!this.input) throw new Error("requested getValues from nonconnected input");
-        return this.input.getValues();
+        // if(!this.input) throw new Error("requested getValues from nonconnected input");
+        if(this.input) return this.input.getValues();
+        return [];
     }
     this.inputChanged=owner.inputChanged;
 }

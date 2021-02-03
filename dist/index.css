@@ -1,5 +1,6 @@
 body{
     margin:0px;
+    background-color: #000304;
 }
 
 svg{
@@ -9,7 +10,7 @@ svg{
 }
 
 svg *{
-    stroke: rgba(204, 0, 255, 0.151);
+    stroke: rgba(204, 0, 255, 0.7);
     stroke-width: 1;
     fill:transparent;
     /* stroke-linecap: butt; */
@@ -24,7 +25,7 @@ svg svg{
     overflow: visible;
 }
 svg text{
-    font: 10px sans-serif; 
+    font: 10px sans-serif;
     fill: rgb(204, 0, 255);
     stroke-width: 0;
 }
