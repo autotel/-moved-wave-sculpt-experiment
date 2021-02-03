@@ -7,23 +7,23 @@ import Oscillator from "../models/Oscillator";
 import round from "../utils/round";
 import WaveDisplay from "./components/WaveDisplay";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
+import typicalLaneSettings from "../utils/const typicalLaneSettings";
 
 class OscillatorDisplay extends Lane{
     /** @param {Oscillator} model */
     constructor (model){
 
-        const translator=new ValuePixelTranslator({
-        centerValue:0,range:2, width:800, height:100,
-        model
-        })
+        const settings=typicalLaneSettings(model);
+        const translator=new ValuePixelTranslator(settings);
 
         super({
-            width:translator.width,x:0,y:0,
+            width:settings.width,x:0,y:0,
             name:"Oscillator"
         });
 
         const xToFrequency = (x)=>{
-            return x;
+            const pixelRange=settings.width;
+            return Math.pow(2,(x/pixelRange)*15);
         }
         const yToAmplitude = translator.yToAmplitude;
 
@@ -32,7 +32,7 @@ class OscillatorDisplay extends Lane{
 
         const readoutText =  new Text({
             class:"freq-times-amp",
-            x:10, y:translator.height/2,
+            x:10, y:settings.height,
             text:"---",
         });
 
@@ -56,7 +56,7 @@ class OscillatorDisplay extends Lane{
 
         contents.add(frequencyHandle);
 
-        frequencyDraggable.setPosition(new Vector2(translator));
+        frequencyDraggable.setPosition(new Vector2());
 
         frequencyDraggable.dragStartCallback=(mouse)=>{
             frequencyHandle.set("r",1);
@@ -79,6 +79,8 @@ class OscillatorDisplay extends Lane{
                         round(model.settings.frequency,4)
                     }Hz; ${
                         round(model.settings.amplitude,4)
+                    }U ${
+                        model.settings.frequency>(settings.rangeSamples/10)?"(ALIASED)":""
                     }`);
             }
 

@@ -4,16 +4,17 @@ import { Circle, Line, Path } from "../scaffolding/elements";
 import Lane from "./components/Lane";
 import Module from "../models/Module";
 import WaveDisplay from "./components/WaveDisplay";
+import ValuePixelTranslator from "../utils/ValuePixelTranslator";
+import typicalLaneSettings from "../utils/const typicalLaneSettings";
 
 /** @param {Module} model */
 class GenericDisplay extends Lane{
     constructor(model){
-        const mySettings={
-            width:800,height:100,
-        }
+        const settings=typicalLaneSettings(model);
+        const translator=new ValuePixelTranslator(settings);
 
         super({
-            width:mySettings.width,x:0,y:0,
+            width:settings.width,x:0,y:0,
             name:"wave display"
         });
 
@@ -21,7 +22,7 @@ class GenericDisplay extends Lane{
         const contents=this.contents;
 
 
-        const waveDisplay=new WaveDisplay(mySettings);
+        const waveDisplay=new WaveDisplay(translator);
         contents.add(waveDisplay);
 
         model.onUpdate(function(changes){
