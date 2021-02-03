@@ -30,11 +30,11 @@ class Component {
         Object.assign(this.attributes, myOptions);
     }
 }
-/**
- * @constructor {Component}
- * @param {Object} myOptions
- **/
+
 class Circle extends Component{
+    /**
+     * @param {{cx?:number, cy?:number, r?:number}} myOptions
+     **/
     constructor(myOptions = {
         cx: 0, cy: 0, r: 50
     }) {
@@ -45,6 +45,9 @@ class Circle extends Component{
     }
 }
 
+/**
+ * @param {Object} myOptions
+ **/
 class Path extends Component{
     constructor(myOptions = {
         d: `M 10,30
@@ -60,6 +63,9 @@ class Path extends Component{
     }
 }
 
+/**
+ * @param {Object} myOptions
+ **/
 class Rectangle extends Component {
     constructor(myOptions = {
         x: 0, y: 0, width: 100, height: 100
@@ -71,6 +77,9 @@ class Rectangle extends Component {
     }
 }
 
+/**
+ * @param {Object} myOptions
+ **/
 class Line extends Component {
     constructor(myOptions = {
         x1: 0, y1: 80, x2: 100, y2: 20
@@ -82,6 +91,9 @@ class Line extends Component {
     }
 }
 
+/**
+ * @param {Object} myOptions
+ **/
 class Group extends Component {
     constructor(myOptions = {
         x: 0, y: 0,
@@ -96,6 +108,9 @@ class Group extends Component {
         this.update();
     }
 }
+/**
+ * @param {Object} myOptions
+ **/
 class Text extends Component {
     constructor(myOptions = {
         x: 0, y: 0, text: "---"
