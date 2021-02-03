@@ -8,23 +8,27 @@ import round from "../utils/round";
 import WaveDisplay from "./components/WaveDisplay";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
+import VerticalZoom from "./components/VerticalZoom";
+import WaveLane from "./LaneTypes/WaveLane";
 
-class OscillatorDisplay extends Lane{
+class OscillatorDisplay extends WaveLane{
     /** @param {Oscillator} model */
-    constructor (model){
+    constructor (model,options={}){
 
         const settings=typicalLaneSettings(model);
+        //plave for defaults
+        settings.name="Oscillator";
+        Object.assign(settings,options);
+
         const translator=new ValuePixelTranslator(settings);
 
-        super({
-            width:settings.width,x:0,y:0,
-            name:"Oscillator"
-        });
+        super(model,translator,settings);
 
         const xToFrequency = (x)=>{
             const pixelRange=settings.width;
             return Math.pow(2,(x/pixelRange)*15);
         }
+
         const yToAmplitude = translator.yToAmplitude;
 
         //lane has a contents sprite.
@@ -35,11 +39,10 @@ class OscillatorDisplay extends Lane{
             x:10, y:settings.height,
             text:"---",
         });
-
         contents.add(readoutText);
 
-        const waveDisplay=new WaveDisplay(translator);
-        contents.add(waveDisplay);
+
+        
 
         //TODO: some knob or text field
         const frequencyHandle = new Circle({r:10});
@@ -65,11 +68,7 @@ class OscillatorDisplay extends Lane{
             frequencyHandle.set("r",10);
         }
 
-
         model.onUpdate((changes)=>{
-            if(changes.cachedValues){
-                waveDisplay.set("wave",changes.cachedValues);
-            }
             if(
                 changes.frequency!==undefined ||
                 changes.amplitude!==undefined
@@ -83,7 +82,6 @@ class OscillatorDisplay extends Lane{
                         model.settings.frequency>(settings.rangeSamples/10)?"(ALIASED)":""
                     }`);
             }
-
         });
 
         model.triggerInitialState();

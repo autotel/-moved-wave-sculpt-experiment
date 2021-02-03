@@ -6,30 +6,20 @@ import Module from "../models/Module";
 import WaveDisplay from "./components/WaveDisplay";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
+import WaveLane from "./LaneTypes/WaveLane";
 
 /** @param {Module} model */
-class GenericDisplay extends Lane{
-    constructor(model){
+class GenericDisplay extends WaveLane{
+    constructor(model,options={}){
         const settings=typicalLaneSettings(model);
+        Object.assign(settings,options);
         const translator=new ValuePixelTranslator(settings);
 
-        super({
-            width:settings.width,x:0,y:0,
-            name:"wave display"
-        });
+        super(model,translator,settings);
 
         //lane has a contents sprite.
         const contents=this.contents;
 
-
-        const waveDisplay=new WaveDisplay(translator);
-        contents.add(waveDisplay);
-
-        model.onUpdate(function(changes){
-            if(changes.cachedValues){
-                waveDisplay.set("wave",changes.cachedValues);
-            }
-        });
         model.triggerInitialState();
     }
 };

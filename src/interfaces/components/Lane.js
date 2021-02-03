@@ -30,7 +30,9 @@ class Lane extends Sprite{
             height: settings.handleHeight,
             fill: "transparent",
         });
+
         const draggable = new Draggable(handleRect.domElement);
+        
         draggable.positionChanged = (newPosition) => {
             handleRect.attributes.x = settings.x;
             handleRect.attributes.y = newPosition.y;

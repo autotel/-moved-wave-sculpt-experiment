@@ -45,10 +45,10 @@ class Circle extends Component{
     }
 }
 
-/**
- * @param {Object} myOptions
- **/
 class Path extends Component{
+    /**
+     * @param {Object} myOptions
+     **/
     constructor(myOptions = {
         d: `M 10,30
     A 20,20 0,0,1 50,30
@@ -62,25 +62,24 @@ class Path extends Component{
         this.update();
     }
 }
-
-/**
- * @param {Object} myOptions
- **/
 class Rectangle extends Component {
+    
+    /**
+     * @param {{x?:number, y?:number, width?:number, height?:number}} myOptions
+     **/
     constructor(myOptions = {
         x: 0, y: 0, width: 100, height: 100
     }) {
         super(myOptions);
-        // Component.call(this, myOptions);
         this.domElement = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
         this.update();
     }
 }
-
-/**
- * @param {Object} myOptions
- **/
 class Line extends Component {
+    
+    /**
+     * @param {Object} myOptions
+     **/
     constructor(myOptions = {
         x1: 0, y1: 80, x2: 100, y2: 20
     }) {
@@ -91,10 +90,10 @@ class Line extends Component {
     }
 }
 
-/**
- * @param {Object} myOptions
- **/
 class Group extends Component {
+    /**
+     * @param {Object} myOptions
+     **/
     constructor(myOptions = {
         x: 0, y: 0,
     }) {
@@ -108,10 +107,10 @@ class Group extends Component {
         this.update();
     }
 }
-/**
- * @param {Object} myOptions
- **/
 class Text extends Component {
+    /**
+     * @param {Object} myOptions
+     **/
     constructor(myOptions = {
         x: 0, y: 0, text: "---"
     }) {
