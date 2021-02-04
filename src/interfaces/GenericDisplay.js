@@ -7,16 +7,17 @@ import WaveDisplay from "./components/WaveDisplay";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
+import Model from "../scaffolding/Model";
 
-/** @param {Module} model */
 class GenericDisplay extends WaveLane{
-    constructor(model,options={}){
+
+    /** @param {Object<String,Model|string|number>} options */
+    constructor(options){
+        const {model} = options;
         const settings=typicalLaneSettings(model);
         Object.assign(settings,options);
         const translator=new ValuePixelTranslator(settings);
-
-        super(model,translator,settings);
-
+        super(translator,settings);
         //lane has a contents sprite.
         const contents=this.contents;
 

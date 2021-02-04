@@ -10,11 +10,12 @@ import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import VerticalZoom from "./components/VerticalZoom";
 import WaveLane from "./LaneTypes/WaveLane";
+import Model from "../scaffolding/Model";
 
 class OscillatorDisplay extends WaveLane{
-    /** @param {Oscillator} model */
-    constructor (model,options={}){
-
+    /** @param {Object<String,Model|string|number>} options */
+    constructor (options){
+        const model = options.model;
         const settings=typicalLaneSettings(model);
         //plave for defaults
         settings.name="Oscillator";
@@ -22,11 +23,16 @@ class OscillatorDisplay extends WaveLane{
 
         const translator=new ValuePixelTranslator(settings);
 
-        super(model,translator,settings);
+        super(translator,settings);
 
+        // const xToFrequency = (x)=>{
+        //     const pixelRange=settings.width;
+        //     return Math.pow(2,(x/pixelRange)*15);
+        // }
         const xToFrequency = (x)=>{
-            const pixelRange=settings.width;
-            return Math.pow(2,(x/pixelRange)*15);
+            const period = translator.xToSeconds(x);
+            const freq = 1/period;
+            return freq;
         }
 
         const yToAmplitude = translator.yToAmplitude;

@@ -45,6 +45,11 @@ class WaveDisplay extends Path{
                         str += `Q ${pixelNumber - 1},${prevTop} ${pixelNumber},${top}`;
                     prevTop = top;
                 }
+
+                str += `Q ${settings.width},${prevTop} ${settings.width},${translator.amplitudeToY(0)}`;
+                str += `Q ${settings.width},${translator.amplitudeToY(0)} ${0},${translator.amplitudeToY(0)} `;
+                str += `z`;
+
                 p = ['d', str];
             }
             superSet(...p);

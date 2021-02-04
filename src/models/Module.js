@@ -2,13 +2,19 @@ import {maxRecursion} from "./vars";
 import Model from "../scaffolding/Model";
 import InputNode from "./InputNode";
 
+let count = 0;
 class Module extends Model{
     constructor(settings) {
         // Model.call(this, settings);
         super(settings);
+        this.unique = count ++;
+
         this.cachedValues = [];
+        /** @type {Object<string, InputNode>} */
         this.inputs = {};
+        /** @type {Set<InputNode>} */
         this.outputs = new Set();
+
         this.hasInput = (inputName) => {
             this.inputs[inputName] = new InputNode(this);
         };
@@ -19,17 +25,25 @@ class Module extends Model{
                     callback(input, index, inputName);
             });
         };
+
         /** @param {InputNode} inputNode */
         this.connectTo = (inputNode) => {
             inputNode.disconnect();
             inputNode.input = this;
             this.outputs.add(inputNode);
+            this.changed({
+                outputs:this.outputs,
+            });
         };
         /** @param {InputNode} inputNode */
         this.disconnect = (inputNode) => {
             inputNode.input = false;
             this.outputs.delete(inputNode);
+            this.changed({
+                outputs:this.outputs,
+            });
         };
+        
         //a module can be set to not useCache, it's not expected to change.
         //maybe I can do a "useCache" flag propagation later, for example
         //to de-cache all outputs of an envelope when its changed

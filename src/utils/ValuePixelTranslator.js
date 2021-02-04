@@ -1,18 +1,21 @@
-import Module from "../models/Module";
+import Model from "../scaffolding/Model";
+import { sampleRate } from "../models/vars";
 
 class ValuePixelTranslator {
     /**
-     * reference to settings objects, which may be changed at runtime
-     * causing changes in the scale in this object.
-     * @param {{
+     * @export @typedef {{
      *  rangeAmplitude:number,
      *  rangeSamples:number,
      *  centerAmplitude:number,
      *  centerSample:number,
      *  width:number,
      *  height:number,
-     *  model:Module,
-     * }} settings
+     *  model:Model,
+     * }} ValuePixelTranslatorParams
+     * 
+     * reference to settings objects, which may be changed at runtime
+     * causing changes in the scale in this object.
+     * @param {ValuePixelTranslatorParams} settings
     */
     constructor(settings) {
         const model = settings.model;
@@ -36,7 +39,7 @@ class ValuePixelTranslator {
                 centerAmplitude
             } = settings;
             const center=height/2;
-            return  (amplitude * height - centerAmplitude * height ) / rangeAmplitude + center;
+            return  ( centerAmplitude * height - amplitude * height ) / rangeAmplitude + center;
         };
 
         /** pixel number to sample number */
@@ -48,6 +51,15 @@ class ValuePixelTranslator {
         this.sampleNumberToX = (sampleNumber) => {
             return Math.floor(settings.width * sampleNumber / settings.rangeSamples);
         };
+
+        /** convert pixel number into time in seconds */
+        this.xToSeconds = (x)=>{
+            return this.xToSampleNumber(x) / sampleRate;
+        }
+        /** convert time in seconds into pixel number  */
+        this.secondsToX = (time)=>{
+            return this.sampleNumberToX(time * sampleRate);
+        }
     }
 }
 export default ValuePixelTranslator;

@@ -1,6 +1,12 @@
+import Lane from "../interfaces/components/Lane";
+
 class Model {
     constructor(settings) {
         const redrawList = [];
+        /** @type {Set<Lane>} */
+        this.interfaces=new Set();
+        /** @returns {Lane|false} */
+        this.getInterface = ()=>this.interfaces.values().next().value;
         this.settings = settings;
         //interface uses this method to conect changes in model to redrawss
         this.onUpdate = (newCallback) => {

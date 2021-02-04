@@ -65,7 +65,13 @@ class Path extends Component{
 class Rectangle extends Component {
     
     /**
-     * @param {{x?:number, y?:number, width?:number, height?:number}} myOptions
+     * @param {{
+     * fill?:string,
+     * x?:number,
+     * y?:number,
+     * width?:number,
+     * height?:number
+     * }} myOptions
      **/
     constructor(myOptions = {
         x: 0, y: 0, width: 100, height: 100
