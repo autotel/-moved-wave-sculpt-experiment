@@ -5,7 +5,7 @@
 class Component {
     /** @param {Object} myOptions */
     constructor(myOptions = { x: 0, y: 0 }) {
-        /** @type {HTMLElement|SVGElement|undefined} */
+        /** @type {SVGElement|undefined} */
         this.domElement=undefined;
         this.attributes = {};
         this.appliedAttributes = {};

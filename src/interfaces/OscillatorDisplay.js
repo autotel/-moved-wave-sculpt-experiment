@@ -34,6 +34,11 @@ class OscillatorDisplay extends WaveLane{
             const freq = 1/period;
             return freq;
         }
+        const freqToX = (freq)=>{
+            const period = 1/freq;
+            const x = translator.secondsToX(period);
+            return x;
+        }
 
         const yToAmplitude = translator.yToAmplitude;
 
@@ -48,19 +53,29 @@ class OscillatorDisplay extends WaveLane{
         contents.add(readoutText);
 
 
-        
-
         //TODO: some knob or text field
         const frequencyHandle = new Circle({r:10});
 
         const frequencyDraggable=new Draggable(frequencyHandle.domElement);
+        const proportionalDraggable=new Draggable(this.waveDisplay.domElement);
 
+        proportionalDraggable.setPosition({x:0,y:0});
         frequencyDraggable.positionChanged=(newPosition)=>{
             frequencyHandle.attributes.cx=newPosition.x;
             frequencyHandle.attributes.cy=newPosition.y;
             frequencyHandle.update();
             model.setFrequency(xToFrequency(newPosition.x));
             model.setAmplitude(yToAmplitude(newPosition.y));
+        }
+
+        let pixFreqOnDragStart;
+        proportionalDraggable.dragStartCallback=(mouse)=>{
+            pixFreqOnDragStart = freqToX(model.settings.frequency);
+        }
+        proportionalDraggable.positionChanged=(pos)=>{
+            model.setFrequency(
+                xToFrequency(pixFreqOnDragStart + pos.delta.x )
+            );
         }
 
         contents.add(frequencyHandle);

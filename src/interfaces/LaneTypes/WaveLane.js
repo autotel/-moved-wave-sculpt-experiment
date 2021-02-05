@@ -17,7 +17,7 @@ class WaveLane extends Lane{
 
         const contents=this.contents;
 
-        const waveDisplay=new WaveDisplay(translator);
+        const waveDisplay=this.waveDisplay = new WaveDisplay(translator);
         contents.add(waveDisplay);
         
         const zoom = new VerticalZoom(translator);

@@ -14,10 +14,10 @@ function Vector2(options={x:0,y:0}){
     this.clone=()=>{
         return new Vector2(this);
     }
-    /** @param {Vector2} to */
+    /** @param {Vector2|{x:number,y:number}} to */
     this.set=(to)=>{
-        this.x=to.x|0;
-        this.y=to.y|0;
+        this.x=to.x;
+        this.y=to.y;
     }
     this.set(options);
 }

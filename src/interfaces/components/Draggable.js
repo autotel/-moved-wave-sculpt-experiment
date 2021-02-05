@@ -14,7 +14,7 @@ import Vector2 from "../../scaffolding/Vector2"
  * @exports NodeWithClassList
  */
 
-/** @param {Node} domElement */
+/** @param {HTMLElement|SVGElement} domElement */
 function Draggable(domElement){
 
     const position = new Vector2();
@@ -36,17 +36,23 @@ function Draggable(domElement){
     this._drag=(mouse)=>{
         position.set(dragStartPosition);
         position.add(mouse.dragDelta);
-
-
+        
         this.dragCallback(mouse);
-        this.positionChanged(position);
+        this.positionChanged({
+            x:position.x,
+            y:position.y,
+            delta:mouse.dragDelta,
+            localDragOffset:dragStartPosition,
+            start:{
+                x:dragStartPosition.x,
+                y:dragStartPosition.y,
+            }
+        });
     }
     this._dragStart=(mouse)=>{
 
-        dragStartPosition.set(
-            Vector2.sub(position,mouse)
-        );
-
+        dragStartPosition.set(position);
+        
         this.dragStartCallback(mouse);
     }
     this._dragEnd=(...p)=>{
@@ -61,12 +67,23 @@ function Draggable(domElement){
     }
     this.dragEndCallback=(mouse)=>{
     }
-    /** @param {Vector2} newPosition */
+    /** @param {{
+     * x:number,
+     * y:number,
+     * delta:{
+     *     x:number,
+     *     y:number,
+     * },
+     * start:{
+     *     x:number,
+     *     y:number,
+     * }
+     * }} newPosition */
     this.positionChanged=(newPosition)=>{
 
     }
 
-    /** @param {Vector2} newPosition */
+    /** @param {Vector2|{x:number,y:number}} newPosition */
     this.setPosition=(newPosition)=>{
         position.set(newPosition);
         this.positionChanged(newPosition);
@@ -75,12 +92,9 @@ function Draggable(domElement){
     domElement.classList.add("draggable");
 }
 
-Draggable.mouse={};
-/** @param {Node} canvas */
-Draggable.setCanvas=(canvas=document)=>{
-    const mouse = Draggable.mouse = new(function(){
-        Vector2.call(this);
-
+class Mouse extends Vector2{
+    constructor(){
+        super();
         /** @type {boolean} */
         this.pressed=false;
         /** @type {Set<Draggable>} */
@@ -89,13 +103,18 @@ Draggable.setCanvas=(canvas=document)=>{
         this.isHovering=false;
         this.dragStartPosition=new Vector2();
         this.dragDelta=new Vector2();
+    }
+}
 
-    })();
-
-
+Draggable.mouse = new Mouse();;
+/** @param {Node} canvas */
+Draggable.setCanvas=(canvas=document)=>{
+    const mouse = Draggable.mouse;
 
     canvas.addEventListener("mousemove",(evt)=>{
+        // @ts-ignore
         mouse.x=evt.clientX;
+        // @ts-ignore
         mouse.y=evt.clientY;
         mouse.dragDelta = Vector2.sub(mouse,mouse.dragStartPosition);
         if(mouse.pressed){
@@ -107,6 +126,9 @@ Draggable.setCanvas=(canvas=document)=>{
 
     canvas.addEventListener("mousedown", (evt)=>{
         mouse.pressed=true;
+        //@ts-ignore
+        mouse.dragStartPosition.set({x:evt.clientX,y:evt.clientY});
+        // @ts-ignore
         if(evt.button==0){
             //to implement multi element seletion, you would do changes here
             if(mouse.isHovering){

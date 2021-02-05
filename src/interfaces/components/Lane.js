@@ -26,6 +26,16 @@ class Lane extends Sprite{
         Object.assign(settings, options);
         // this.settings=settings;
         
+        /** @type {function[]} */
+        const movedCallbacks=[];
+        /** @param {function} callback */
+        this.onMoved=(callback)=>{
+            movedCallbacks.push(callback);
+        }
+        const handleMoved=()=>{
+            movedCallbacks.map((cb)=>cb());
+        }
+
         model.interfaces.add(this);
 
         const handleRect = new Rectangle({
@@ -37,16 +47,18 @@ class Lane extends Sprite{
         });
 
         const draggable = new Draggable(handleRect.domElement);
-        
+        draggable.setPosition(settings);
         draggable.positionChanged = (newPosition) => {
             settings.y=newPosition.y;
 
             // handleRect.attributes.x = settings.x;
             handleRect.attributes.y = settings.y;
             handleRect.update();
+            
             // this.contents.attributes.x = settings.x;
             this.contents.attributes.y = settings.y + settings.handleHeight;
             this.contents.update();
+            handleMoved();
         };
         
         this.contents = new Group({
@@ -137,13 +149,6 @@ class Lane extends Sprite{
 
 
         this.add(handleRect);
-        draggable.setPosition(new Vector2({
-            x:settings.x,y:settings.y
-        }));
-        draggable.dragStartCallback = (mouse) => {
-        };
-        draggable.dragEndCallback = (mouse) => {
-        };
     }
 }
 ;

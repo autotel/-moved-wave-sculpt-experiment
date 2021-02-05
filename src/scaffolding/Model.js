@@ -5,7 +5,7 @@ class Model {
         const redrawList = [];
         /** @type {Set<Lane>} */
         this.interfaces=new Set();
-        /** @returns {Lane|false} */
+        /** @returns {Lane|undefined} */
         this.getInterface = ()=>this.interfaces.values().next().value;
         this.settings = settings;
         //interface uses this method to conect changes in model to redrawss

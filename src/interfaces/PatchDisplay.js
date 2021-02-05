@@ -32,6 +32,10 @@ class PatchDisplay extends Sprite{
                 }
             });
 
+            const modInterface=module.getInterface();
+            console.log(modInterface);
+            if(modInterface) modInterface.onMoved(updatePatchLines);
+
             updatePatchLines();
         }
 
@@ -92,8 +96,6 @@ class PatchDisplay extends Sprite{
             });
         }
 
-        //TODO: create some form of event when interface is dragged, so that we can subscribe
-        setInterval(updatePatchLines,500);
     }
 }
 export default PatchDisplay;
