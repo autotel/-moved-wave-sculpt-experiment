@@ -52,7 +52,7 @@ class Module extends Model{
             useCache = true;
             this.changed({ useCache });
         };
-        this.inputChanged = () => {
+        this.cacheObsolete = () => {
             useCache = false;
             this.changed({ useCache });
             this.getValues();
@@ -66,7 +66,7 @@ class Module extends Model{
                 this.changed({ cachedValues: this.cachedValues });
                 this.useCache();
                 //if my cache changes, it means all my output modules need recalculation
-                this.outputs.forEach((outputModule) => outputModule.inputChanged());
+                this.outputs.forEach((outputModule) => outputModule.cacheObsolete());
             }
             return this.cachedValues;
         };

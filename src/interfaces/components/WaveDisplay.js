@@ -1,6 +1,7 @@
 import { Path } from "../../scaffolding/elements";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
 import VerticalZoom from "./VerticalZoom";
+import Hoverable from "./Hoverable";
 
 class WaveDisplay extends Path{
     /** @param {ValuePixelTranslator} translator */
@@ -28,17 +29,26 @@ class WaveDisplay extends Path{
                 let str = `M ${0},${settings.height / 2}`;
                 
                 // let valsPerPixel = ;
-                
+                let lastLevel = 0;
                 let topOffset = settings.height / 2;
                 let prevTop = topOffset;
                 //todo: take whichever has less: pixels or samples.
                 //when multi samples per pixel, use max and a filled area
                 //otherwise, it's a line
                 for (let pixelNumber = 0; pixelNumber < settings.width; pixelNumber++) {
+                    const index=translator.xToSampleNumber(pixelNumber);
+                    if(index>=theWave.length){
+                        //value gets "frozen"
+                        str += `Q ${settings.width},${prevTop} ${settings.width},${prevTop}`;
+                        break;
+                    }
+
+                    const levelNow=theWave[index];
+                    
+                    lastLevel=levelNow;
+                    
                     const top = translator.amplitudeToY(
-                        theWave[
-                            translator.xToSampleNumber(pixelNumber)
-                        ]
+                        lastLevel
                     );
 
                     if (pixelNumber > 0)

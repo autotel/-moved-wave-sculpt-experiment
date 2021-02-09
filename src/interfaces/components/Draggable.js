@@ -83,7 +83,7 @@ function Draggable(domElement){
 
     }
 
-    /** @param {Vector2|{x:number,y:number}} newPosition */
+    /** @param {Vector2|{x?:number,y?:number}} newPosition */
     this.setPosition=(newPosition)=>{
         position.set(newPosition);
         this.positionChanged(newPosition);

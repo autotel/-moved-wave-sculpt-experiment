@@ -5,7 +5,7 @@ const defaultSettings={
     amplitude:1,
     bias:0,
     length:1,
-    frequency:220,
+    frequency:1,
     shape:"sin",
 };
 
@@ -29,15 +29,26 @@ class Oscillator extends Module{
         const accumulatePhase = (frequency) => {
             phaseAccumulator += frequency / sampleRate;
         };
+        
         const shapes = {
             sin: (frequency, amplitude,bias) => {
                 accumulatePhase(frequency);
-                return Math.sin(phaseAccumulator + Math.PI * 2) * amplitude
+                return Math.sin(phaseAccumulator * Math.PI * 2) * amplitude
                     + bias;
             },
             cos: (frequency, amplitude,bias) => {
                 accumulatePhase(frequency);
-                return Math.cos(phaseAccumulator + Math.PI * 2) * amplitude
+                return Math.cos(phaseAccumulator * Math.PI * 2) * amplitude
+                    + bias;
+            },
+            ramp: (frequency, amplitude,bias) => {
+                accumulatePhase(frequency);
+                return (phaseAccumulator % 1 - 0.5) * amplitude
+                    + bias;
+            },
+            noise: (frequency, amplitude,bias) => {
+                accumulatePhase(frequency);
+                return Math.random() * amplitude
                     + bias;
             },
             offset: (frequency, amplitude,bias) => {
@@ -57,14 +68,25 @@ class Oscillator extends Module{
             this.changed({
                 frequency: to
             });
-            this.inputChanged();
+            this.cacheObsolete();
+            return this;
         };
         this.setAmplitude = (to) => {
             settings.amplitude = to;
             this.changed({
                 amplitude: to
             });
-            this.inputChanged();
+            this.cacheObsolete();
+            return this;
+        };
+        
+        this.setShape = (to) => {
+            settings.shape = to;
+            this.changed({
+                shape: to
+            });
+            this.cacheObsolete();
+            return this;
         };
         
         this.recalculate = (recursion = 0) => {

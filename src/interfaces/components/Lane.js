@@ -6,6 +6,7 @@ import typicalLaneSettings from "../../utils/const typicalLaneSettings";
 import Model from "../../scaffolding/Model";
 import Module from "../../models/Module";
 import InputNode from "../../models/InputNode";
+import Hoverable from "./Hoverable";
 
 /**
  * @typedef {{x:number,y:number}} MiniVector
@@ -21,7 +22,9 @@ class Lane extends Sprite{
         
         const {model} = options;
         const settings = typicalLaneSettings(model);
+
         settings.handleHeight=10;
+        
         super(options.name || "lane");
         Object.assign(settings, options);
         // this.settings=settings;
@@ -45,7 +48,16 @@ class Lane extends Sprite{
             height: settings.handleHeight,
             fill: "transparent",
         });
-
+        handleRect.domElement.classList.add("lane-handle");
+        //position this lane at a distance from top, proportional to it's height,
+        this.handyPosition=(posNumber)=>{
+            draggable.setPosition({
+                y:posNumber * (settings.height + settings.handleHeight)
+            });
+            handleMoved();
+            return this;
+        }
+        
         const draggable = new Draggable(handleRect.domElement);
         draggable.setPosition(settings);
         draggable.positionChanged = (newPosition) => {
@@ -61,6 +73,8 @@ class Lane extends Sprite{
             handleMoved();
         };
         
+        this.add(handleRect);
+
         this.contents = new Group({
             x: settings.x, y: settings.y,
             width: settings.width, height: settings.height,
@@ -148,7 +162,6 @@ class Lane extends Sprite{
         this.contents.add(title);
 
 
-        this.add(handleRect);
     }
 }
 ;

@@ -1,31 +1,49 @@
 body{
     margin:0px;
-    background-color: #000304;
+    background-color: #010c08;
 }
 
 svg{
     position: absolute;
     width: 100%;
-    height: 100%;
+    height: 2000px;
 }
 
 svg *{
-    stroke: rgba(204, 0, 255, 0.7);
+    stroke: rgb(71, 65, 9);
     stroke-width: 1;
     fill:transparent;
     /* stroke-linecap: butt; */
     /* stroke-dasharray: 2 2; */
+    transition: fill, stroke 0.1s;
 }
 svg *.active{
-
-    stroke: rgb(204, 0, 255);
+    stroke: rgb(175, 175, 168);
+    fill: rgba(175, 175, 168, 0.377);
     stroke-width: 1;
+    transition: fill, stroke 0.1s;
 }
 svg svg{
-    overflow: visible;
+    overflow: scroll;
 }
 svg text{
     font: 10px sans-serif;
-    fill: rgb(204, 0, 255);
+    fill: rgb(191, 221, 241);
     stroke-width: 0;
+    pointer-events: none;
+}
+svg .wave-display{
+    stroke: rgb(191, 221, 241);
+}
+svg .lane-handle{
+    fill: rgb(191, 221, 241);
+    opacity: 0.2;
+    stroke-width: 0;
+}
+.hover-text{
+    pointer-events: none;
+    /* opacity: 0; */
+}
+.hover-text.active{
+    opacity: 1;
 }

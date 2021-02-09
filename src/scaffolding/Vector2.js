@@ -1,4 +1,6 @@
 function Vector2(options={x:0,y:0}){
+    this.x=options.x;
+    this.y=options.y;
     /** @param {Vector2} to */
     this.add=(to)=>{
         this.x+=to.x;
@@ -14,10 +16,10 @@ function Vector2(options={x:0,y:0}){
     this.clone=()=>{
         return new Vector2(this);
     }
-    /** @param {Vector2|{x:number,y:number}} to */
+    /** @param {Vector2|{x?:number,y?:number}} to */
     this.set=(to)=>{
-        this.x=to.x;
-        this.y=to.y;
+        if(to.x!==undefined) this.x=to.x;
+        if(to.y!==undefined) this.y=to.y;
     }
     this.set(options);
 }

@@ -33,7 +33,6 @@ class PatchDisplay extends Sprite{
             });
 
             const modInterface=module.getInterface();
-            console.log(modInterface);
             if(modInterface) modInterface.onMoved(updatePatchLines);
 
             updatePatchLines();
