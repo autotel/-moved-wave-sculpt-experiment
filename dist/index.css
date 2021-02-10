@@ -23,6 +23,7 @@ svg *.active{
     stroke-width: 1;
     transition: fill, stroke 0.1s;
 }
+
 svg svg{
     overflow: scroll;
 }

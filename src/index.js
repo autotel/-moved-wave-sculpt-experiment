@@ -12,10 +12,13 @@ import OscillatorDisplay from "./interfaces/OscillatorDisplay";
 import PatchDisplay from "./interfaces/PatchDisplay";
 import EnvelopeGeneratorDisplay from "./interfaces/EnvelopeGeneratorDisplay";
 import Filter from "./SoundModules/Filter";
+import SoundPlayer from "./scaffolding/SoundPlayer";
 
 let p=0;
 
 Draggable.setCanvas(drawBoard.element);
+
+const player=new SoundPlayer();
 
 const patchDisplay = new PatchDisplay();
 drawBoard.add(patchDisplay);
@@ -39,6 +42,8 @@ function create(Which,name=false){
         default:
             theInterface=new GenericDisplay({model:newm,name});
     }
+    
+    player.appendModule(newm);
     theInterface.handyPosition(p);
     drawBoard.add(theInterface);
 
