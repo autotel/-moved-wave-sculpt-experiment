@@ -58,7 +58,7 @@ class Oscillator extends Module{
             },
             noise: (frequency, amplitude,bias) => {
                 accumulatePhase(frequency);
-                return Math.random() * amplitude
+                return (Math.random() - 0.5) * amplitude
                     + bias;
             },
             offset: (frequency, amplitude,bias) => {

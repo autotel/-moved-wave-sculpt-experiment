@@ -49,7 +49,7 @@ class Module extends Model{
          * @param {InputNode} inputNode */
         this.connectTo = (inputNode) => {
             if(!(inputNode && inputNode.isInputNode)) throw new Error("you can only connect to InputNodes");
-            inputNode.disconnect();
+            if(inputNode.input) inputNode.input=undefined;
             inputNode.input = this;
             this.outputs.add(inputNode);
             this.changed({
@@ -61,7 +61,9 @@ class Module extends Model{
          * @param {InputNode} inputNode
          */
         this.disconnect = (inputNode) => {
-            inputNode.disconnect();
+            if (inputNode.input) {
+                inputNode.input=undefined;
+            }
             this.outputs.delete(inputNode);
             this.changed({
                 outputs:this.outputs,

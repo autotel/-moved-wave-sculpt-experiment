@@ -4,9 +4,9 @@ import Lane from "../interfaces/components/Lane";
 import { Rectangle } from "./elements";
 
 
-
 class SoundPlayer{
     constructor(){
+
 
         /** @type {AudioBufferSourceNode|false} */
         var source=false;
@@ -16,6 +16,34 @@ class SoundPlayer{
         
         /** @type {Module|false} */
         let myModule = false;
+        let playing = false;
+
+        let magicPlayerPlayhead=0;
+        var bufferSize = 4096;
+
+        var magicPlayer = (function() {
+            var node = audioContext.createScriptProcessor(bufferSize, 1, 1);
+            node.onaudioprocess = function(e) {
+                let playhead=magicPlayerPlayhead;
+                // var input = e.inputBuffer.getChannelData(0);
+                var output = e.outputBuffer.getChannelData(0);
+                for (var i = 0; i < bufferSize; i++) {
+                    if(playing && myModule){
+                        playhead %= myModule.cachedValues.length;
+                        output[i] = myModule.cachedValues[playhead];
+                    }else{
+                        output[i]=0;
+                    }
+                    playhead++;
+                }
+                magicPlayerPlayhead += bufferSize;
+            }
+            return node;
+        })();
+
+        magicPlayer.connect(myGain);
+
+
         let position={
             x:720,
             y:70,
@@ -40,7 +68,7 @@ class SoundPlayer{
 
             module.onUpdate((changes)=>{
                 if(changes.cachedValues){
-                    this.updateBuffer();
+                    // this.updateBuffer();
                 }
             });
             
@@ -72,42 +100,20 @@ class SoundPlayer{
         /** @param {Module} module */
         this.setModule = (module,start=false)=>{
             myModule=module;
-            if(start) this.restart();
+            if(start) playing=true;
         }
-        this.updateBuffer = ()=>{
-            if(!buffer) return;
-            if(!myModule) return;
-            //not possible for now
-        }
-        /** @type {AudioBuffer|false} */
-        let buffer=false;
-        this.restart = ()=>{
-            this.stop();
-            if(!myModule) return;
 
-            buffer = new AudioBuffer({
-                length: myModule.cachedValues.length,
-                sampleRate: sampleRate,
-                numberOfChannels: 1,
-            });
+        // this.updateBuffer = ()=>{
+        //     if(!buffer) return;
+        //     if(!myModule) return;
+        //     //not possible for now
+        // }
 
-            buffer.getChannelData(0).set(myModule.cachedValues);
-            source = new AudioBufferSourceNode(audioContext, {buffer});
-            if(!source) throw new Error("failed to make source");
-            source.connect(myGain);
-            source.loop = true;
-            source.start(0);
-        }
+        // /** @type {AudioBuffer|false} */
+        // let buffer=false;
 
         this.stop = ()=>{
-            if(source){
-                try{
-                    source.disconnect();
-                    source.stop();
-                }catch(e){
-                    console.warn("problem stopping source:",e);
-                }
-            }
+            playing=false;
         }
     }
 }

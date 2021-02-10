@@ -2,7 +2,7 @@ import Module from "./Module";
 import {sampleRate} from "./vars";
 const Fili = require('fili');
 
-
+//todo: add these filters: https://noisehack.com/custom-audio-effects-javascript-web-audio-api/
 /**
  * @namespace SoundModules.Filter
  */
