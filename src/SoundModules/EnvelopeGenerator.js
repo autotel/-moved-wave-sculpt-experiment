@@ -1,24 +1,37 @@
 import Module from "./Module";
 import {sampleRate} from "./vars";
 
+/**
+ * @namespace SoundModules.EnvelopeGenerator
+ */
+
+/**
+ * @typedef {Array<number>} EnvelopePoint a tuple containing two numbers: first is sample number (integers only), and the second is level (float)
+ */
+
+/** 
+ * @typedef {Object} EnvelopeGeneratorSettings
+ * @property {number} [amplitude]
+ * @property {number} [bias]
+ * @property {number} [length]
+ * @property {Array<EnvelopePoint>} [points]
+ */
+
+ /** @type {EnvelopeGeneratorSettings} */
 const defaultSettings={
     amplitude:1,
     bias:0,
     length:1,
-    frequency:220,
-    shape:"sin",
     points:[],
 };
 
+/**
+ * @class EnvelopeGenerator 
+ * @extends Module
+ */
 class EnvelopeGenerator extends Module{
     /**
-     * @param {{
-     * amplitude?:number,
-     * bias?:number,
-     * length?:number,
-     * frequency?:number,
-     * points?:[number,number][]
-     * }} userSettings
+     * @param {EnvelopeGeneratorSettings} userSettings
      */
     constructor(userSettings = {}) {
         //apply default settings for all the settings user did not provide
@@ -69,10 +82,10 @@ class EnvelopeGenerator extends Module{
         }
         this.recalculate = (recursion = 0) => {
             sortPointsByTime();
-            /** @returns {[number,number]|false} */
+            /** @returns {EnvelopePoint|false} */
             const getNextPoint=(spl)=>{
 
-                /** @type {[number,number]|false} */
+                /** @type {EnvelopePoint|false} */
                 let selected=false;
                 for(let pnum = 0; pnum < settings.points.length; pnum++){
                     const point = settings.points[pnum];

@@ -4,19 +4,30 @@ import Draggable from "./Draggable";
 import Vector2 from "../../scaffolding/Vector2";
 import typicalLaneSettings from "../../utils/const typicalLaneSettings";
 import Model from "../../scaffolding/Model";
-import Module from "../../models/Module";
-import InputNode from "../../models/InputNode";
+import Module from "../../SoundModules/Module";
+import InputNode from "../../SoundModules/InputNode";
 import Hoverable from "./Hoverable";
+const VectorTypedef = require("../../scaffolding/Vector2");
 
 /**
- * @typedef {{x:number,y:number}} MiniVector
+ * @typedef {VectorTypedef.MiniVector} MiniVector
  */
 
+/**
+ * @typedef {MiniVector} LaneOptions
+ * @property {Module} model
+ * @property {string} name
+ * @exports LaneOptions
+ */
+
+
+/**
+ * @class Lane
+ * @extends Sprite
+ * */
 class Lane extends Sprite{
     /**
-     * @param {{
-     *  x?:number,y?:number,model:Module,name?:string
-     * }} options
+     * @param {LaneOptions} options
      */
     constructor(options) {
         

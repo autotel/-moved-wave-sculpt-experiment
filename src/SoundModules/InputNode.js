@@ -3,6 +3,7 @@ import Module from "./Module";
 /** @param {Module} owner */
 class InputNode {
     constructor(owner) {
+        this.isInputNode=true;
         /** @type {undefined | Module} */
         this.input = undefined;
         this.owner = owner;

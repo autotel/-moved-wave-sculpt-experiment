@@ -3,7 +3,7 @@ import { Circle, Line, Path, Text } from "../scaffolding/elements";
 import Lane from "./components/Lane";
 import Draggable from "./components/Draggable";
 import Vector2 from "../scaffolding/Vector2";
-import Oscillator from "../models/Oscillator";
+import Oscillator from "../SoundModules/Oscillator";
 import round from "../utils/round";
 import WaveDisplay from "./components/WaveDisplay";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
@@ -13,6 +13,14 @@ import WaveLane from "./LaneTypes/WaveLane";
 import Model from "../scaffolding/Model";
 import GenericDisplay from "./GenericDisplay";
 
+/**
+ * @namespace Interfaces.OscillatorDisplay
+ */
+
+/** 
+ * @class OscillatorDisplay
+ * @extends WaveLane
+ */
 class OscillatorDisplay extends WaveLane{
     /** @param {Object<String,Model|string|number>} options */
     constructor (options){

@@ -1,22 +1,32 @@
 import Module from "./Module";
 import {sampleRate} from "./vars";
 
+/**
+ * @namespace SoundModules.Chevyshev
+ */
+
+/** 
+ * @typedef {Object} ChevyshevSettings
+ * @property {number} [amplitude]
+ * @property {number} [bias]
+ * @property {number} [length]
+ * @property {0|1|2|3|4} [order]
+ */
+
+/** @type {ChevyshevSettings} */
 const defaultSettings={
     amplitude:1,
     bias:0,
     length:1,
-    frequency:220,
     order:3,
 };
+/**
+ * @class Chevyshev 
+ * @extends Module
+ */
 class Chevyshev extends Module{
     /**
-     * @param {{
-     * amplitude?:number,
-     * bias?:number,
-     * length?:number,
-     * frequency?:number,
-     * order?:0|1|2|3|4
-     * }} userSettings
+     * @param {ChevyshevSettings} userSettings
      */
     constructor(userSettings = {}) {
         //apply default settings for all the settings user did not provide

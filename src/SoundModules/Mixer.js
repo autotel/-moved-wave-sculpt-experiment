@@ -1,9 +1,16 @@
 import Module from "./Module";
 
+/**
+ * @namespace SoundModules.Mixer
+ */
+
 const defaultSettings={
     amplitude:0.5
 };
-
+/**
+ * @class Mixer
+ * @extends Module
+ */
 class Mixer extends Module{
     constructor(userSettings = {}) {
         //apply default settings for all the settings user did not provide

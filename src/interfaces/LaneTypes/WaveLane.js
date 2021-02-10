@@ -1,5 +1,5 @@
 import Lane from "../components/Lane";
-import Module from "../../models/Module";
+import Module from "../../SoundModules/Module";
 import typicalLaneSettings from "../../utils/const typicalLaneSettings";
 import WaveDisplay from "../components/WaveDisplay";
 import VerticalZoom from "../components/VerticalZoom";

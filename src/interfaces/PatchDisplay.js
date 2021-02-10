@@ -1,13 +1,24 @@
-import Module from "../models/Module";
+import Module from "../SoundModules/Module";
 import { Line } from "../scaffolding/elements";
 import Lane from "./components/Lane";
-import InputNode from "../models/InputNode";
+import InputNode from "../SoundModules/InputNode";
 import Sprite from "../scaffolding/Sprite";
+
+/**
+ * @namespace Interfaces.PatchDisplay
+ */
+/*
+ * TODO: interfaces should also extend model, so that changes to interface can be tracked better.
+ */
 
 /**
  * @typedef {{x:number,y:number}} MiniVector
  */
 
+/** 
+ * @class PatchDisplay
+ * @extends Sprite
+ */
 class PatchDisplay extends Sprite{
     constructor(){
         super();
@@ -40,7 +51,7 @@ class PatchDisplay extends Sprite{
 
         const updatePatchLines=()=>{
 
-            /** @type {{x1:number,y1:number,x2:number,y2:number}[]} */
+            /** @type {Array<{x1:number,y1:number,x2:number,y2:number}>} */
             const coords = [];
 
             /**

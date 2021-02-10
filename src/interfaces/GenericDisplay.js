@@ -2,7 +2,7 @@ import Sprite from "../scaffolding/Sprite";
 import { Circle, Line, Path, Text } from "../scaffolding/elements";
 
 import Lane from "./components/Lane";
-import Module from "../models/Module";
+import Module from "../SoundModules/Module";
 import WaveDisplay from "./components/WaveDisplay";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
@@ -11,6 +11,13 @@ import Model from "../scaffolding/Model";
 import Hoverable from "./components/Hoverable";
 import round from "../utils/round";
 
+/**
+ * @namespace Interfaces.GenericDisplay
+ */
+/** 
+ * @class GenericDisplay
+ * @extends WaveLane
+ */
 class GenericDisplay extends WaveLane{
 
     /** @param {Object<String,Model|string|number>} options */

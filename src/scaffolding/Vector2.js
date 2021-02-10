@@ -1,3 +1,14 @@
+/**
+ * @typedef {Object} MiniVector
+ * @property {number} [x]
+ * @property {number} [y]
+ * @export MiniVector
+ */
+
+/**
+ * @class Vector 2
+ * @param {Vector2|MiniVector} options
+ */
 function Vector2(options={x:0,y:0}){
     this.x=options.x;
     this.y=options.y;
@@ -16,7 +27,7 @@ function Vector2(options={x:0,y:0}){
     this.clone=()=>{
         return new Vector2(this);
     }
-    /** @param {Vector2|{x?:number,y?:number}} to */
+    /** @param {Vector2|MiniVector} to */
     this.set=(to)=>{
         if(to.x!==undefined) this.x=to.x;
         if(to.y!==undefined) this.y=to.y;
@@ -25,7 +36,7 @@ function Vector2(options={x:0,y:0}){
 }
 
 /** 
- * @param {Vector2} vec1 
+ * @param {Vector2|MiniVector} vec1 
  * @param {Vector2} vec2 
  **/
 Vector2.add=(vec1, vec2)=>{
@@ -33,7 +44,7 @@ Vector2.add=(vec1, vec2)=>{
 }
 
 /** 
- * @param {Vector2} vec1 
+ * @param {Vector2|MiniVector} vec1 
  * @param {Vector2} vec2 
  **/
 Vector2.sub=(vec1, vec2)=>{
@@ -41,7 +52,7 @@ Vector2.sub=(vec1, vec2)=>{
 }
 
 /** 
- * @param {Vector2} vec1
+ * @param {Vector2|MiniVector} vec1
  **/
 Vector2.clone=(vec1)=>{
     return (new Vector2(vec1));

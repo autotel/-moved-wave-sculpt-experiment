@@ -1,12 +1,21 @@
 import Module from "./Module";
 import { sampleRate } from "./vars";
 
+/**
+ * @namespace SoundModules.Module
+ */
+
 const defaultSettings={
     feedback:0.5,
     time:0.2, //seconds
     dry:1,
+    wet:0.5,
 };
 
+/**
+ * @class Delay
+ * @extends Module
+ */
 class Delay extends Module{
     constructor(userSettings = {}) {
         //apply default settings for all the settings user did not provide
@@ -18,11 +27,12 @@ class Delay extends Module{
         super(settings);
 
         this.hasInput("main");
-        // this.hasInput("feedback");
-        // this.hasInput("time");
+        this.hasInput("feedback");
+        this.hasInput("time");
 
         
         this.recalculate = (recursion = 0) => {
+
             this.cachedValues = [];
             let delayCache = [];
             
@@ -35,14 +45,14 @@ class Delay extends Module{
                 if(!this.cachedValues[sampleNumber]) this.cachedValues[sampleNumber]=0;
                 
                 if(settings.dry>0){
-                    this.cachedValues[sampleNumber] += value;
+                    this.cachedValues[sampleNumber] += value * settings.dry;
                 }
                 if(len > delayInSamples){
-                    this.cachedValues[sampleNumber] += delayCache.shift();
-                    
-                    if(settings.feedback > 0){
-                        delayCache[delayCache.length - 1] += this.cachedValues[sampleNumber] * settings.feedback;
-                    }
+                    this.cachedValues[sampleNumber] += delayCache.shift() * settings.wet;
+
+                }
+                if(settings.feedback > 0){
+                    delayCache[len - 2] += this.cachedValues[sampleNumber] * settings.feedback;
                 }
 
             });

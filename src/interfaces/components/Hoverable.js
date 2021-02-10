@@ -1,19 +1,13 @@
 import Vector2 from "../../scaffolding/Vector2"
-
 /**
- * thing that can be dragged. It does not implement actual updating of position,
- * as it doesn't assume the object to have certain properties for position or 
- * certain render methods. The user must implement by using dragCallback function
- * override
- */
-
-/**
- * @typedef {Object} HasClassList
+ * @typedef {Node} NodeWithClassList
  * @property {Set<string>} classList
- * @typedef {Node & HasClassList} NodeWithClassList
  * @exports NodeWithClassList
  */
 
+/**
+ * thing that can be hovered.
+ */
 /** @param {HTMLElement|SVGElement} domElement */
 function Hoverable(domElement){
 

@@ -1,6 +1,10 @@
 import Module from "./Module";
 import {sampleRate} from "./vars";
 
+/**
+ * @namespace SoundModules.Oscillator
+ */
+
 const defaultSettings={
     amplitude:1,
     bias:0,
@@ -9,15 +13,21 @@ const defaultSettings={
     shape:"sin",
 };
 
+/** 
+ * @typedef {Object} OscillatorOptions
+ * @property {number} [amplitude]
+ * @property {number} [bias]
+ * @property {number} [length]
+ * @property {number} [frequency]
+ * @property {"sin"|"cos"|"ramp"|"noise"|"offset"} [shape]
+ */
+/**
+ * @class Oscillator 
+ * @extends Module
+ */
 class Oscillator extends Module{
     /**
-     * @param {{
-     * amplitude?:number,
-     * bias?:number,
-     * length?:number,
-     * frequency?:number,
-     * shape?:"sin"|"cos"|"offset"
-     * }} userSettings
+     * @param {OscillatorOptions} userSettings
      */
     constructor(userSettings = {}) {
         //apply default settings for all the settings user did not provide

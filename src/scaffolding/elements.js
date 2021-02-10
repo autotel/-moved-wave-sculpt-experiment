@@ -1,9 +1,16 @@
 
+
+/**
+ * @typedef {Object<String,any>} ComponentOptions
+ * @property {number} [x]
+ * @property {number} [y]
+ */
+
 /**
  * Defines a drawable object which can be attached to a Sprite or a Group
  */
 class Component {
-    /** @param {Object} myOptions */
+    /** @param {ComponentOptions} myOptions */
     constructor(myOptions = { x: 0, y: 0 }) {
         /** @type {SVGElement|undefined} */
         this.domElement=undefined;
@@ -31,9 +38,13 @@ class Component {
     }
 }
 
+/**
+ * @typedef {ComponentOptions} CircleOptions
+ * @param {number} [radius]
+ */
 class Circle extends Component{
     /**
-     * @param {{cx?:number, cy?:number, r?:number}} myOptions
+     * @param {CircleOptions} myOptions
      **/
     constructor(myOptions = {
         cx: 0, cy: 0, r: 50
@@ -45,9 +56,12 @@ class Circle extends Component{
     }
 }
 
+/**
+ * @typedef {ComponentOptions} PathOptions
+ */
 class Path extends Component{
     /**
-     * @param {Object} myOptions
+     * @param {PathOptions} myOptions
      **/
     constructor(myOptions = {
         d: `M 10,30
@@ -62,16 +76,17 @@ class Path extends Component{
         this.update();
     }
 }
+
+/**
+ * @typedef {ComponentOptions} RectangleOptions
+ * @property {string} [fill]
+ * @property {number} [width]
+ * @property {number} [height]
+ */
 class Rectangle extends Component {
     
     /**
-     * @param {{
-     * fill?:string,
-     * x?:number,
-     * y?:number,
-     * width?:number,
-     * height?:number
-     * }} myOptions
+     * @param {RectangleOptions} myOptions
      **/
     constructor(myOptions = {
         x: 0, y: 0, width: 100, height: 100
@@ -81,10 +96,13 @@ class Rectangle extends Component {
         this.update();
     }
 }
+
+/**
+ * @typedef {ComponentOptions} LineOptions
+ */
 class Line extends Component {
-    
     /**
-     * @param {Object} myOptions
+     * @param {LineOptions} myOptions
      **/
     constructor(myOptions = {
         x1: 0, y1: 80, x2: 100, y2: 20
@@ -96,10 +114,11 @@ class Line extends Component {
     }
 }
 
+/**
+ * @typedef {ComponentOptions} GroupOptions
+ */
 class Group extends Component {
-    /**
-     * @param {Object} myOptions
-     **/
+    /** @param {GroupOptions} myOptions */
     constructor(myOptions = {
         x: 0, y: 0,
     }) {
@@ -113,10 +132,14 @@ class Group extends Component {
         this.update();
     }
 }
+
+
+/**
+ * @typedef {ComponentOptions} TextOptions
+ */
 class Text extends Component {
-    /**
-     * @param {Object} myOptions
-     **/
+
+    /** @param {ComponentOptions} myOptions */
     constructor(myOptions = {
         x: 0, y: 0, text: "---"
     }) {

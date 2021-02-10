@@ -1,20 +1,34 @@
 import Vector2 from "../../scaffolding/Vector2"
+const VectorTypedef = require("../../scaffolding/Vector2");
 
 /**
+ * @typedef {VectorTypedef.MiniVector} MiniVector
+ */
+
+/**
+ * @typedef {MiniVector} DragPosition
+ * @property {MiniVector} start
+ * @property {MiniVector} delta
+ * 
+ **/
+
+/**
+ * @typedef {Node} NodeWithClassList
+ * @property {Set<string>} classList
+ * @exports NodeWithClassList
+ */
+
+
+
+/**
+ * @class Draggable
+ * 
  * thing that can be dragged. It does not implement actual updating of position,
  * as it doesn't assume the object to have certain properties for position or 
  * certain render methods. The user must implement by using dragCallback function
  * override
- */
-
-/**
- * @typedef {Object} HasClassList
- * @property {Set<string>} classList
- * @typedef {Node & HasClassList} NodeWithClassList
- * @exports NodeWithClassList
- */
-
-/** @param {HTMLElement|SVGElement} domElement */
+ *  @constructor 
+ *  @param {HTMLElement|SVGElement} domElement */
 function Draggable(domElement){
 
     const position = new Vector2();
@@ -67,23 +81,13 @@ function Draggable(domElement){
     }
     this.dragEndCallback=(mouse)=>{
     }
-    /** @param {{
-     * x:number,
-     * y:number,
-     * delta:{
-     *     x:number,
-     *     y:number,
-     * },
-     * start:{
-     *     x:number,
-     *     y:number,
-     * }
-     * }} newPosition */
+    
+    /** @param {DragPosition} newPosition */
     this.positionChanged=(newPosition)=>{
 
     }
 
-    /** @param {Vector2|{x?:number,y?:number}} newPosition */
+    /** @param {Vector2|MiniVector} newPosition */
     this.setPosition=(newPosition)=>{
         position.set(newPosition);
         this.positionChanged(newPosition);

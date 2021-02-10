@@ -1,5 +1,5 @@
 import Model from "../scaffolding/Model";
-import { sampleRate } from "../models/vars";
+import { sampleRate } from "../SoundModules/vars";
 
 class ValuePixelTranslator {
     /**
