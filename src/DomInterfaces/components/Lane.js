@@ -63,7 +63,7 @@ class Lane extends Sprite{
         //position this lane at a distance from top, proportional to it's height,
         this.handyPosition=(posNumber)=>{
             draggable.setPosition({
-                y:posNumber * (settings.height + settings.handleHeight)
+                y:posNumber * (settings.height + settings.handleHeight + 20)
             });
             handleMoved();
             return this;
@@ -104,13 +104,13 @@ class Lane extends Sprite{
                 inputPositions={};
                 Object.keys(model.inputs).map((inputName,index)=>{
                     const newInputPosition={
-                        x:settings.width + index * 20 + 10,
-                        y:settings.height - index * 20 + 10,
+                        x:settings.width + 10,
+                        y:settings.height - index * 20 - 10,
                         absolute:{},
                         input:model.inputs[inputName],
                     };
                     newInputPosition.absolute.x=newInputPosition.x + settings.x;
-                    newInputPosition.absolute.y=newInputPosition.y + settings.y;
+                    newInputPosition.absolute.y=newInputPosition.y + settings.y + 10;
                     inputPositions[inputName] = newInputPosition;
                 });
             // }
@@ -123,7 +123,7 @@ class Lane extends Sprite{
             }
             ret.absolute={
                 x:ret.x + settings.x,
-                y:ret.y + settings.y,
+                y:ret.y + settings.y + 5,
             };
             return ret;
         };

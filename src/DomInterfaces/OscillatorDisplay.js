@@ -14,24 +14,42 @@ import Model from "../scaffolding/Model";
 import GenericDisplay from "./GenericDisplay";
 
 /**
- * @namespace Interfaces.EnvelopeGeneratorDisplay
+ * @namespace DomInterface.OscillatorDisplay
  */
+
 /** 
- * @class EnvelopeGeneratorDisplay
+ * @class OscillatorDisplay
  * @extends WaveLane
  */
-class EnvelopeGeneratorDisplay extends WaveLane{
+class OscillatorDisplay extends WaveLane{
     /** @param {Object<String,Model|string|number>} options */
     constructor (options){
         const model = options.model;
         const settings=typicalLaneSettings(model);
         //plave for defaults
-        settings.name="Envelope";
+        settings.name="Oscillator";
         Object.assign(settings,options);
 
         const translator=new ValuePixelTranslator(settings);
 
         super(translator,settings);
+
+        // const xToFrequency = (x)=>{
+        //     const pixelRange=settings.width;
+        //     return Math.pow(2,(x/pixelRange)*15);
+        // }
+        const xToFrequency = (x)=>{
+            const period = translator.xToSeconds(x);
+            const freq = 1/period;
+            return freq;
+        }
+        const freqToX = (freq)=>{
+            const period = 1/freq;
+            const x = translator.secondsToX(period);
+            return x;
+        }
+
+        const yToAmplitude = translator.yToAmplitude;
 
         //lane has a contents sprite.
         const contents=this.contents;
@@ -45,42 +63,40 @@ class EnvelopeGeneratorDisplay extends WaveLane{
 
 
         //TODO: some knob or text field
-        const handles=[
-            new Circle({r:10}),
-            new Circle({r:10}),
-            new Circle({r:10}),
-            new Circle({r:10}),
-            new Circle({r:10}),
-        ];
+        const frequencyHandle = new Circle({r:10});
 
-        handles.map((handle)=>handle.point = [0,0]);
-        handles.map((handle)=>{
-            const frequencyDraggable=new Draggable(handle.domElement);
+        const frequencyDraggable=new Draggable(frequencyHandle.domElement);
+        const proportionalDraggable=new Draggable(this.waveDisplay.domElement);
 
-            //TODO: more elegant way
-            
-            frequencyDraggable.positionChanged=(pos)=>{
-                handle.attributes.cx=pos.x;
-                handle.attributes.cy=pos.y;
-                handle.update();
-                handle.point=[
-                    translator.xToSampleNumber(pos.x),
-                    translator.yToAmplitude(pos.y)
-                ];
-                model.setPoints(handles.map((handleEach)=>handleEach.point));
-            }
-            contents.add(handle);
-    
-    
-            frequencyDraggable.setPosition(new Vector2());
-    
-            // frequencyDraggable.dragStartCallback=(mouse)=>{
-            //     handles[].set("r",1);
-            // }
-            // frequencyDraggable.dragEndCallback=(mouse)=>{
-            //     handles[].set("r",10);
-            // }
-        });
+        proportionalDraggable.setPosition({x:0,y:0});
+        frequencyDraggable.positionChanged=(newPosition)=>{
+            frequencyHandle.attributes.cx=newPosition.x;
+            frequencyHandle.attributes.cy=newPosition.y;
+            frequencyHandle.update();
+            model.setFrequency(xToFrequency(newPosition.x));
+            model.setAmplitude(yToAmplitude(newPosition.y));
+        }
+
+        let pixFreqOnDragStart;
+        proportionalDraggable.dragStartCallback=(mouse)=>{
+            pixFreqOnDragStart = freqToX(model.settings.frequency);
+        }
+        proportionalDraggable.positionChanged=(pos)=>{
+            model.setFrequency(
+                xToFrequency(pixFreqOnDragStart + pos.delta.x )
+            );
+        }
+
+        contents.add(frequencyHandle);
+
+        frequencyDraggable.setPosition({x:0,y:0});
+
+        frequencyDraggable.dragStartCallback=(mouse)=>{
+            frequencyHandle.set("r",1);
+        }
+        frequencyDraggable.dragEndCallback=(mouse)=>{
+            frequencyHandle.set("r",10);
+        }
 
         model.onUpdate((changes)=>{
             if(
@@ -102,4 +118,4 @@ class EnvelopeGeneratorDisplay extends WaveLane{
     }
 };
 
-export default EnvelopeGeneratorDisplay;
+export default OscillatorDisplay;

@@ -1,4 +1,4 @@
-import Lane from "../interfaces/components/Lane";
+import Lane from "../DomInterfaces/components/Lane";
 
 class Model {
     constructor(settings) {

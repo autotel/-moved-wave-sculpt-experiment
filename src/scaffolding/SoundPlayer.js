@@ -1,7 +1,7 @@
 import Module from "../SoundModules/Module";
 import { sampleRate, audioContext } from "../SoundModules/vars";
-import Lane from "../interfaces/components/Lane";
-import { Rectangle } from "./elements";
+import Lane from "../DomInterfaces/components/Lane";
+import { Rectangle, Path } from "./elements";
 
 
 class SoundPlayer{
@@ -55,11 +55,30 @@ class SoundPlayer{
         /** @param {Module} module */
         this.appendModule = (module)=>{
             console.log("module appended to player");
-            const playButton = new Rectangle({
-                x:position.x, 
-                y:position.y, 
-                width:position.width,
-                height:position.height
+            //rect
+            let c1=`${position.x}, ${position.y}`;
+            let c2=`${position.x + position.width}, ${position.y}`;
+            let c3=`${position.x + position.width}, ${position.y + position.height}`;
+            let c4=`${position.x}, ${position.y + position.height}`;
+            let triW = position.width / 5;
+            let triH = position.width / 5;
+            let triStartX = position.x + position.width/2 - triW/2;
+            let triStartY = position.y + position.height/2 - triH/2;
+            //tri
+            let c5=`${triStartX}, ${triStartY}`;
+            let c6=`${triStartX + triW}, ${triStartY + triH / 2}`;
+            let c7=`${triStartX}, ${triStartY + triH}`;
+
+            const playButton = new Path({
+                d: `M ${c1}
+                    Q ${c1} ${c2} 
+                    Q ${c2} ${c3} 
+                    Q ${c3} ${c4}
+                    z
+                    M ${c5}
+                    Q ${c5} ${c6}
+                    Q ${c6} ${c7}
+                    z`,
             });
 
             playButton.domElement.setAttribute("class","button play");

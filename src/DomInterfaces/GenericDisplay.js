@@ -12,7 +12,7 @@ import Hoverable from "./components/Hoverable";
 import round from "../utils/round";
 
 /**
- * @namespace Interfaces.GenericDisplay
+ * @namespace DomInterface.GenericDisplay
  */
 /** 
  * @class GenericDisplay

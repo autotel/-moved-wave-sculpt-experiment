@@ -1,13 +1,17 @@
 import Module from "../SoundModules/Module";
-import { Line } from "../scaffolding/elements";
+import { Line, Path } from "../scaffolding/elements";
 import Lane from "./components/Lane";
 import InputNode from "../SoundModules/InputNode";
 import Sprite from "../scaffolding/Sprite";
+const pathTypes = require("../scaffolding/elements");
+
+/** @typedef {pathTypes.PathOptions} PathOptions */
 
 /**
- * @namespace Interfaces.PatchDisplay
+ * @namespace DomInterface.PatchDisplay
  */
-/*
+
+ /*
  * TODO: interfaces should also extend model, so that changes to interface can be tracked better.
  */
 
@@ -22,7 +26,7 @@ import Sprite from "../scaffolding/Sprite";
 class PatchDisplay extends Sprite{
     constructor(){
         super();
-        /** @type {Line[]} */
+        /** @type {Path[]} */
         const lines=[];
         
         /** @type {Set<Module>}  */
@@ -50,8 +54,7 @@ class PatchDisplay extends Sprite{
         }
 
         const updatePatchLines=()=>{
-
-            /** @type {Array<{x1:number,y1:number,x2:number,y2:number}>} */
+            /** @type {Array<PathOptions>} */
             const coords = [];
 
             /**
@@ -72,15 +75,16 @@ class PatchDisplay extends Sprite{
                         filteredCoordinates.push(outputCoordinates);
                     }
                 })
-
+                let bez=80;
                 filteredCoordinates.map((filteredCoord)=>{
                     const startPos = modulesInterface.getOutputPosition().absolute;
                     const endPos = filteredCoord.absolute;
                     coords.push({
-                        x1:endPos.x,
-                        y1:startPos.y,
-                        x2:endPos.x,
-                        y2:endPos.y,
+                        d:`M ${endPos.x}, ${startPos.y}
+                            C ${endPos.x + bez}, ${startPos.y}
+                              ${endPos.x + bez}, ${endPos.y}
+                              ${endPos.x}, ${endPos.y}
+                            `
                     });
                 });
             }
@@ -96,14 +100,22 @@ class PatchDisplay extends Sprite{
                 });
             });
 
+            lines.map((line)=>{
+                Object.assign(line.attributes,{d:""});
+            });
             coords.map((coord,i)=>{
                 if(!lines[i]){
-                    lines[i]=new Line();
+                    lines[i]=new Path();
                     this.add(lines[i]);
                 }
                 Object.assign(lines[i].attributes,coord);
-                lines[i].update();
+                lines[i].attributes.class="patchcord";
             });
+
+            lines.map((line)=>{
+                line.update();
+            });
+
         }
 
     }

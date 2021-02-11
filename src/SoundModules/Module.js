@@ -44,6 +44,10 @@ class Module extends Model{
             });
         };
 
+        this.eachOutput = (callback) => {
+            this.outputs.forEach(callback);
+        }
+
         /** 
          * @function connectTo connect the output of this module to one input of another module. The module's produced samples will affect the inputNode's owner according to the module's recalculate function
          * @param {InputNode} inputNode */
@@ -58,16 +62,20 @@ class Module extends Model{
         };
         /** 
          * @function disconnect disconnect this module from an input node. The module will not cause effects in the other module's input any more.
-         * @param {InputNode} inputNode
+         * @param {InputNode | false } inputNode if not given, it will disconnect all the modules to which this module outputs
          */
-        this.disconnect = (inputNode) => {
-            if (inputNode.input) {
-                inputNode.input=undefined;
+        this.disconnect = (inputNode = false) => {
+            if(inputNode){
+                if (inputNode.input) {
+                    inputNode.input=undefined;
+                }
+                this.outputs.delete(inputNode);
+                this.changed({
+                    outputs:this.outputs,
+                });
+            }else{
+                this.eachOutput(this.disconnect);
             }
-            this.outputs.delete(inputNode);
-            this.changed({
-                outputs:this.outputs,
-            });
         };
         
         let useCache = false;
