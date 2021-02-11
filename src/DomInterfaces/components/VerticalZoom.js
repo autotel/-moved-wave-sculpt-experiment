@@ -17,24 +17,24 @@ class VerticalZoom extends Group{
         
         super();
 
-        const yToZoom=(y)=>{
+        const yToRange=(y)=>{
             const r = zoomSettings.range;
             const h = settings.height;
-            return (Math.pow(2, Math.pow(y / h,4)) - 1) * r;
+            return (Math.pow(2, Math.pow(y / h,12)) - 1) * r;
         }
 
-        const zoomToY=(zoom)=>{
+        const rangeToY=(zoom)=>{
             const z = zoom;
             const r = zoomSettings.range;
             const h = settings.height;
-            throw new Error("not implemeted");
+            return h * Math.pow(Math.log((z/r)+1)/Math.LN2,1/12);
         }
 
-        // console.log(` ${33.44} ==? ${yToZoom(zoomToY(33.44))}`);
-        // console.log(` ${33.44} ==? ${yToZoom(zoomToY(33.44))}`);
+        // console.log(` ${33.44} ==? ${yToRange(rangeToY(33.44))}`);
+        // console.log(` ${33.44} ==? ${yToRange(rangeToY(33.44))}`);
 
-        // console.log(` ${24.421} ==? ${yToZoom(zoomToY(24.421))}`);
-        // console.log(` ${24.421} ==? ${yToZoom(zoomToY(24.421))}`);
+        // console.log(` ${24.421} ==? ${yToRange(rangeToY(24.421))}`);
+        // console.log(` ${24.421} ==? ${yToRange(rangeToY(24.421))}`);
 
         const readoutText =  new Text({
             class:"zoom-level",
@@ -50,6 +50,7 @@ class VerticalZoom extends Group{
             y: settings.height,
         });
         this.add(handleRect);
+        
 
 
 
@@ -59,12 +60,14 @@ class VerticalZoom extends Group{
             y: handleRect.attributes.y,
         }));
 
-        this.changeCallback=()=>{}
-
         draggable.dragStartCallback = (mouse) => {};
         draggable.dragEndCallback = (mouse) => {};
+        
         draggable.positionChanged = (newPosition) => {
-            settings.rangeAmplitude = yToZoom(newPosition.y);
+            // settings.rangeAmplitude = yToRange(newPosition.y);
+            translator.change({
+                rangeAmplitude:yToRange(newPosition.y)
+            });
 
             handleRect.set("y",newPosition.y);
 
@@ -72,10 +75,23 @@ class VerticalZoom extends Group{
                 y:handleRect.attributes.y + 5,
                 text:round(settings.rangeAmplitude,2),
             });
-            readoutText.update();
-            this.changeCallback();
 
+            readoutText.update();
         };
+
+        //if something else changes zoom, update the scroller
+        translator.onChange((changes)=>{
+            if(changes.rangeAmplitude){
+                const ypos=rangeToY(changes.rangeAmplitude);
+                handleRect.set("y",ypos);
+                draggable.setPosition({y:ypos},false)
+                Object.assign(readoutText.attributes,{
+                    y:ypos + 5,
+                    text:round(settings.rangeAmplitude,2),
+                });
+
+            }
+        });
 
         const superSet = this.set;
 

@@ -129,6 +129,9 @@ class Group extends Component {
         this.add = (elem) => {
             this.domElement.appendChild(elem.domElement);
         };
+        this.remove = (elem) => {
+            this.domElement.removeChild(elem.domElement);
+        }
         this.update();
     }
 }

@@ -10,6 +10,8 @@ import OscillatorDisplay from "../DomInterfaces/OscillatorDisplay";
 import EnvelopeGeneratorDisplay from "../DomInterfaces/EnvelopeGeneratorDisplay";
 import Filter from "../SoundModules/Filter";
 import MixerTesselator from "../SoundModules/MixerTesselator";
+import Model from "../scaffolding/Model";
+import Module from "../SoundModules/Module";
 
 
 class LiveCodingInterface{
@@ -25,7 +27,10 @@ class LiveCodingInterface{
 
         this.modules = {};
 
-        /** @param {string|false} name */
+        /** 
+         * @param {string|false} name
+         * @returns {Module} 
+         **/
         this.create=function(Which,name=false){
             let protoname=Which.name;
 

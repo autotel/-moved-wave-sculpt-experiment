@@ -1,7 +1,6 @@
 import { Path } from "../../scaffolding/elements";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
-import VerticalZoom from "./VerticalZoom";
-import Hoverable from "./Hoverable";
+
 
 class WaveDisplay extends Path{
     /** @param {ValuePixelTranslator} translator */

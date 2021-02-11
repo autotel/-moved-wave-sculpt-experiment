@@ -1,18 +1,15 @@
-import Sprite from "../scaffolding/Sprite";
-import { Circle, Line, Path, Text } from "../scaffolding/elements";
-import Lane from "./components/Lane";
+
+import { Circle, Text } from "../scaffolding/elements";
 import Draggable from "./components/Draggable";
 import Vector2 from "../scaffolding/Vector2";
-import Oscillator from "../SoundModules/Oscillator";
 import round from "../utils/round";
-import WaveDisplay from "./components/WaveDisplay";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
-import VerticalZoom from "./components/VerticalZoom";
 import WaveLane from "./LaneTypes/WaveLane";
 import Model from "../scaffolding/Model";
-import GenericDisplay from "./GenericDisplay";
-
+import EnvelopeGenerator from "../SoundModules/EnvelopeGenerator";
+const vectorTypes = require("../scaffolding/Vector2");
+/** @typedef {vectorTypes.MiniVector} MiniVector
 /**
  * @namespace DomInterface.EnvelopeGeneratorDisplay
  */
@@ -23,6 +20,7 @@ import GenericDisplay from "./GenericDisplay";
 class EnvelopeGeneratorDisplay extends WaveLane{
     /** @param {Object<String,Model|string|number>} options */
     constructor (options){
+        /** @type {EnvelopeGenerator} */
         const model = options.model;
         const settings=typicalLaneSettings(model);
         //plave for defaults
@@ -43,45 +41,97 @@ class EnvelopeGeneratorDisplay extends WaveLane{
         });
         contents.add(readoutText);
 
+        class Handle extends Circle {
+            constructor(settings){
+                let circleSettings = {r:10};
+                Object.apply(circleSettings,settings);
+                super(circleSettings);
+                this.point=[0,0];
+                const draggable = this.draggable = new Draggable(this.domElement);
+                
+                /** @param {MiniVector} pos */
+                draggable.positionChanged=(pos)=>{
+                    this.handleGuiChangedPoint(pos);
+                }
 
-        //TODO: some knob or text field
+                let activated=false;
+                
+                /**
+                 * change handle position visually and propagate the result to the model. 
+                 * @param {MiniVector} pos
+                 **/
+                this.handleGuiChangedPoint = (pos) =>{
+                    //display the change in the gui
+                    this.attributes.cx=pos.x;
+                    this.attributes.cy=pos.y;
+                    this.update();
+
+                    //update the point belonging to the model
+                    this.point[0]=translator.xToSampleNumber(pos.x);
+                    this.point[1]=translator.yToAmplitude(pos.y);
+
+                    //let the model know of the change
+                    let newPoints=handles.map((h)=>h.point);//.sort();
+                    // model.setPoints(model.settings.points);
+                    model.setPoints(newPoints);
+                }
+                /**
+                 * update the handle's point coordinates and cause
+                 * this change to be reflected visually
+                 * @param {Array<number>} point [sample number, level]
+                 */
+                this.handleModelChangedPoint = () => {
+                    const point = this.point;
+                    let pos = {
+                        x:translator.sampleNumberToX(point[0]),
+                        y:translator.amplitudeToY(point[1]),
+                    }
+                    draggable.setPosition(pos,false);
+                    this.attributes.cx=pos.x;
+                    this.attributes.cy=pos.y;
+                    this.update();
+                }
+
+                this.activate = ()=>{ 
+                    if(!activated) contents.add(this);
+                    activated=true;
+                }
+                this.deactivate = ()=>{
+                    if(activated)contents.remove(this);
+                    activated=false;
+                }
+            }
+        }
+        
         const handles=[
-            new Circle({r:10}),
-            new Circle({r:10}),
-            new Circle({r:10}),
-            new Circle({r:10}),
-            new Circle({r:10}),
+            new Handle(),
         ];
 
-        handles.map((handle)=>handle.point = [0,0]);
-        handles.map((handle)=>{
-            const frequencyDraggable=new Draggable(handle.domElement);
-
-            //TODO: more elegant way
-            
-            frequencyDraggable.positionChanged=(pos)=>{
-                handle.attributes.cx=pos.x;
-                handle.attributes.cy=pos.y;
-                handle.update();
-                handle.point=[
-                    translator.xToSampleNumber(pos.x),
-                    translator.yToAmplitude(pos.y)
-                ];
-                model.setPoints(handles.map((handleEach)=>handleEach.point));
+        function updatePointsPositions(points){
+            points.map((point,index)=>{
+                if(!handles[index]){
+                    handles[index]=new Handle();
+                    handles[index].point=point;
+                }
+                handles[index].handleModelChangedPoint();
+                handles[index].activate();
+            });
+            //undisplay remaining handles, if any
+            for(let index = points.length; index < handles.length; index++){
+                handles[index].deactivate();
             }
-            contents.add(handle);
-    
-    
-            frequencyDraggable.setPosition(new Vector2());
-    
-            // frequencyDraggable.dragStartCallback=(mouse)=>{
-            //     handles[].set("r",1);
-            // }
-            // frequencyDraggable.dragEndCallback=(mouse)=>{
-            //     handles[].set("r",10);
-            // }
+        }
+        handles.map((handle)=>{
+            const frequencyDraggable=handle.draggable;
+            handle.activate();
         });
 
+        //helps moving points according to zoom level
+        translator.onChange((changes)=>{
+            updatePointsPositions(model.settings.points);
+        });
+        
+        //let us represent changes in the module graphically
         model.onUpdate((changes)=>{
             if(
                 changes.frequency!==undefined ||
@@ -95,6 +145,9 @@ class EnvelopeGeneratorDisplay extends WaveLane{
                     }U ${
                         model.settings.frequency>(settings.rangeSamples/10)?"(ALIASED)":""
                     }`);
+            }
+            if(changes.points){
+                updatePointsPositions(changes.points);
             }
         });
 

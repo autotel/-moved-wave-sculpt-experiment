@@ -1,18 +1,31 @@
 import Model from "../scaffolding/Model";
 import { sampleRate } from "../SoundModules/vars";
 
+/**
+ * @export @typedef {{
+*  rangeAmplitude:number,
+*  rangeSamples:number,
+*  centerAmplitude:number,
+*  centerSample:number,
+*  width:number,
+*  height:number,
+*  model:Model,
+* }} ValuePixelTranslatorParams
+*/
+/**
+ * @export @typedef {Object} ValuePixelChanges 
+ * @param {number} [rangeAmplitude]
+ * @param {number} [rangeSamples]
+ * @param {number} [centerAmplitude]
+ * @param {number} [centerSample]
+ * @param {number} [width]
+ * @param {number} [height]
+ * @param {Model} [model]
+ * }} 
+*/
+    
 class ValuePixelTranslator {
     /**
-     * @export @typedef {{
-     *  rangeAmplitude:number,
-     *  rangeSamples:number,
-     *  centerAmplitude:number,
-     *  centerSample:number,
-     *  width:number,
-     *  height:number,
-     *  model:Model,
-     * }} ValuePixelTranslatorParams
-     * 
      * reference to settings objects, which may be changed at runtime
      * causing changes in the scale in this object.
      * @param {ValuePixelTranslatorParams} settings
@@ -21,6 +34,41 @@ class ValuePixelTranslator {
         const model = settings.model;
         const modelSettings = model.settings;
         this.settings=settings;
+        
+        Object.seal(this.settings);
+        let changedListeners = [];
+        /**
+         * @param {Function}  callback
+         */
+        this.onChange = (callback)=>{
+            changedListeners.push(callback);
+        }
+
+        /** if you manually change some parameters, call this after, so that it can trigger the listeners accordingly. */
+        this.handleChanged = (changes)=>{
+            changedListeners.map((cb)=>cb(changes));
+        }
+
+        /**
+         * Use this to change parameters such as zoom, center etc. and call any listener.
+         * Also, call this without argument to just call the callbacks; for example when you need to get the initial state represented.
+         * @param {ValuePixelChanges} settings 
+         */
+        this.change=(settings={})=>{
+            Object.assign(this.settings,settings);
+            this.handleChanged(settings);
+        }
+
+        /**
+         * handy function to set the zoom/pan in such way that maxValue translates to maxPixel
+         */
+        this.coverVerticalRange=(minValue,maxValue)=>{
+            const range=maxValue-minValue;
+            this.change({
+                rangeAmplitude: range,
+                centerAmplitude: minValue + (range/2),
+            });
+        };
 
         /** pixel number to amplitude */
         this.yToAmplitude = (y) => {

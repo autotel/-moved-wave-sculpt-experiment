@@ -88,9 +88,9 @@ function Draggable(domElement){
     }
 
     /** @param {Vector2|MiniVector} newPosition */
-    this.setPosition=(newPosition)=>{
+    this.setPosition=(newPosition, callback=true)=>{
         position.set(newPosition);
-        this.positionChanged(newPosition);
+        if(callback) this.positionChanged(newPosition);
     }
 
     domElement.classList.add("draggable");

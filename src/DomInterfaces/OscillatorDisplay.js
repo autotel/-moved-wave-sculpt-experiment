@@ -8,7 +8,6 @@ import round from "../utils/round";
 import WaveDisplay from "./components/WaveDisplay";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
-import VerticalZoom from "./components/VerticalZoom";
 import WaveLane from "./LaneTypes/WaveLane";
 import Model from "../scaffolding/Model";
 import GenericDisplay from "./GenericDisplay";

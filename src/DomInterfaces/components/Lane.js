@@ -37,6 +37,9 @@ class Lane extends Sprite{
         settings.handleHeight=10;
         
         super(options.name || "lane");
+
+        this.autoZoom = () => {}
+        
         Object.assign(settings, options);
         // this.settings=settings;
         
@@ -60,6 +63,7 @@ class Lane extends Sprite{
             fill: "transparent",
         });
         handleRect.domElement.classList.add("lane-handle");
+
         //position this lane at a distance from top, proportional to it's height,
         this.handyPosition=(posNumber)=>{
             draggable.setPosition({
@@ -116,6 +120,7 @@ class Lane extends Sprite{
             // }
             return inputPositions;
         }
+
         this.getOutputPosition=()=>{
             let ret = {
                 x:settings.width+10,
@@ -171,10 +176,7 @@ class Lane extends Sprite{
             text: settings.name
         });
         this.contents.add(title);
-
-
     }
-}
-;
+};
 
 export default Lane;
