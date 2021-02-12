@@ -78,6 +78,13 @@ class Module extends Model{
             }
         };
         
+        this.set=(changes = {})=>{
+            Object.assign(this.settings,changes);
+            this.changed(changes);
+            this.cacheObsolete();
+            return this;
+        }
+
         let useCache = false;
 
         /**

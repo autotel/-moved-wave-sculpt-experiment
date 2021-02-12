@@ -10,7 +10,6 @@ import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
 import Model from "../scaffolding/Model";
-import GenericDisplay from "./GenericDisplay";
 
 /**
  * @namespace DomInterface.OscillatorDisplay
@@ -33,6 +32,9 @@ class OscillatorDisplay extends WaveLane{
 
         super(translator,settings);
 
+        const frequencyKnob = this.addParameterKnob("frequency");
+        const amplitudeKnob = this.addParameterKnob("amplitude");
+        const biasKnob = this.addParameterKnob("bias");
         // const xToFrequency = (x)=>{
         //     const pixelRange=settings.width;
         //     return Math.pow(2,(x/pixelRange)*15);

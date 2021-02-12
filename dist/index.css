@@ -80,3 +80,6 @@ svg .patchcord:nth-child(5n+3){
 svg .patchcord:nth-child(5n+4){
     stroke: rgb(255, 0, 200);
 }
+.lane{
+    /* overflow: hidden; */
+}

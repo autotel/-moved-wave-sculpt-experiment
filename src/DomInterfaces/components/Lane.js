@@ -7,6 +7,7 @@ import Model from "../../scaffolding/Model";
 import Module from "../../SoundModules/Module";
 import InputNode from "../../SoundModules/InputNode";
 import Hoverable from "./Hoverable";
+import Knob from "./Knob";
 const VectorTypedef = require("../../scaffolding/Vector2");
 
 /**
@@ -23,9 +24,9 @@ const VectorTypedef = require("../../scaffolding/Vector2");
 
 /**
  * @class Lane
- * @extends Sprite
+ * @extends Group
  * */
-class Lane extends Sprite{
+class Lane extends Group{
     /**
      * @param {LaneOptions} options
      */
@@ -36,7 +37,9 @@ class Lane extends Sprite{
 
         settings.handleHeight=10;
         
-        super(options.name || "lane");
+        super(options);
+
+        this.domElement.classList.add("lane"),
 
         this.autoZoom = () => {}
         
@@ -49,6 +52,7 @@ class Lane extends Sprite{
         this.onMoved=(callback)=>{
             movedCallbacks.push(callback);
         }
+
         const handleMoved=()=>{
             movedCallbacks.map((cb)=>cb());
         }
@@ -67,16 +71,29 @@ class Lane extends Sprite{
         //position this lane at a distance from top, proportional to it's height,
         this.handyPosition=(posNumber)=>{
             draggable.setPosition({
-                y:posNumber * (settings.height + settings.handleHeight + 20)
+                y:posNumber * (settings.height + settings.handleHeight + 5)
             });
             handleMoved();
             return this;
+        }
+
+        let knobsCount = 0;
+        /** @param {string} parameterName */
+        this.addParameterKnob=(parameterName)=>{
+            const newKnob = new Knob({x:options.width - 50 * knobsCount++ - 70, y: 80});
+            newKnob.setToModuleParameter(model,parameterName);
+            this.contents.add(newKnob);
+            return newKnob;
         }
         
         const draggable = new Draggable(handleRect.domElement);
         draggable.setPosition(settings);
         draggable.positionChanged = (newPosition) => {
             settings.y=newPosition.y;
+            this.set("y",newPosition.y);
+            handleMoved();
+            return;
+
 
             // handleRect.attributes.x = settings.x;
             handleRect.attributes.y = settings.y;

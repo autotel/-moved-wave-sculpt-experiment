@@ -12,6 +12,9 @@ import Filter from "../SoundModules/Filter";
 import MixerTesselator from "../SoundModules/MixerTesselator";
 import Model from "../scaffolding/Model";
 import Module from "../SoundModules/Module";
+import FilterDisplay from "../DomInterfaces/FilterDisplay";
+import DelayDisplay from "../DomInterfaces/DelayDisplay";
+import MixerDisplay from "../DomInterfaces/MixerDisplay";
 
 
 class LiveCodingInterface{
@@ -41,10 +44,22 @@ class LiveCodingInterface{
             switch (protoname){
                 case "Oscillator":
                     newInterface=new OscillatorDisplay({model:newModule,name});
-                    break;
+                break;
                 case "EnvelopeGenerator":
                     newInterface=new EnvelopeGeneratorDisplay({model:newModule,name});
-                    break;
+                break;
+                case "Filter":
+                    newInterface=new FilterDisplay({model:newModule,name});
+                break;
+                case "Delay":
+                    newInterface=new DelayDisplay({model:newModule,name});
+                break;
+                case "MixerTesselator":
+                    newInterface=new MixerDisplay({model:newModule,name});
+                break;
+                case "Mixer":
+                    newInterface=new MixerDisplay({model:newModule,name});
+                break;
                 default:
                     newInterface=new GenericDisplay({model:newModule,name});
             }

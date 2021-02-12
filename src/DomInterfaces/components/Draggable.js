@@ -5,12 +5,6 @@ const VectorTypedef = require("../../scaffolding/Vector2");
  * @typedef {VectorTypedef.MiniVector} MiniVector
  */
 
-/**
- * @typedef {MiniVector} DragPosition
- * @property {MiniVector} start
- * @property {MiniVector} delta
- * 
- **/
 
 /**
  * @typedef {Node} NodeWithClassList
@@ -81,6 +75,12 @@ function Draggable(domElement){
     }
     this.dragEndCallback=(mouse)=>{
     }
+
+    /**
+     * @typedef {MiniVector} DragPosition
+     * @property {MiniVector} start
+     * @property {MiniVector} delta
+     **/
     
     /** @param {DragPosition} newPosition */
     this.positionChanged=(newPosition)=>{

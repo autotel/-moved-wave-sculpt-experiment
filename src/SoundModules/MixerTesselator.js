@@ -5,7 +5,11 @@ import Module from "./Module";
  */
 
 const defaultSettings={
-    amplitude:0.5
+    amplitude:1,
+    levela:0.25,
+    levelb:0.25,
+    levelc:0.25,
+    leveld:0.25,
 };
 /**
  * mixes channels and also tesselates them using sine shaped window.
@@ -33,21 +37,18 @@ class MixerTesselator extends Module{
             this.cachedValues = [];
             let result=[];
             let first = true;
-            this.eachInput((input) => {
+            this.eachInput((input,inputno,inputName) => {
                 const inputValues = input.getValues(recursion);
                 inputValues.map((val, index) => {
                     const currentVal = result[index] ? result[index] : 0;
-                    result[index] = (val + currentVal) * amplitude;
-                    // if(isNaN(result[index])){
-                    //     throw new Error(`is NaN ${result[index]} += (${val} + ${currentVal}) * ${amplitude}`);
-                    // }
+                    result[index] = (val + currentVal) * amplitude * settings["level"+inputName];
                 });
             });
             
             let lengthSamples=result.length;
             let half = Math.floor(lengthSamples/2);
             
-            this.cachedValues = result.map((v,i)=>{ 
+            this.cachedValues = result.map((v,i)=>{
                 let awindow = Math.cos(2 * Math.PI * i/lengthSamples) / 2 + 0.5;
                 let window = 1 - awindow; 
                 if(i>half){

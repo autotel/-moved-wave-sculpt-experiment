@@ -5,7 +5,11 @@ import Module from "./Module";
  */
 
 const defaultSettings={
-    amplitude:0.5
+    amplitude:1,
+    levela:0.25,
+    levelb:0.25,
+    levelc:0.25,
+    leveld:0.25,
 };
 /**
  * @class Mixer
@@ -19,18 +23,21 @@ class Mixer extends Module{
         Object.assign(settings, userSettings);
         const { amplitude } = settings;
         super(settings);
+        
         this.hasInput("a");
         this.hasInput("b");
         this.hasInput("c");
         this.hasInput("d");
+        
         this.recalculate = (recursion = 0) => {
             this.cachedValues = [];
             let first = true;
-            this.eachInput((input) => {
+            this.eachInput((input,number,inputName) => {
+                
                 const inputValues = input.getValues(recursion);
                 inputValues.map((val, index) => {
                     const currentVal = this.cachedValues[index] ? this.cachedValues[index] : 0;
-                    this.cachedValues[index] = (val + currentVal) * amplitude;
+                    this.cachedValues[index] = (val + currentVal) * amplitude * settings["level"+inputName];
                     // if(isNaN(this.cachedValues[index])){
                     //     throw new Error(`is NaN ${this.cachedValues[index]} += (${val} + ${currentVal}) * ${amplitude}`);
                     // }

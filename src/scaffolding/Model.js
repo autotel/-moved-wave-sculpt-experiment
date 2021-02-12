@@ -18,6 +18,12 @@ class Model {
         this.changed = (changes = {}) => {
             redrawList.map((cb) => { cb(changes); });
         };
+
+        this.set=(changes = {})=>{
+            Object.assign(this.settings,changes);
+            this.changed(changes);
+            return this;
+        }
         //get the initial state of the model
         this.triggerInitialState = () => { };
     }

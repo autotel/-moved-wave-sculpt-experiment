@@ -121,6 +121,8 @@ class EnvelopeGeneratorDisplay extends WaveLane{
                 handles[index].deactivate();
             }
         }
+
+        
         handles.map((handle)=>{
             const frequencyDraggable=handle.draggable;
             handle.activate();
