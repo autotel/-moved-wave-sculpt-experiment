@@ -24,6 +24,7 @@ webInspectorInterface.onModuleCreated((newModule,newInterface,count)=>{
 Draggable.setCanvas(drawBoard.element);
 
 //pre-run a live-coded patch
-import drumpat from "./patches/drumpat";
+// import drumpat from "./patches/drumpat";
+import drumpat from "./patches/filterTester";
 
 drumpat(webInspectorInterface);

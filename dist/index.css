@@ -1,85 +1,92 @@
-body{
-    margin:0px;
-    background-color: #010c08;
+body {
+  margin: 0px;
+  background-color: #010c08;
 }
 
-svg{
-    position: absolute;
-    width: 100%;
-    height: 2000px;
+svg {
+  position: absolute;
+  width: 100%;
+  height: 2000px;
+}
+svg * {
+  stroke: #474109;
+  stroke-width: 1;
+  fill: transparent;
+  /* stroke-linecap: butt; */
+  /* stroke-dasharray: 2 2; */
+  transition: fill, stroke 0.1s;
+}
+svg *.active {
+  stroke: #afafa8;
+  fill: rgba(175, 175, 168, 0.377);
+  stroke-width: 1;
+  transition: fill, stroke 0.1s;
+}
+svg .button:hover {
+  fill: rgba(248, 248, 248, 0.055);
+  stroke: #afafa8;
+}
+svg .button.active:hover {
+  fill: rgba(248, 248, 248, 0.452);
+  /* stroke: rgb(175, 175, 168); */
+}
+svg text {
+  font: 10px sans-serif;
+  fill: #bfddf1;
+  stroke-width: 0;
+  pointer-events: none;
+}
+svg .wave-display {
+  stroke: #bfddf1;
+}
+svg .lane-handle {
+  fill: rgba(9, 22, 34, 0.56);
+  stroke-width: 0;
+}
+svg .hover-text {
+  pointer-events: none;
+  /* opacity: 0; */
+}
+svg .hover-text.active {
+  opacity: 1;
+}
+svg .patchcord {
+  stroke-width: 3px;
+  opacity: 0.3;
+  transition: opacity 0.2s;
+  fill: none;
+}
+svg .patchcord:hover {
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+svg .patchcord:nth-child(5n+0) {
+  stroke: #0099ff;
+}
+svg .patchcord:nth-child(5n+1) {
+  stroke: #4c00ff;
+}
+svg .patchcord:nth-child(5n+2) {
+  stroke: #d0ff00;
+}
+svg .patchcord:nth-child(5n+3) {
+  stroke: #ff7300;
+}
+svg .patchcord:nth-child(5n+4) {
+  stroke: #ff00c8;
+}
+svg svg.knob {
+  overflow: visible;
+}
+svg svg.knob.active .knob-value-arc {
+  stroke: #0099ff;
+  stroke-width: 3px;
+}
+svg svg.lane, svg svg {
+  overflow: visible;
+}
+svg .lane {
+  /* overflow: hidden; */
 }
 
-svg *{
-    stroke: rgb(71, 65, 9);
-    stroke-width: 1;
-    fill:transparent;
-    /* stroke-linecap: butt; */
-    /* stroke-dasharray: 2 2; */
-    transition: fill, stroke 0.1s;
-}
-svg *.active{
-    stroke: rgb(175, 175, 168);
-    fill: rgba(175, 175, 168, 0.377);
-    stroke-width: 1;
-    transition: fill, stroke 0.1s;
-}
-svg .button:hover{
-    fill: rgba(248, 248, 248, 0.055);
-    stroke: rgb(175, 175, 168);
-}
-svg .button.active:hover{
-    fill: rgba(248, 248, 248, 0.452);
-    /* stroke: rgb(175, 175, 168); */
-}
-svg svg{
-    overflow: scroll;
-}
-svg text{
-    font: 10px sans-serif;
-    fill: rgb(191, 221, 241);
-    stroke-width: 0;
-    pointer-events: none;
-}
-svg .wave-display{
-    stroke: rgb(191, 221, 241);
-}
-svg .lane-handle{
-    fill: rgb(191, 221, 241);
-    opacity: 0.2;
-    stroke-width: 0;
-}
-.hover-text{
-    pointer-events: none;
-    /* opacity: 0; */
-}
-.hover-text.active{
-    opacity: 1;
-}
-svg .patchcord{
-    stroke-width: 3px;
-    opacity: 0.3;
-    transition: opacity 0.2s;
-    fill:none;
-}
-svg .patchcord:hover{
-    opacity: 1;
-    transition: opacity 0.2s;
-}
-svg .patchcord:nth-child(5n+0){
-    stroke: rgb(0, 153, 255);
-}
-svg .patchcord:nth-child(5n+1){
-    stroke: rgb(76, 0, 255);
-}
-svg .patchcord:nth-child(5n+2){
-    stroke: rgb(208, 255, 0);
-}
-svg .patchcord:nth-child(5n+3){
-    stroke: rgb(255, 115, 0);
-}
-svg .patchcord:nth-child(5n+4){
-    stroke: rgb(255, 0, 200);
-}
-.lane{
-    /* overflow: hidden; */
-}
+/*# sourceMappingURL=index.css.map */

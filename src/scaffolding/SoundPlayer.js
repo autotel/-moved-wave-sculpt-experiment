@@ -18,37 +18,39 @@ class SoundPlayer{
         let myModule = false;
         let playing = false;
 
-        let magicPlayerPlayhead=0;
-        var bufferSize = 2048;
-
-        const fadeCurveFunction = (v) => {
-            return (1-Math.cos(Math.PI * v))/2;
-        }
-        //makes a slice from the source buffer in a circular way
-        const makePeriodSlice=(start)=>{
-            let returnBuffer = [];
-            if(myModule){
-                start %= myModule.cachedValues.length;
-                let sliceStart = start;
-                let sliceEnd = (start+bufferSize) % myModule.cachedValues.length
-
-                returnBuffer = myModule.cachedValues.slice(
-                    start,
-                    start+bufferSize
-                );
-
-                //if the current period will reach beyond the length of audio loop
-                if(sliceEnd<sliceStart){
-                    let append = myModule.cachedValues.slice(
-                        0,
-                        sliceStart-sliceEnd
-                    );
-                    returnBuffer.push(...append);
-                }
-            }
-            return returnBuffer;
-        }
         var magicPlayer = (function() {
+            //playing position in the original module, from where we source sound
+            let sourcePlayhead=0;
+            //how long each period
+            var bufferSize = 2048;
+            //get a curve to fade in/out old and new "peeked" buffer (click prevention)
+            const fadeCurveFunction = (v) => {
+                return (1-Math.cos(Math.PI * v))/2;
+            }
+            //makes a slice from the module's buffer in a circular way
+            const getCircularSlice=(start,length)=>{
+                let returnBuffer = [];
+                if(myModule){
+                    start %= myModule.cachedValues.length;
+                    let sliceStart = start;
+                    let sliceEnd = (start+length) % myModule.cachedValues.length
+    
+                    returnBuffer = myModule.cachedValues.slice(
+                        start,
+                        start+length
+                    );
+    
+                    //if the current period will reach beyond the length of audio loop
+                    if(sliceEnd<sliceStart){
+                        let append = myModule.cachedValues.slice(
+                            0,
+                            sliceStart-sliceEnd
+                        );
+                        returnBuffer.push(...append);
+                    }
+                }
+                return returnBuffer;
+            }
             //the foreseen period, in the state it was on the last period
             /** @type {false|Array<number>} */
             let peekedPeriod = false;
@@ -61,7 +63,7 @@ class SoundPlayer{
                 //preventing the clicks caused by buffer changes while playing.
                 //note that the frequency response of the interpolation changes 
                 //in function of the bufferSize selection.
-                let currentBuffer = makePeriodSlice(magicPlayerPlayhead);
+                let currentBuffer = getCircularSlice(sourcePlayhead,bufferSize);
                 // var input = e.inputBuffer.getChannelData(0);
                 var output = e.outputBuffer.getChannelData(0);
 
@@ -75,17 +77,18 @@ class SoundPlayer{
                         output[i] = currentBuffer[i] * nowWeight;
                         if(peekedPeriod){
                             //and the previously expected sonic contents fading out.
-                            output[i] += peekedPeriod[i] * nextWeight;
+                            //clipped, for security.
+                            output[i] += Math.min(1,peekedPeriod[i] * nextWeight);
                         }
                     }else{
                         output[i]=0;
                     }
                 }
-                magicPlayerPlayhead += bufferSize;
-                if(myModule) magicPlayerPlayhead %= myModule.cachedValues.length;
+                sourcePlayhead += bufferSize;
+                if(myModule) sourcePlayhead %= myModule.cachedValues.length;
 
                 //peek into next period, so that in next lap we interpolate
-                peekedPeriod = makePeriodSlice(magicPlayerPlayhead);
+                peekedPeriod = getCircularSlice(sourcePlayhead,bufferSize);
             }
             return node;
         })();

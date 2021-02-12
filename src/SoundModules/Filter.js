@@ -1,16 +1,11 @@
 import Module from "./Module";
 import {sampleRate} from "./vars";
-const Fili = require('fili');
 
 //todo: add these filters: https://noisehack.com/custom-audio-effects-javascript-web-audio-api/
 /**
  * @namespace SoundModules.Filter
  */
-/** @typedef {"IIR.lowpass.butterworth" 
- *          | "IIR.highpass.butterworth"
- *          | "IIR.bandpass.butterworth"
- *          | "IIR.bandstop.butterworth"
- * } filterType */
+/** @typedef {"none"|"minimal"|"pinking"|"moog"} filterType */
 
 /** 
  * @typedef {Object} FilterSettings
@@ -28,126 +23,87 @@ const Fili = require('fili');
  * @property {number} bandwidth 
  * @property {number} gain 
  * @property {number} order 
- */
+*/
 
-/** @param {CommonFilterProperties} filterProperties */
-function FilterInterface(filterProperties){
-    this.calculateFunction=(samples)=>{
-        return samples;
+class base{
+    constructor(){
+        this.calculateSample=(sample,frequency,bandwidth,gain,order)=>{
+            return sample;
+        }
     }
 }
 
-/** @param {CommonFilterProperties} filterProperties */
-function FiliFilterInterface(filterProperties){
-    FilterInterface.call(this,filterProperties);
-    //setup filter
-    this.iirCalculator = new Fili.CalcCascades();
-    // let availableFilters = this.iirCalculator.available();
-    // console.log(availableFilters);
-    /*  0: "fromPZ"
-        1: "lowpassMZ"
-        2: "lowpassBT"
-        3: "highpassBT"
-        4: "lowpass"
-        5: "highpass"
-        6: "allpass"
-        7: "bandpassQ"
-        8: "bandpass"
-        9: "bandstop"
-        10: "peak"
-        11: "lowshelf"
-        12: "highshelf"
-        13: "aweighting"
-*/
-    
+//just average, only takes sample into account
+class boxcar extends base{
+    constructor(){
+        super();
+        let lastOutput = 0;
+        this.calculateSample=(sample,frequency,bandwidth,gain,order)=>{
+            //I actually don't know well how to calculate the cutoff frequency, I just made this simplistic guess:
+            //a moving average roughly takes "weight" times to get quite close to the value
+            let weighta = frequency/sampleRate;
+            if(weighta>1) weighta=1;
+            const weightb = 1-weighta;
+            let output = (sample * weighta + lastOutput * weightb);
+            lastOutput = output;
+            return output * gain;
+        }
+    }
+}
+//https://noisehack.com/custom-audio-effects-javascript-web-audio-api/
+class pinking extends base{
+    constructor(){
+        super();
+
+        let b0, b1, b2, b3, b4, b5, b6;
+        b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+        
+        this.calculateSample=(sample,frequency,bandwidth,gain,order)=>{
+            let outSample=0;
+            b0 = 0.99886 * b0 + sample * 0.0555179;
+            b1 = 0.99332 * b1 + sample * 0.0750759;
+            b2 = 0.96900 * b2 + sample * 0.1538520;
+            b3 = 0.86650 * b3 + sample * 0.3104856;
+            b4 = 0.55000 * b4 + sample * 0.5329522;
+            b5 = -0.7616 * b5 - sample * 0.0168980;
+            outSample = b0 + b1 + b2 + b3 + b4 + b5 + b6 + sample * 0.5362;
+            outSample *= gain;
+            b6 = sample * 0.115926;
+            return outSample;
+        }
+    }
+}
+
+//https://noisehack.com/custom-audio-effects-javascript-web-audio-api/
+class moog extends base{
+    constructor(){
+        super();
+        var in1, in2, in3, in4, out1, out2, out3, out4;
+        in1 = in2 = in3 = in4 = out1 = out2 = out3 = out4 = 0.0;
+        this.calculateSample=(sample,frequency,bandwidth,gain,order)=>{
+            let f = frequency * 1.16;
+            let fb = gain * (1.0 - 0.15 * f * f);
+            let outSample=0;
+            sample -= out4 * fb;
+            sample *= 0.35013 * (f*f)*(f*f);
+            out1 = sample + 0.3 * in1 + (1 - f) * out1; // Pole 1
+            in1 = sample;
+            out2 = out1 + 0.3 * in2 + (1 - f) * out2; // Pole 2
+            in2 = out1;
+            out3 = out2 + 0.3 * in3 + (1 - f) * out3; // Pole 3
+            in3 = out2;
+            out4 = out3 + 0.3 * in4 + (1 - f) * out4; // Pole 4
+            in4 = out3;
+            outSample = out4;
+        }
+    }
 }
 
 const filterProtos={
-    IIR:{
-        lowpass:{},
-        highpass:{},
-        bandpass:{},
-        bandstop:{},
-    },
-    FIR:{
-        lowpass:{},
-        highpass:{},
-        bandpass:{},
-        bandstop:{},
-    },
+    none:base,moog,boxcar,pinking
 }
 
-//todo: cover all the filters available in the library
-/** @param {CommonFilterProperties} filterProperties */
-filterProtos.IIR.lowpass.butterworth=function(filterProperties){
-    FiliFilterInterface.call(this),filterProperties;
-    var iirCalculator = new Fili.CalcCascades();
-    var iirFilterCoeffs = iirCalculator.lowpass({
-        order: filterProperties.order, // cascade 3 biquad filters (max: 12)
-        characteristic: 'butterworth',
-        Fs: sampleRate, // sampling frequency
-        Fc: filterProperties.frequency, // cutoff frequency / center frequency for bandpass, bandstop, peak
-        BW: filterProperties.bandwidth, // bandwidth only for bandstop and bandpass filters - optional
-        gain: filterProperties.gain, // gain for peak, lowshelf and highshelf
-        preGain: false // adds one constant multiplication for highpass and lowpass
-        // k = (1 + cos(omega)) * 0.5 / k = 1 with preGain == false
-    });
-    var iirFilter = new Fili.IirFilter(iirFilterCoeffs);
-    this.calculateFunction=(arr)=>iirFilter.multiStep(arr);
-}
 
-/** @param {CommonFilterProperties} filterProperties */
-filterProtos.IIR.highpass.butterworth=function(filterProperties){
-    FiliFilterInterface.call(this),filterProperties;
-    var iirCalculator = new Fili.CalcCascades();
-    var iirFilterCoeffs = iirCalculator.highpass({
-        order: filterProperties.order, // cascade 3 biquad filters (max: 12)
-        characteristic: 'butterworth',
-        Fs: sampleRate, // sampling frequency
-        Fc: filterProperties.frequency, // cutoff frequency / center frequency for bandpass, bandstop, peak
-        BW: filterProperties.bandwidth, // bandwidth only for bandstop and bandpass filters - optional
-        gain: filterProperties.gain, // gain for peak, lowshelf and highshelf
-        preGain: false // adds one constant multiplication for highpass and lowpass
-        // k = (1 + cos(omega)) * 0.5 / k = 1 with preGain == false
-    });
-    var iirFilter = new Fili.IirFilter(iirFilterCoeffs);
-    this.calculateFunction=(arr)=>iirFilter.multiStep(arr);
-}
-
-/** @param {CommonFilterProperties} filterProperties */
-filterProtos.IIR.bandpass.butterworth=function(filterProperties){
-    FiliFilterInterface.call(this),filterProperties;
-    var iirCalculator = new Fili.CalcCascades();
-    var iirFilterCoeffs = iirCalculator.bandpass({
-        order: filterProperties.order, // cascade 3 biquad filters (max: 12)
-        characteristic: 'butterworth',
-        Fs: sampleRate, // sampling frequency
-        Fc: filterProperties.frequency, // cutoff frequency / center frequency for bandpass, bandstop, peak
-        BW: filterProperties.bandwidth, // bandwidth only for bandstop and bandpass filters - optional
-        gain: filterProperties.gain, // gain for peak, lowshelf and highshelf
-        preGain: false // adds one constant multiplication for highpass and lowpass
-        // k = (1 + cos(omega)) * 0.5 / k = 1 with preGain == false
-    });
-    var iirFilter = new Fili.IirFilter(iirFilterCoeffs);
-    this.calculateFunction=(arr)=>iirFilter.multiStep(arr);
-}
-/** @param {CommonFilterProperties} filterProperties */
-filterProtos.IIR.bandstop.butterworth=function(filterProperties){
-    FiliFilterInterface.call(this),filterProperties;
-    var iirCalculator = new Fili.CalcCascades();
-    var iirFilterCoeffs = iirCalculator.bandstop({
-        order: filterProperties.order, // cascade 3 biquad filters (max: 12)
-        characteristic: 'butterworth',
-        Fs: sampleRate, // sampling frequency
-        Fc: filterProperties.frequency, // cutoff frequency / center frequency for bandpass, bandstop, peak
-        BW: filterProperties.bandwidth, // bandwidth only for bandstop and bandpass filters - optional
-        gain: filterProperties.gain, // gain for peak, lowshelf and highshelf
-        preGain: false // adds one constant multiplication for highpass and lowpass
-        // k = (1 + cos(omega)) * 0.5 / k = 1 with preGain == false
-    });
-    var iirFilter = new Fili.IirFilter(iirFilterCoeffs);
-    this.calculateFunction=(arr)=>iirFilter.multiStep(arr);
-}
 
 
 /** @type {FilterSettings} */
@@ -155,10 +111,12 @@ const defaultSettings={
     gain:1,
     bandwidth:0.2,
     length:1,
-    type:"IIR.lowpass.butterworth",
+    type:"moog",
     order:1,
     frequency:100,
 };
+
+const voz=(val)=>val?val:0;
 
 /**
  * @class Filter 
@@ -180,6 +138,9 @@ class Filter extends Module{
         super(settings);
 
         this.hasInput("main");
+        this.hasInput("frequency");
+        this.hasInput("gain");
+        this.hasInput("bandwidth");
 
         this.setOrder = (to) => {
             settings.order = to;
@@ -208,53 +169,25 @@ class Filter extends Module{
         };
 
         this.recalculate = (recursion = 0) => {
-            /** @type {CommonFilterProperties} */
-            let filterProperties = {
-                gain:settings.gain,
-                bandwidth:settings.bandwidth,
-                frequency:settings.frequency,
-                order:settings.order
-            }
-            let filterTypeParts = settings.type.split(".");
             
             //create an interface for the filter
-            let filter = new filterProtos[
-                filterTypeParts[0]
-            ][
-                filterTypeParts[1]
-            ][
-                filterTypeParts[2]
-            ](filterProperties);
-
-            // var iirCalculator = new Fili.CalcCascades();
-
-            // var availableFilters = iirCalculator.available();
-
-            // var iirFilterCoeffs = iirCalculator.lowpass({
-            //     order: 3, // cascade 3 biquad filters (max: 12)
-            //     characteristic: 'butterworth',
-            //     Fs: 1000, // sampling frequency
-            //     Fc: 100, // cutoff frequency / center frequency for bandpass, bandstop, peak
-            //     BW: 1, // bandwidth only for bandstop and bandpass filters - optional
-            //     gain: 0, // gain for peak, lowshelf and highshelf
-            //     preGain: false // adds one constant multiplication for highpass and lowpass
-            //     // k = (1 + cos(omega)) * 0.5 / k = 1 with preGain == false
-            // });
-
-            // var filter = new Fili.IirFilter(iirFilterCoeffs);
-
-
-            this.cachedValues = [];
-            //only one input, thus we need not to add or anything
-            this.eachInput((input) => {
-                const inputValues = input.getValues(recursion)
-                inputValues.map((v)=>{if(isNaN(v))throw new Error("NAN")});
-                // console.log(inputValues);
-                // console.log(filter);
-                this.cachedValues = filter.calculateFunction(inputValues).map((v)=>isNaN(v)?0:v)
-                // this.cachedValues = filter.multiStep(inputValues);
-            });
+            let filter = new filterProtos[settings.type]();
+            const order = settings.order;
+            const frequencies = this.inputs.frequency.getValues();
+            const gains = this.inputs.gain.getValues();
+            const bandwidths = this.inputs.bandwidth.getValues();
             
+            this.cachedValues = [];
+            const inputValues=this.inputs.main.getValues();
+
+            this.cachedValues = inputValues.map((inputValue,spl)=>filter.calculateSample(
+                inputValue,
+                voz(frequencies[spl]) + settings.frequency,
+                voz(bandwidths[spl]) + settings.bandwidth,
+                voz(gains[spl]) + settings.gain,
+                order
+            ));
+        
             this.changed({ cachedValues: this.cachedValues });
         };
     }

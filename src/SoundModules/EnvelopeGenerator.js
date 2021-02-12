@@ -35,7 +35,8 @@ class EnvelopeGenerator extends Module{
      */
     constructor(userSettings = {}) {
         //apply default settings for all the settings user did not provide
-        const settings = defaultSettings;
+        const settings = {};
+        Object.assign(settings,defaultSettings);
         Object.assign(settings, userSettings);
         let first = true;
         let phaseAccumulator = 0;

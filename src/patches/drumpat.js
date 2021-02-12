@@ -1,61 +1,197 @@
+// @ts-nocheck
+
 import LiveCodingInterface from "../LiveCodingInterface";
 
 /** @param {LiveCodingInterface} codeInterface */
-export default function run(codeInterface){
-    let mixer = codeInterface.create(codeInterface.possibleModules.MixerTesselator,"main");
-
-    let oscillator1 = codeInterface.create(codeInterface.possibleModules.Oscillator,"ramp").setShape("ramp");
-    let oscillator2 = codeInterface.create(codeInterface.possibleModules.Oscillator,"sine").setShape("sin");
-    let envelope = codeInterface.create(codeInterface.possibleModules.EnvelopeGenerator,"envelope");
-    let filter = codeInterface.create(codeInterface.possibleModules.Filter,"filter");
-
-
-    let noiseEnvelope = codeInterface.create(codeInterface.possibleModules.EnvelopeGenerator,"noiseEnvelope");
-    let noise = codeInterface.create(codeInterface.possibleModules.Oscillator).setShape("noise")
-    let noiseFilter = codeInterface.create(codeInterface.possibleModules.Filter,"noiseFilter");
-    
-    let delayTimeEnvelope = codeInterface.create(codeInterface.possibleModules.EnvelopeGenerator,"delayTimeEnvelope");
-    let delayAmountEnvelope = codeInterface.create(codeInterface.possibleModules.EnvelopeGenerator,"delayAmountEnvelope");
-    let delay = codeInterface.create(codeInterface.possibleModules.Delay,"delay");
-
-    filter.setType("IIR.highpass.butterworth");
-    filter.setFrequency(4);
-
-    console.log(mixer.inputs);
-
-    noiseEnvelope.connectTo(noise.inputs.amplitude);
-    noise.connectTo(noiseFilter.inputs.main);
-    noise.setAmplitude(0);
-
-    noiseFilter.connectTo(delay.inputs.main);
-    delay.connectTo(mixer.inputs.c);
-
-    delayTimeEnvelope.connectTo(delay.inputs.time);
-    delayAmountEnvelope.connectTo(delay.inputs.feedback);
-    delayTimeEnvelope.set({points:[[0,0],[0,0],[0,0],[0,0],[0,0]]});
-    delayAmountEnvelope.set({points:[[0,0],[0,0],[0,0],[0,0],[0,0]]});
-
-    noiseFilter.setFrequency(440);
-
-
-    // oscillator1.connectTo(filter.inputs.main);
-    envelope.connectTo(filter.inputs.main);
-    filter.connectTo(oscillator1.inputs.frequency);
-    filter.connectTo(oscillator2.inputs.frequency);
-    oscillator2.connectTo(mixer.inputs.b);
-
-    envelope.setPoints([[0,1],[0,1],[11962,-58.408550385947244],[16647,-158.53749390471395],[22050,-166.88157253127784]]);
-    envelope.getInterface().autoZoom();
-    
-    // Object.assign(oscillator2,{ amplitude: 1.44, frequency: 44.455});
-    oscillator2.setFrequency(44.455);
-    oscillator2.setAmplitude(1.44);
-
-    noiseEnvelope.setPoints([[8323,-0.11166969088139744],[10639,5.24847547142568],[10969,-6.588511762002449],[11851,3.3500907264419233],[12568,0.5583484544069872]]);
-    noiseEnvelope.getInterface().autoZoom();
-
-    filter.getInterface().autoZoom();
-
-    
+export default function run(codeInterface) {
+  create(possibleModules.MixerTesselator, 'main');
+  create(possibleModules.Oscillator, 'square');
+  create(possibleModules.Oscillator, 'sine');
+  create(possibleModules.EnvelopeGenerator, 'envelope');
+  create(possibleModules.Filter, 'filter');
+  create(possibleModules.EnvelopeGenerator, 'noiseEnvelope');
+  create(possibleModules.Oscillator, 'Oscillator 6');
+  create(possibleModules.Filter, 'noiseFilter');
+  create(possibleModules.EnvelopeGenerator, 'delayTimeEnvelope');
+  create(possibleModules.EnvelopeGenerator, 'delayAmountEnvelope');
+  create(possibleModules.Delay, 'delay');
+  modules['sine'].connectTo(modules['main'].inputs.b);
+  modules['envelope'].connectTo(modules['filter'].inputs.main);
+  modules['filter'].connectTo(modules['sine'].inputs.frequency);
+  modules['noiseEnvelope'].connectTo(modules['Oscillator 6'].inputs.amplitude);
+  modules['Oscillator 6'].connectTo(modules['noiseFilter'].inputs.main);
+  modules['noiseFilter'].connectTo(modules['delay'].inputs.main);
+  modules['delayTimeEnvelope'].connectTo(modules['delay'].inputs.time);
+  modules['delayAmountEnvelope'].connectTo(modules['delay'].inputs.feedback);
+  modules['delay'].connectTo(modules['main'].inputs.c);
+  modules['main'].set({
+    'amplitude': 1,
+    'levela': 1.1333333333333333,
+    'levelb': 4,
+    'levelc': 0.22666666666666668,
+    'leveld': 0
+  });
+  modules['main'].getInterface().autoZoom();
+  modules['square'].set({
+    'amplitude': 1,
+    'bias': 0,
+    'length': 1,
+    'frequency': 42.11111111110753,
+    'shape': 'square'
+  });
+  modules['square'].getInterface().autoZoom();
+  modules['sine'].set({
+    'amplitude': 0.7567991480823322,
+    'bias': 0,
+    'length': 1,
+    'frequency': 34.806629834254146,
+    'shape': 'sin'
+  });
+  modules['sine'].getInterface().autoZoom();
+  modules['envelope'].set({
+    'amplitude': 1,
+    'bias': 0,
+    'length': 1,
+    'points': [
+      [
+        0,
+        0
+      ],
+      [
+        22270,
+        13.626263291709844
+      ],
+      [
+        25522,
+        128.47619675040696
+      ],
+      [
+        27783,
+        128.47619675040693
+      ],
+      [
+        33295,
+        -331.51985699299104
+      ]
+    ]
+  });
+  modules['envelope'].getInterface().autoZoom();
+  modules['filter'].set({
+    'gain': 1,
+    'bandwidth': 0.2,
+    'length': 1,
+    'type': 'IIR.highpass.butterworth',
+    'order': 1,
+    'frequency': 5.555555555555555
+  });
+  modules['filter'].getInterface().autoZoom();
+  modules['noiseEnvelope'].set({
+    'amplitude': 1,
+    'bias': 0,
+    'length': 1,
+    'points': [
+      [
+        14663,
+        0.0010715725766371397
+      ],
+      [
+        19348,
+        0.0007011543464989415
+      ],
+      [
+        22546,
+        2.6186681752370333
+      ],
+      [
+        23924,
+        5.316216140802374e-16
+      ],
+      [
+        34453,
+        0.7161578883994346
+      ]
+    ]
+  });
+  modules['noiseEnvelope'].getInterface().autoZoom();
+  modules['Oscillator 6'].set({
+    'amplitude': 0,
+    'bias': 0,
+    'length': 1,
+    'frequency': 0,
+    'shape': 'noise'
+  });
+  modules['Oscillator 6'].getInterface().autoZoom();
+  modules['noiseFilter'].set({
+    'gain': 1,
+    'bandwidth': 20.4,
+    'length': 1,
+    'type': 'IIR.lowpass.butterworth',
+    'order': 1,
+    'frequency': 1654.6666666666624
+  });
+  modules['noiseFilter'].getInterface().autoZoom();
+  modules['delayTimeEnvelope'].set({
+    'amplitude': 1,
+    'bias': 0,
+    'length': 1,
+    'points': [
+      [
+        0,
+        0
+      ],
+      [
+        11741,
+        0
+      ],
+      [
+        20286,
+        0
+      ],
+      [
+        25081,
+        -0.1532736364269152
+      ],
+      [
+        33460,
+        -0.2248498208548268
+      ]
+    ]
+  });
+  modules['delayTimeEnvelope'].getInterface().autoZoom();
+  modules['delayAmountEnvelope'].set({
+    'amplitude': 1,
+    'bias': 0,
+    'length': 1,
+    'points': [
+      [
+        0,
+        0
+      ],
+      [
+        11741,
+        0
+      ],
+      [
+        16813,
+        -0.14963818144211619
+      ],
+      [
+        19238,
+        -3.295675446711356
+      ],
+      [
+        22932,
+        -4.339899810513023
+      ]
+    ]
+  });
+  modules['delayAmountEnvelope'].getInterface().autoZoom();
+  modules['delay'].set({
+    'feedback': 0.6200000000000001,
+    'time': 0.4007900000000001,
+    'dry': 0.5699999999999998,
+    'wet': 0.5299999999999997
+  });
+  modules['delay'].getInterface().autoZoom();
 
 }

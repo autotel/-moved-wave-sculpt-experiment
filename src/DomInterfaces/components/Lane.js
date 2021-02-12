@@ -35,8 +35,6 @@ class Lane extends Group{
         const {model} = options;
         const settings = typicalLaneSettings(model);
 
-        settings.handleHeight=10;
-        
         super(options);
 
         this.domElement.classList.add("lane"),
@@ -63,7 +61,7 @@ class Lane extends Group{
             x: settings.x,
             y: settings.y,
             width: settings.width,
-            height: settings.handleHeight,
+            height: settings.height,
             fill: "transparent",
         });
         handleRect.domElement.classList.add("lane-handle");
@@ -71,7 +69,7 @@ class Lane extends Group{
         //position this lane at a distance from top, proportional to it's height,
         this.handyPosition=(posNumber)=>{
             draggable.setPosition({
-                y:posNumber * (settings.height + settings.handleHeight + 5)
+                y:posNumber * (settings.height + 5)
             });
             handleMoved();
             return this;
@@ -100,7 +98,7 @@ class Lane extends Group{
             handleRect.update();
             
             // this.contents.attributes.x = settings.x;
-            this.contents.attributes.y = settings.y + settings.handleHeight;
+            this.contents.attributes.y = settings.y;
             this.contents.update();
             handleMoved();
         };
@@ -131,7 +129,7 @@ class Lane extends Group{
                         input:model.inputs[inputName],
                     };
                     newInputPosition.absolute.x=newInputPosition.x + settings.x;
-                    newInputPosition.absolute.y=newInputPosition.y + settings.y + 10;
+                    newInputPosition.absolute.y=newInputPosition.y + settings.y;
                     inputPositions[inputName] = newInputPosition;
                 });
             // }
@@ -173,7 +171,7 @@ class Lane extends Group{
 
             const rect = new Rectangle({
                 x: position.x,
-                y: position.y - settings.handleHeight,
+                y: position.y,
                 width: 80,
                 height: 10,
             });

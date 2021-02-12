@@ -1,5 +1,6 @@
 import Module from "./Module";
 import {sampleRate} from "./vars";
+import seedrandom from "seedrandom";
 
 /**
  * @namespace SoundModules.Oscillator
@@ -40,6 +41,8 @@ class Oscillator extends Module{
             phaseAccumulator += frequency / sampleRate;
         };
         
+        let rng=seedrandom();
+
         const shapes = {
             sin: (frequency, amplitude,bias) => {
                 accumulatePhase(frequency);
@@ -56,9 +59,14 @@ class Oscillator extends Module{
                 return (phaseAccumulator % 1 - 0.5) * amplitude
                     + bias;
             },
+            square: (frequency, amplitude,bias) => {
+                accumulatePhase(frequency);
+                return (((phaseAccumulator % 1 ) > 0.5)?1:-1) * amplitude
+                    + bias;
+            },
             noise: (frequency, amplitude,bias) => {
                 accumulatePhase(frequency);
-                return (Math.random() - 0.5) * amplitude
+                return (rng() - 0.5) * amplitude
                     + bias;
             },
             offset: (frequency, amplitude,bias) => {
@@ -103,11 +111,14 @@ class Oscillator extends Module{
             phaseAccumulator = 0;
             const lengthSamples = settings.length * sampleRate;
             if (!shapes[settings.shape])
-                throw new Error(`Wave shape function named ${settings.shape}, does not exist`);
+            throw new Error(`Wave shape function named ${settings.shape}, does not exist`);
             
             const freqInputValues = this.inputs.frequency.getValues();
             const ampInputValues = this.inputs.amplitude.getValues();
             const biasInputValues = this.inputs.bias.getValues();
+            
+            //for noise, lets us have always the same noise. Frequency will be the seed
+            rng=seedrandom(settings.frequency);
 
             for (let a = 0; a < lengthSamples; a++) {
                 const freq = (freqInputValues[a] || 0) + settings.frequency;

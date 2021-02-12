@@ -57,8 +57,7 @@ class Delay extends Module{
                 }
                 
                 delayCache[len - 2] += this.cachedValues[sampleNumber] 
-                    * settings.feedback
-                    * feedbackLevels[sampleNumber];
+                    * (settings.feedback + feedbackLevels[sampleNumber]);
                 
 
             });
