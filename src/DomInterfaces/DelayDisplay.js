@@ -10,7 +10,7 @@ class DelayDisplay extends GenericDisplay{
         const dryKnob = this.addParameterKnob("dry");
 
         // timeKnob.step=1/10000;
-        timeKnob.setDeltaCurve("period");
+        timeKnob.setDeltaCurve("periodseconds");
 
     }
 }

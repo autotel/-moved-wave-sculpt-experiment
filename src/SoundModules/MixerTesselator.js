@@ -6,10 +6,10 @@ import Module from "./Module";
 
 const defaultSettings={
     amplitude:1,
-    levela:0.25,
-    levelb:0.25,
-    levelc:0.25,
-    leveld:0.25,
+    levela:0.5,
+    levelb:0.5,
+    levelc:0.5,
+    leveld:0.5,
 };
 /**
  * mixes channels and also tesselates them using sine shaped window.

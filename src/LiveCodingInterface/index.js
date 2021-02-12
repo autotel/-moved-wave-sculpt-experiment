@@ -89,7 +89,7 @@ class LiveCodingInterface{
             Filter,
         };
 
-        window.create=this.create;
+        window.create=(module,name)=>{return this.create(module,name)};
         window.modules=this.modules;
 
     }

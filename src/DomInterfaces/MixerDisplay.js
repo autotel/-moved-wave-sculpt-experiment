@@ -10,11 +10,12 @@ class MixerDisplay extends GenericDisplay{
             this.addParameterKnob("levelc"),
             this.addParameterKnob("leveld")
         ];
+
         levels.map((k)=>
             k.setMinMax(0,4)
             .setDeltaCurve("channelvol")
         );
-
+        options.model.triggerInitialState();
 
     }
 }

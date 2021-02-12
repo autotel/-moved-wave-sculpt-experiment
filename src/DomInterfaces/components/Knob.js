@@ -14,10 +14,16 @@ let defaultKnobOptions = {
 
 //TODO:
 const deltaCurves = {
-    period:(deltaval)=> Math.pow(deltaval,3),
-    frequency:(deltaval)=>Math.pow(2,deltaval),
-    gain:(deltaval)=>(deltaval),
-    channelvol:(deltaval)=>deltaval,
+    periodseconds:(deltaval)=> {
+        const newVal = Math.pow(deltaval/10,2)*10 * Math.sign(deltaval);
+        return newVal;
+    },
+    frequency:(deltaval)=>{
+        deltaval*=10;
+        return Math.pow(2,1+Math.abs(deltaval))*Math.sign(deltaval);
+    },
+    gain:(deltaval)=>(deltaval*3),
+    channelvol:(deltaval)=>deltaval*5,
 }
 
 class Knob extends Group{
@@ -27,26 +33,31 @@ class Knob extends Group{
         Object.assign(options,userOptions);
         super(options);
 
-        let text = new Text({
+        let nameText = new Text({
             x:-options.radius,
             y: options.radius + 5
         });
+        let valueText = new Text({
+            x:-options.radius,
+            y: options.radius + 15
+        });
 
-        this.add(text);
+        this.add(nameText);
+        this.add(valueText);
 
 
         let knobShape = new Path();
         this.add(knobShape);
         
         const remakePath=()=>{
-            let corners = 9;
+            let corners = 7;
             let lastPoint = [];
             let pathString = "";
 
             for(let corner = 0; corner<corners; corner++){
                 let nowPoint=[
-                    Math.sin(Math.PI * 2 * corner/corners) * options.radius,
-                    Math.cos(Math.PI * 2 * corner/corners) * options.radius,
+                    Math.sin(Math.PI * 2 * corner/corners) * options.radius * 0.6,
+                    Math.cos(Math.PI * 2 * corner/corners) * options.radius * 0.6,
                 ];
                 if(corner > 0){
                     pathString += `Q ${lastPoint[0]},${lastPoint[1]} ${nowPoint[0]},${nowPoint[1]} `
@@ -62,8 +73,6 @@ class Knob extends Group{
                 pathString += `M ${-options.radius},${0}`;
                 pathString += `Q ${-options.radius},${0} ${0},${0}`
             }
-
-            
             knobShape.set("d",pathString);
         }
 
@@ -96,13 +105,9 @@ class Knob extends Group{
 
             //choose the lengthiest coord to define delta
             let theDistance = -newPosition.delta.y;
-
             let valueDelta = distanceToValue(theDistance);
-            
             let newValue = deltaCurves[options.deltaCurve](valueDelta);
             
-            // console.log("delta",theDistance,"yields",newValue);
-
             newValue+=distanceToValue(pixValueOnDragStart);
 
             if(options.min !== false){
@@ -125,7 +130,8 @@ class Knob extends Group{
         
         this.updateGraphic=()=>{
             knobShape.set("transform",`rotate(${getAngle()})`);
-            text.set("text",options.name);// + round(this.value,2));
+            nameText.set("text",options.name);
+            valueText.set("text","~"+(round(this.value,2)));
         }
 
         this.changeValue=(to)=>{
@@ -139,8 +145,12 @@ class Knob extends Group{
          * @param {string} parameterName
          */
         this.setToModuleParameter=(module,parameterName)=>{
+            
             let propertyObject = {};
+            propertyObject=module.settings;
             options.name=parameterName;
+            this.value=propertyObject[parameterName];
+
             this.onChange(({value})=>{
                 propertyObject[parameterName] = value;
                 module.set(propertyObject);
@@ -151,22 +161,31 @@ class Knob extends Group{
                     this.updateGraphic();
                 }
             });
-            this.value=propertyObject[parameterName];
+            switch (parameterName){
+                case "frequency":
+                    this.setDeltaCurve("frequency");
+                    this.setMinMax(0,22000);
+                break;
+
+                case "time":
+                case "length":
+                    this.setDeltaCurve("periodseconds");
+                    this.setMinMax(0,false);
+                break;
+            }
+
             this.updateGraphic();
-
-            if(parameterName == "frequency") options.min = 0;
-            if(parameterName == "length") options.min = 0;
-
-            remakePath();
         }
+
         this.setMinMax=(min,max)=>{
+            if(max<=min) console.warn("max<=min",min,max);
             options.min=min;
             options.max=max;
             remakePath();
             return this;
         }
         /**
-         * @param {"period"|"frequency"|"gain"|"channelvol"} deltaCurve
+         * @param {"periodseconds"|"frequency"|"gain"|"channelvol"} deltaCurve
          **/
         this.setDeltaCurve=(deltaCurve)=>{
             options.deltaCurve=deltaCurve;

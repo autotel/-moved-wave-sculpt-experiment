@@ -13,7 +13,9 @@ export default function run(codeInterface){
     let noiseEnvelope = codeInterface.create(codeInterface.possibleModules.EnvelopeGenerator,"noiseEnvelope");
     let noise = codeInterface.create(codeInterface.possibleModules.Oscillator).setShape("noise")
     let noiseFilter = codeInterface.create(codeInterface.possibleModules.Filter,"noiseFilter");
-
+    
+    let delayTimeEnvelope = codeInterface.create(codeInterface.possibleModules.EnvelopeGenerator,"delayTimeEnvelope");
+    let delayAmountEnvelope = codeInterface.create(codeInterface.possibleModules.EnvelopeGenerator,"delayAmountEnvelope");
     let delay = codeInterface.create(codeInterface.possibleModules.Delay,"delay");
 
     filter.setType("IIR.highpass.butterworth");
@@ -24,7 +26,14 @@ export default function run(codeInterface){
     noiseEnvelope.connectTo(noise.inputs.amplitude);
     noise.connectTo(noiseFilter.inputs.main);
     noise.setAmplitude(0);
-    noiseFilter.connectTo(mixer.inputs.a);
+
+    noiseFilter.connectTo(delay.inputs.main);
+    delay.connectTo(mixer.inputs.c);
+
+    delayTimeEnvelope.connectTo(delay.inputs.time);
+    delayAmountEnvelope.connectTo(delay.inputs.feedback);
+    delayTimeEnvelope.set({points:[[0,0],[0,0],[0,0],[0,0],[0,0]]});
+    delayAmountEnvelope.set({points:[[0,0],[0,0],[0,0],[0,0],[0,0]]});
 
     noiseFilter.setFrequency(440);
 
@@ -46,5 +55,7 @@ export default function run(codeInterface){
     noiseEnvelope.getInterface().autoZoom();
 
     filter.getInterface().autoZoom();
+
+    
 
 }
