@@ -3,6 +3,8 @@ It provides a more intuitive ontrol of timing, as it doesn't run on realtime.
 
 <img src="./showoff/current.png"/>
 
+http://autotel.co/sound-sculpt/
+
 ## available uses
 * open ./dist/index.html to play
     * open developer console to change things with the patch (experimental)
@@ -28,10 +30,15 @@ It provides a more intuitive ontrol of timing, as it doesn't run on realtime.
 * find a small square at the right of the lanes; when you drag it vertically, it changes the vertical scale of the lanes.
 
 ## todo:
-* some changes are not propagated from model to interface: points in envelopeGenerator, frequency/amplitude in oscillator, etc.
-* complete the filters
-* auto-range in lanes, which propagates the change to the zoom rectangle.
-* there still are no interfaces to control some properties without the command line
+* some changes are not propagated from model to interface: 
+    * points in envelopeGenerator
+* Add more interesting filters
+* there still are no interfaces to control some properties without the command line:
+    * patching among modules
+    * filter type selection
+    * wave shape
 * envelopeGenerator shapes
-* gui connection of modules
 * export patches, export wav.
+* remove reminiscent "NaNHz" from envelopeGenerator
+* add link from the hosted experiment to repository, and to my website.
+* implement the improved knobs interaction design (allows rotate/drag on same gesture)

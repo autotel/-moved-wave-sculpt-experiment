@@ -80,7 +80,7 @@ export default function run(codeInterface) {
     'gain': 1,
     'bandwidth': 0.2,
     'length': 1,
-    'type': 'IIR.highpass.butterworth',
+    'type': 'boxcar',
     'order': 1,
     'frequency': 5.555555555555555
   });
@@ -125,7 +125,7 @@ export default function run(codeInterface) {
     'gain': 1,
     'bandwidth': 20.4,
     'length': 1,
-    'type': 'IIR.lowpass.butterworth',
+    'type': 'boxcar',
     'order': 1,
     'frequency': 1654.6666666666624
   });
