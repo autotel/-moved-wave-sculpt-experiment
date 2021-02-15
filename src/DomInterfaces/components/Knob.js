@@ -18,6 +18,10 @@ const deltaCurves = {
         const newVal = Math.pow(deltaval/10,2)*10 * Math.sign(deltaval);
         return newVal;
     },
+    integer:(deltaval)=> {
+        const newVal = Math.round(deltaval * 20);
+        return newVal;
+    },
     frequency:(deltaval)=>{
         deltaval*=100;
         return Math.pow(Math.abs(deltaval),2)*Math.sign(deltaval);
@@ -215,10 +219,14 @@ class Knob extends Group{
                     this.setDeltaCurve("frequency");
                     this.setMinMax(0,22000);
                 break;
+                case "order":
+                    this.setDeltaCurve("integer");
+                    this.setMinMax(0,10);
+                break;
 
                 case "time":
                 case "length":
-                    this.setDeltaCurve("periodseconds");
+                    this.setDeltaCurve("integer");
                     this.setMinMax(0,false);
                 break;
             }
@@ -234,7 +242,7 @@ class Knob extends Group{
             return this;
         }
         /**
-         * @param {"periodseconds"|"frequency"|"gain"|"channelvol"} deltaCurve
+         * @param {"integer"|"frequency"|"gain"|"channelvol"|"integer"} deltaCurve
          **/
         this.setDeltaCurve=(deltaCurve)=>{
             options.deltaCurve=deltaCurve;

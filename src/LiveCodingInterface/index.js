@@ -41,7 +41,11 @@ class LiveCodingInterface{
             if(!name) name=protoname+" "+count;
             if(modules[name]) name = name+"_"+count;
 
+            
             const newModule=new Which();
+            
+            if(window[name]===undefined) window[name]=newModule;
+
             let newInterface;
             switch (protoname){
                 case "Oscillator":

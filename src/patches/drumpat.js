@@ -78,9 +78,9 @@ export default function run(codeInterface) {
   modules['envelope'].getInterface().autoZoom();
   modules['filter'].set({
     'gain': 1,
-    'bandwidth': 0.2,
+    'reso': 0.2,
     'length': 1,
-    'type': 'boxcar',
+    'type': 'lp_boxcar',
     'order': 1,
     'frequency': 5.555555555555555
   });
@@ -123,9 +123,9 @@ export default function run(codeInterface) {
   modules['Oscillator 6'].getInterface().autoZoom();
   modules['noiseFilter'].set({
     'gain': 1,
-    'bandwidth': 20.4,
+    'reso': 20.4,
     'length': 1,
-    'type': 'boxcar',
+    'type': 'lp_boxcar',
     'order': 1,
     'frequency': 1654.6666666666624
   });
