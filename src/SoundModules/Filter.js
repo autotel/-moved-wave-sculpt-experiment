@@ -123,8 +123,20 @@ class lp_nboxcar extends base{
                 lastOutputs[pole] = currentIn * weighta + lastOutputs[pole] * weightb;
                 currentIn = lastOutputs[pole];
             }
-            let output=currentIn * gain - resoScaled * 0.8;
+            let output=currentIn * gain;
             return saturate?saturate1(output):output;
+        }
+    }
+}
+
+class hp_nboxcar extends lp_boxcar{
+    constructor(){
+        super();
+        let superCSample = this.calculateSample;
+        this.calculateSample=(sample,frequency,reso,gain,order,saturate)=>{
+            let output = sample * gain - superCSample(sample,frequency,reso,gain,order,false);
+            return saturate?saturate1(output):output;
+
         }
     }
 }
@@ -151,6 +163,39 @@ class pinking extends base{
             outSample = b0 + b1 + b2 + b3 + b4 + b5 + b6 + sample * 0.5362;
             outSample *= gain;
             b6 = sample * 0.115926;
+            return saturate?saturate1(outSample):outSample;
+        }
+    }
+}
+
+//I havent checked that this is actually a comb filter
+class comb extends base{
+    constructor(){
+        super();
+
+        let delayBuf=[];
+        
+        this.reset=()=>{
+            delayBuf=[];
+        }
+        this.calculateSample=(sample,frequency,reso,gain,order,saturate)=>{
+            reso *= 0.5;
+            gain *= 0.5;
+            frequency /= 4;
+
+            let period = sampleRate/frequency;
+            
+            let delayedSample = 0;
+            
+            if(delayBuf.length>period){
+                delayedSample = delayBuf.shift();
+            }
+
+            sample *= reso;
+            sample += delayedSample * reso;
+            delayBuf.push(sample);
+            
+            let outSample = sample * gain;
             return saturate?saturate1(outSample):outSample;
         }
     }
@@ -226,6 +271,8 @@ const filterProtos={
     lp_boxcar,
     lp_nboxcar,
     hp_boxcar,
+    hp_nboxcar,
+    comb,
     pinking
 }
 

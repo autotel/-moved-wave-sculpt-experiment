@@ -110,7 +110,7 @@ class Mouse extends Vector2{
     }
 }
 
-Draggable.mouse = new Mouse();;
+Draggable.mouse = new Mouse();
 /** @param {Node} canvas */
 Draggable.setCanvas=(canvas=document)=>{
     const mouse = Draggable.mouse;

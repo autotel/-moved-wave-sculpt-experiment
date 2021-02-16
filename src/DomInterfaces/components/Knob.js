@@ -78,7 +78,7 @@ class Knob extends Group{
                     Math.sin(Math.PI * 2 * corner/maxCorners) * options.radius,
                 ];
                 if(corner > 0){
-                    pathString += `Q ${lastPoint.join()} ${nowPoint.join()} `
+                    pathString += `L ${nowPoint.join()} `
                 }else{
                     pathString += `M ${nowPoint.join()}`;
                 }
@@ -90,7 +90,7 @@ class Knob extends Group{
                 Math.cos(Math.PI * 2 * endPortion) * options.radius,
                 Math.sin(Math.PI * 2 * endPortion) * options.radius,
             ];
-            pathString += `Q ${lastPoint.join()} ${nowPoint.join()} `
+            pathString += `L ${nowPoint.join()} `
             
 
             valueShape.set("d",pathString);
@@ -107,7 +107,7 @@ class Knob extends Group{
                     Math.sin(Math.PI * 2 * corner/corners) * options.radius * 0.6,
                 ];
                 if(corner > 0){
-                    pathString += `Q ${lastPoint.join()} ${nowPoint.join()} `
+                    pathString += `L ${lastPoint.join()} ${nowPoint.join()} `
                 }else{
                     pathString += `M ${nowPoint.join()}`;
                 }
@@ -232,8 +232,7 @@ class Knob extends Group{
 
                 case "time":
                 case "length":
-                    this.setDeltaCurve("integer");
-                    this.setMinMax(0,false);
+                    this.setMinMax(0,5);
                 break;
             }
 

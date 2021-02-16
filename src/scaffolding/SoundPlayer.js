@@ -1,7 +1,7 @@
 import Module from "../SoundModules/Module";
 import { sampleRate, audioContext } from "../SoundModules/vars";
 import Lane from "../DomInterfaces/components/Lane";
-import { Rectangle, Path } from "./elements";
+import { Rectangle, Path, Group } from "./elements";
 
 
 class SoundPlayer{
@@ -97,8 +97,8 @@ class SoundPlayer{
 
 
         let position={
-            x:760,
-            y:70,
+            x:-15,
+            y:-10,
             width:30,
             height:20,
             spacing:5,
@@ -121,22 +121,26 @@ class SoundPlayer{
             let c6=`${triStartX + triW}, ${triStartY + triH / 2}`;
             let c7=`${triStartX}, ${triStartY + triH}`;
 
-            const playButton = new Path({
+            const playButton = new Group();
+
+            let path = new Path({
                 d: `M ${c1}
-                    Q ${c1} ${c2} 
-                    Q ${c2} ${c3} 
-                    Q ${c3} ${c4}
+                    L ${c1} ${c2} 
+                    L ${c2} ${c3} 
+                    L ${c3} ${c4}
                     z
                     M ${c5}
-                    Q ${c5} ${c6}
-                    Q ${c6} ${c7}
+                    L ${c5} ${c6}
+                    L ${c6} ${c7}
                     z`,
             });
 
+            playButton.add(path);
+
             playButton.domElement.setAttribute("class","button play");
             everyPlayButton.push(playButton);
-            module.getInterface().contents.add(playButton);
-
+            module.getInterface().appendToControlPanel(playButton);
+            
             module.onUpdate((changes)=>{
                 if(changes.cachedValues){
                     // this.updateBuffer();

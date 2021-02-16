@@ -1,5 +1,5 @@
 import Sprite from "../../scaffolding/Sprite";
-import { Line, Rectangle, Path, Group, Text } from "../../scaffolding/elements";
+import { Line, Rectangle, Path, Group, Text, Component } from "../../scaffolding/elements";
 import Draggable from "./Draggable";
 import Vector2 from "../../scaffolding/Vector2";
 import typicalLaneSettings from "../../utils/const typicalLaneSettings";
@@ -27,33 +27,33 @@ const VectorTypedef = require("../../scaffolding/Vector2");
  * @class Lane
  * @extends Group
  * */
-class Lane extends Group{
+class Lane extends Group {
     /**
      * @param {LaneOptions} options
      */
     constructor(options) {
-        
-        const {model} = options;
+
+        const { model } = options;
         const settings = typicalLaneSettings(model);
 
         super(options);
 
         this.domElement.classList.add("lane"),
 
-        this.autoZoom = () => {}
-        
+            this.autoZoom = () => { }
+
         Object.assign(settings, options);
         // this.settings=settings;
-        
+
         /** @type {function[]} */
-        const movedCallbacks=[];
+        const movedCallbacks = [];
         /** @param {function} callback */
-        this.onMoved=(callback)=>{
+        this.onMoved = (callback) => {
             movedCallbacks.push(callback);
         }
 
-        const handleMoved=()=>{
-            movedCallbacks.map((cb)=>cb());
+        const handleMoved = () => {
+            movedCallbacks.map((cb) => cb());
         }
 
         model.interfaces.add(this);
@@ -68,37 +68,85 @@ class Lane extends Group{
         handleRect.domElement.classList.add("lane-handle");
 
         //position this lane at a distance from top, proportional to it's height,
-        this.handyPosition=(posNumber)=>{
+        this.handyPosition = (posNumber) => {
             draggable.setPosition({
-                y:posNumber * (settings.height + 5)
+                y: posNumber * (settings.height + 5)
             });
             handleMoved();
             return this;
         }
 
         let controlsCount = 0;
+
+        const widthPerControl = 50;
+        const controlPanelTop = 10;
+        const controlPanelRight = 10;
+        const controlPanelHeight = 70;
+        const controlsCenterTop = 26;
+        const controlPanelBackground = new Rectangle();
+        const controlPanel = new Group();
+        let controlPanelAppended = false;
+        const updateControlsBg = () => {
+            if (controlsCount > 0 && !controlPanelAppended) {
+                this.contents.add(controlPanel);
+                controlPanel.add(controlPanelBackground);
+                controlPanelAppended = true;
+            }
+            const cc1 = controlsCount + 1;
+            controlPanel.attributes.class="control-panel";
+            controlPanel.attributes.width = widthPerControl * cc1;
+            controlPanel.attributes.x = options.width - widthPerControl * cc1 - controlPanelRight;
+            controlPanel.attributes.y = controlPanelTop;
+            controlPanel.attributes.height = controlPanelHeight;
+
+            controlPanelBackground.attributes.class="background";
+            controlPanelBackground.attributes.width=controlPanel.attributes.width;
+            controlPanelBackground.attributes.height=controlPanel.attributes.height;
+
+            controlPanel.update();
+            controlPanelBackground.update();
+        }
+        /** @param {Component} component */
+        this.appendToControlPanel = (component,width=widthPerControl) => {
+            controlsCount++;
+            updateControlsBg();
+            component.attributes.x= widthPerControl * controlsCount;
+            component.attributes.y= controlsCenterTop;
+            component.update();
+            controlPanel.add(component);
+        }
         /** @param {string} parameterName */
-        this.addKnob=(parameterName)=>{
+        this.addKnob = (parameterName) => {
             let newControl;
-            newControl = new Knob({x:options.width - 50 * controlsCount++ - 70, y: 80});
-            newControl.setToModuleParameter(model,parameterName);
-            this.contents.add(newControl);
+            controlsCount++;
+            updateControlsBg();
+            newControl = new Knob({
+                x: widthPerControl * controlsCount, 
+                y: controlsCenterTop
+            });
+            newControl.setToModuleParameter(model, parameterName);
+            controlPanel.add(newControl);
             return newControl;
         }
         /** @param {string} parameterName */
-        this.addToggle=(parameterName)=>{
+        this.addToggle = (parameterName) => {
             let newControl;
-            newControl = new Toggle({x:options.width - 50 * controlsCount++ - 70, y: 80});
-            newControl.setToModuleParameter(model,parameterName);
-            this.contents.add(newControl);
+            controlsCount++;
+            updateControlsBg();
+            newControl = new Toggle({
+                x: widthPerControl * controlsCount, 
+                y: controlsCenterTop
+            });
+            newControl.setToModuleParameter(model, parameterName);
+            controlPanel.add(newControl);
             return newControl;
         }
-        
+
         const draggable = new Draggable(handleRect.domElement);
         draggable.setPosition(settings);
         draggable.positionChanged = (newPosition) => {
-            settings.y=newPosition.y;
-            this.set("y",newPosition.y);
+            settings.y = newPosition.y;
+            this.set("y", newPosition.y);
             handleMoved();
             return;
 
@@ -106,13 +154,13 @@ class Lane extends Group{
             // handleRect.attributes.x = settings.x;
             handleRect.attributes.y = settings.y;
             handleRect.update();
-            
+
             // this.contents.attributes.x = settings.x;
             this.contents.attributes.y = settings.y;
             this.contents.update();
             handleMoved();
         };
-        
+
         this.add(handleRect);
 
         this.contents = new Group({
@@ -128,42 +176,42 @@ class Lane extends Group{
         /** @type {Object<String,inputPosition>|undefined} */
         let inputPositions;
         /** @returns {Object<String,inputPosition>} */
-        this.getInputPositions=()=>{
+        this.getInputPositions = () => {
             // if(!inputPositions) {
-                inputPositions={};
-                Object.keys(model.inputs).map((inputName,index)=>{
-                    const newInputPosition={
-                        x:settings.width + 10,
-                        y:settings.height - index * 20 - 10,
-                        absolute:{},
-                        input:model.inputs[inputName],
-                    };
-                    newInputPosition.absolute.x=newInputPosition.x + settings.x;
-                    newInputPosition.absolute.y=newInputPosition.y + settings.y;
-                    inputPositions[inputName] = newInputPosition;
-                });
+            inputPositions = {};
+            Object.keys(model.inputs).map((inputName, index) => {
+                const newInputPosition = {
+                    x: settings.width + 10,
+                    y: settings.height - index * 20 - 10,
+                    absolute: {},
+                    input: model.inputs[inputName],
+                };
+                newInputPosition.absolute.x = newInputPosition.x + settings.x;
+                newInputPosition.absolute.y = newInputPosition.y + settings.y;
+                inputPositions[inputName] = newInputPosition;
+            });
             // }
             return inputPositions;
         }
 
-        this.getOutputPosition=()=>{
+        this.getOutputPosition = () => {
             let ret = {
-                x:settings.width+10,
-                y:0,
+                x: settings.width + 10,
+                y: 0,
             }
-            ret.absolute={
-                x:ret.x + settings.x,
-                y:ret.y + settings.y + 5,
+            ret.absolute = {
+                x: ret.x + settings.x,
+                y: ret.y + settings.y + 5,
             };
             return ret;
         };
-        
-        
+
+
         /** @param {inputPosition} inputPosition */
-        const InputGraph=function(inputPosition,name,num,container){
+        const InputGraph = function (inputPosition, name, num, container) {
             const optxt = new Text({
                 x: inputPosition.x + 10, y: inputPosition.y + 5,
-                text:name,
+                text: name,
             });
             container.add(optxt);
             const rect = new Rectangle({
@@ -177,7 +225,7 @@ class Lane extends Group{
 
 
         /** @param {MiniVector} position */
-        const OutputGraph=function(position,container){
+        const OutputGraph = function (position, container) {
 
             const rect = new Rectangle({
                 x: position.x,
@@ -190,10 +238,10 @@ class Lane extends Group{
         }
 
         this.getInputPositions()
-        Object.keys(inputPositions).map((a,b)=>{
-            new InputGraph(inputPositions[a],a,b,this.contents)
+        Object.keys(inputPositions).map((a, b) => {
+            new InputGraph(inputPositions[a], a, b, this.contents)
         });
-        const myOutputGraph = new OutputGraph(this.getOutputPosition(),this.contents);
+        const myOutputGraph = new OutputGraph(this.getOutputPosition(), this.contents);
 
 
         const title = new Text({

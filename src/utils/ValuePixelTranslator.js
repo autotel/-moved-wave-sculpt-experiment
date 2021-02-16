@@ -6,7 +6,7 @@ import { sampleRate } from "../SoundModules/vars";
 *  rangeAmplitude:number,
 *  rangeSamples:number,
 *  centerAmplitude:number,
-*  centerSample:number,
+*  firstSample:number,
 *  width:number,
 *  height:number,
 *  model:Model,
@@ -15,9 +15,7 @@ import { sampleRate } from "../SoundModules/vars";
 /**
  * @export @typedef {Object} ValuePixelChanges 
  * @param {number} [rangeAmplitude]
- * @param {number} [rangeSamples]
  * @param {number} [centerAmplitude]
- * @param {number} [centerSample]
  * @param {number} [width]
  * @param {number} [height]
  * @param {Model} [model]
@@ -42,6 +40,7 @@ class ValuePixelTranslator {
          */
         this.onChange = (callback)=>{
             changedListeners.push(callback);
+            ValuePixelTranslator.onChange(callback);
         }
 
         /** if you manually change some parameters, call this after, so that it can trigger the listeners accordingly. */
@@ -92,12 +91,16 @@ class ValuePixelTranslator {
 
         /** pixel number to sample number */
         this.xToSampleNumber = (x) => {
-            return Math.floor(settings.rangeSamples * x / settings.width);
+            let sampleNumber =  Math.floor(
+                ValuePixelTranslator.shared.rangeSamples  * x / settings.width
+            );
+            return sampleNumber + ValuePixelTranslator.shared.firstSample;
         };
 
         /** sample number to pixel number */
         this.sampleNumberToX = (sampleNumber) => {
-            return Math.floor(settings.width * sampleNumber / settings.rangeSamples);
+            sampleNumber -= ValuePixelTranslator.shared.firstSample;
+            return Math.floor(settings.width * sampleNumber / ValuePixelTranslator.shared.rangeSamples);
         };
 
         /** convert pixel number into time in seconds */
@@ -110,4 +113,33 @@ class ValuePixelTranslator {
         }
     }
 }
+
+ValuePixelTranslator.shared = {
+    rangeSamples:sampleRate,
+    firstSample:0,
+}
+
+
+ValuePixelTranslator.changedListeners = [];
+/**
+ * @param {Function}  callback
+ */
+ValuePixelTranslator.onChange = (callback)=>{
+    ValuePixelTranslator.changedListeners.push(callback);
+}
+/** if you manually change some parameters, call this after, so that it can trigger the listeners accordingly. */
+ValuePixelTranslator.handleChanged = (changes)=>{
+    ValuePixelTranslator.changedListeners.map((cb)=>cb(changes));
+}
+/**
+ * Use this to change parameters such as zoom, center etc. and call any listener.
+ * Also, call this without argument to just call the callbacks; for example when you need to get the initial state represented.
+ * @param {ValuePixelChanges} settings 
+ */
+ValuePixelTranslator.change=(settings={})=>{
+    Object.assign(ValuePixelTranslator.shared,settings);
+    ValuePixelTranslator.handleChanged(settings);
+}
+
+
 export default ValuePixelTranslator;

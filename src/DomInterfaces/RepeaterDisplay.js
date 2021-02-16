@@ -7,34 +7,33 @@ import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
 import Model from "../scaffolding/Model";
-import EnvelopeGenerator from "../SoundModules/EnvelopeGenerator";
+import Repeater from "../SoundModules/Repeater";
 import { sampleRate } from "../SoundModules/vars";
 const vectorTypes = require("../scaffolding/Vector2");
 /** @typedef {vectorTypes.MiniVector} MiniVector
 /**
- * @namespace DomInterface.EnvelopeGeneratorDisplay
+ * @namespace DomInterface.RepeaterDisplay
  */
 /** 
- * @class EnvelopeGeneratorDisplay
+ * @class RepeaterDisplay
  * @extends WaveLane
  */
-class EnvelopeGeneratorDisplay extends WaveLane{
+class RepeaterDisplay extends WaveLane{
     /** @param {Object<String,Model|string|number>} options */
     constructor (options){
-        /** @type {EnvelopeGenerator} */
+        /** @type {Repeater} */
         const model = options.model;
         const settings=typicalLaneSettings(model);
         //plave for defaults
-        settings.name="Envelope";
+        settings.name="Repeater";
         Object.assign(settings,options);
 
         const translator=new ValuePixelTranslator(settings);
         super(translator,settings);
 
-
         const lengthKnob = this.addKnob("length");
-        const loopToggle = this.addToggle("loop");
-
+        // const loopToggle = this.addToggle("loop");
+        this.addKnob("gain");
 
         //lane has a contents sprite.
         const contents=this.contents;
@@ -177,4 +176,4 @@ class EnvelopeGeneratorDisplay extends WaveLane{
     }
 };
 
-export default EnvelopeGeneratorDisplay;
+export default RepeaterDisplay;

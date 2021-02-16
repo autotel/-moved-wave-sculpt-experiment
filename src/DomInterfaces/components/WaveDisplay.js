@@ -10,7 +10,7 @@ class WaveDisplay extends Path{
 
         super({
             d: `M ${0},${settings.height / 2}
-            Q ${0},${settings.height / 2} ${settings.width},${settings.height / 2}`,
+            L ${0},${settings.height / 2} ${settings.width},${settings.height / 2}`,
             fill: "transparent",
             stroke: "black"
         });
@@ -18,50 +18,34 @@ class WaveDisplay extends Path{
 
         const superSet = this.set;
 
-        this.set = (...p) => {
+        this.set = (what,value) => {
             const {
                 rangeAmplitude
             }=settings;
 
-            if (p[0] == "wave") {
-                const theWave = p[1];
+            if (what == "wave") {
+                const theWave = value;
                 let str = `M ${0},${settings.height / 2}`;
                 
-                // let valsPerPixel = ;
-                let lastLevel = 0;
-                let topOffset = settings.height / 2;
-                let prevTop = topOffset;
+                let end = Math.min(
+                    settings.width,
+                    translator.sampleNumberToX(theWave.length)
+                );
                 //todo: take whichever has less: pixels or samples.
                 //when multi samples per pixel, use max and a filled area
                 //otherwise, it's a line
-                for (let pixelNumber = 0; pixelNumber < settings.width; pixelNumber++) {
+                for (let pixelNumber = 0; pixelNumber < end; pixelNumber++) {
                     const index=translator.xToSampleNumber(pixelNumber);
-                    if(index>=theWave.length){
-                        //value gets "frozen"
-                        str += `Q ${settings.width},${prevTop} ${settings.width},${prevTop}`;
-                        break;
-                    }
-
-                    const levelNow=theWave[index];
-                    
-                    lastLevel=levelNow;
-                    
-                    const top = translator.amplitudeToY(
-                        lastLevel
-                    );
-
-                    if (pixelNumber > 0)
-                        str += `Q ${pixelNumber - 1},${prevTop} ${pixelNumber},${top}`;
-                    prevTop = top;
+                    const top = translator.amplitudeToY(theWave[index]);
+                    str += `L ${pixelNumber},${top}`;
                 }
 
-                str += `Q ${settings.width},${prevTop} ${settings.width},${translator.amplitudeToY(0)}`;
-                str += `Q ${settings.width},${translator.amplitudeToY(0)} ${0},${translator.amplitudeToY(0)} `;
+                str += `L ${end},${translator.amplitudeToY(0)}`;
+                str += `L ${0},${translator.amplitudeToY(0)} `;
                 str += `z`;
 
-                p = ['d', str];
+                superSet('d',str);
             }
-            superSet(...p);
         };
     }
 }

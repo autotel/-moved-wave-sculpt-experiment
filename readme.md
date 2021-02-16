@@ -30,9 +30,7 @@ http://autotel.co/sound-sculpt/
 * find a small square at the right of the lanes; when you drag it vertically, it changes the vertical scale of the lanes.
 
 ## todo:
-* some changes are not propagated from model to interface: 
-    * points in envelopeGenerator
-* Add more interesting filters
+
 * there still are no interfaces to control some properties without the command line:
     * patching among modules
     * filter type selection
@@ -42,7 +40,11 @@ http://autotel.co/sound-sculpt/
 * remove reminiscent "NaNHz" from envelopeGenerator
 * add link from the hosted experiment to repository, and to my website.
 * implement the improved knobs interaction design (allows rotate/drag on same gesture)
+* time navigation
+* some background for knobs lane, would lead to better contrast. Probably hiding/showing knobs
+* something is wrong with the mixer input levels scaling: some affect others.
 * refactors
     * draggable, clickable, using attachment of event listeners instead of overriding callbacks
     * create a consistent interface for attaching callbacks. not eventlisteners, because it produces "unpredictable" listener names, but i am currently implementing listeners separately everywhere.
+    * placement of elements in each lane, and hierarchy
 

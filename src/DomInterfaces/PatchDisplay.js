@@ -1,5 +1,5 @@
 import Module from "../SoundModules/Module";
-import { Line, Path } from "../scaffolding/elements";
+import { Line, Path, Group } from "../scaffolding/elements";
 import Lane from "./components/Lane";
 import InputNode from "../SoundModules/InputNode";
 import Sprite from "../scaffolding/Sprite";
@@ -21,9 +21,9 @@ const pathTypes = require("../scaffolding/elements");
 
 /** 
  * @class PatchDisplay
- * @extends Sprite
+ * @extends Group
  */
-class PatchDisplay extends Sprite{
+class PatchDisplay extends Group{
     constructor(){
         super();
         /** @type {Path[]} */
@@ -75,10 +75,12 @@ class PatchDisplay extends Sprite{
                         filteredCoordinates.push(outputCoordinates);
                     }
                 })
-                let bez=80;
                 filteredCoordinates.map((filteredCoord)=>{
                     const startPos = modulesInterface.getOutputPosition().absolute;
                     const endPos = filteredCoord.absolute;
+                    
+                    let bez=Math.abs(startPos.y-endPos.y) / 5;
+
                     coords.push({
                         d:`M ${endPos.x}, ${startPos.y}
                             C ${endPos.x + bez}, ${startPos.y}
@@ -106,6 +108,7 @@ class PatchDisplay extends Sprite{
             coords.map((coord,i)=>{
                 if(!lines[i]){
                     lines[i]=new Path();
+                    lines[i].domElement.addEventListener('click',(evt)=>lines[i].domElement.classList.toggle("highlight"));
                     this.add(lines[i]);
                 }
                 Object.assign(lines[i].attributes,coord);

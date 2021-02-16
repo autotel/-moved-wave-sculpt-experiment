@@ -3,12 +3,16 @@ body {
   background-color: #010c08;
 }
 
+svg.nav {
+  position: fixed;
+  bottom: 0px;
+  height: 30px;
+}
+
 svg {
   position: absolute;
   width: 100%;
   height: 2000px;
-}
-svg * {
   stroke: #474109;
   stroke-width: 1;
   fill: transparent;
@@ -16,17 +20,30 @@ svg * {
   /* stroke-dasharray: 2 2; */
   transition: fill, stroke 0.1s;
 }
-svg *.active {
-  stroke: #afafa8;
+svg .time-pan.draggable {
+  fill: white;
+  stroke: transparent;
+  cursor: col-resize;
+}
+svg .time-zoom.draggable {
+  stroke: white;
+  fill: transparent;
+  cursor: e-resize;
+}
+svg .active {
+  stroke: white;
   fill: rgba(175, 175, 168, 0.377);
   stroke-width: 1;
   transition: fill, stroke 0.1s;
 }
-svg .button:hover {
+svg .no-mouse {
+  pointer-events: none;
+}
+svg .button :hover {
   fill: rgba(248, 248, 248, 0.055);
   stroke: #afafa8;
 }
-svg .button.active:hover {
+svg .button.active, svg .button :hover {
   fill: rgba(248, 248, 248, 0.452);
   /* stroke: rgb(175, 175, 168); */
 }
@@ -56,7 +73,7 @@ svg .patchcord {
   transition: opacity 0.2s;
   fill: none;
 }
-svg .patchcord:hover {
+svg .patchcord:hover, svg .patchcord.highlight {
   opacity: 1;
   transition: opacity 0.2s;
 }
@@ -75,12 +92,34 @@ svg .patchcord:nth-child(5n+3) {
 svg .patchcord:nth-child(5n+4) {
   stroke: #ff00c8;
 }
-svg svg.knob {
+svg .control-panel {
+  opacity: 0.2;
+  transition: 0.2s opacity;
   overflow: visible;
 }
-svg svg.knob.active .knob-value-arc {
+svg .control-panel:active, svg .control-panel:hover {
+  opacity: 1;
+}
+svg .control-panel .background {
+  stroke: none;
+  fill: #000000c9;
+}
+svg .control-panel path, svg .control-panel rect, svg .control-panel .button, svg .control-panel svg {
+  stroke: #6f8493;
+}
+svg .control-panel .button.play.active.active > path {
+  stroke: #0099ff;
+  fill: transparent;
+}
+svg .control-panel text {
+  fill: #6f8493;
+}
+svg .control-panel .knob.active .knob-value-arc {
   stroke: #0099ff;
   stroke-width: 3px;
+}
+svg .control-panel .knob {
+  cursor: row-resize;
 }
 svg svg.lane, svg svg {
   overflow: visible;

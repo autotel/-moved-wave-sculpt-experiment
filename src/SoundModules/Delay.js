@@ -53,7 +53,6 @@ class Delay extends Module{
                 }
                 if(len > currentTimeLevel){
                     this.cachedValues[sampleNumber] += delayCache.shift() * settings.wet;
-
                 }
                 
                 delayCache[len - 2] += this.cachedValues[sampleNumber] 

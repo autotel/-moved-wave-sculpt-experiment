@@ -3,7 +3,7 @@ import Oscillator from "../SoundModules/Oscillator";
 import Mixer from "../SoundModules/Mixer";
 import Delay from "../SoundModules/Delay";
 import EnvelopeGenerator from "../SoundModules/EnvelopeGenerator";
-import Chevyshev from "../SoundModules/Chebyshev";
+import Chebyshev from "../SoundModules/Chebyshev";
 
 import GenericDisplay from "../DomInterfaces/GenericDisplay";
 import OscillatorDisplay from "../DomInterfaces/OscillatorDisplay";
@@ -12,10 +12,13 @@ import Filter from "../SoundModules/Filter";
 import MixerTesselator from "../SoundModules/MixerTesselator";
 import Model from "../scaffolding/Model";
 import Module from "../SoundModules/Module";
+import Repeater from "../SoundModules/Repeater";
 import FilterDisplay from "../DomInterfaces/FilterDisplay";
 import DelayDisplay from "../DomInterfaces/DelayDisplay";
 import MixerDisplay from "../DomInterfaces/MixerDisplay";
 import InputNode from "../SoundModules/InputNode";
+import ChebyshevDisplay from "../DomInterfaces/ChebyshevDisplay";
+import RepeaterDisplay from "../DomInterfaces/RepeaterDisplay";
 
 
 class LiveCodingInterface{
@@ -54,8 +57,14 @@ class LiveCodingInterface{
                 case "EnvelopeGenerator":
                     newInterface=new EnvelopeGeneratorDisplay({model:newModule,name});
                 break;
+                case "Repeater":
+                    newInterface=new RepeaterDisplay({model:newModule,name});
+                break;
                 case "Filter":
                     newInterface=new FilterDisplay({model:newModule,name});
+                break;
+                case "Chebyshev":
+                    newInterface=new ChebyshevDisplay({model:newModule,name});
                 break;
                 case "Delay":
                     newInterface=new DelayDisplay({model:newModule,name});
@@ -74,7 +83,7 @@ class LiveCodingInterface{
             newModule.name = name;
             
             this.modules[name]=newModule;
-            newInterface.handyPosition(count);
+            newInterface.handyPosition(count + 3);
 
             count++;
             return newModule;
@@ -124,8 +133,9 @@ class LiveCodingInterface{
             MixerTesselator,
             Delay,
             EnvelopeGenerator,
-            Chevyshev,
+            Chebyshev,
             Filter,
+            Repeater,
         };
 
         Object.keys(this.possibleModules).map((mname)=>{

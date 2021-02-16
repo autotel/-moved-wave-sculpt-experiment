@@ -109,6 +109,7 @@ class Oscillator extends Module{
         
         this.recalculate = (recursion = 0) => {
             phaseAccumulator = 0;
+            this.cachedValues=[];
             const lengthSamples = settings.length * sampleRate;
             if (!shapes[settings.shape])
             throw new Error(`Wave shape function named ${settings.shape}, does not exist`);
@@ -126,6 +127,7 @@ class Oscillator extends Module{
                 const bias = (biasInputValues[a] || 0) + settings.bias;
                 this.cachedValues[a] = shapes[settings.shape](freq, amp, bias);
             }
+
             this.changed({ cachedValues: this.cachedValues });
         };
     }

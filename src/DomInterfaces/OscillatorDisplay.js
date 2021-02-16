@@ -68,9 +68,7 @@ class OscillatorDisplay extends WaveLane{
         const frequencyHandle = new Circle({r:10});
 
         const frequencyDraggable=new Draggable(frequencyHandle.domElement);
-        const proportionalDraggable=new Draggable(this.waveDisplay.domElement);
 
-        proportionalDraggable.setPosition({x:0,y:0});
         frequencyDraggable.positionChanged=(newPosition)=>{
             frequencyHandle.attributes.cx=newPosition.x;
             frequencyHandle.attributes.cy=newPosition.y;
@@ -80,14 +78,6 @@ class OscillatorDisplay extends WaveLane{
         }
 
         let pixFreqOnDragStart;
-        proportionalDraggable.dragStartCallback=(mouse)=>{
-            pixFreqOnDragStart = freqToX(model.settings.frequency);
-        }
-        proportionalDraggable.positionChanged=(pos)=>{
-            model.setFrequency(
-                xToFrequency(pixFreqOnDragStart + pos.delta.x )
-            );
-        }
 
         contents.add(frequencyHandle);
 

@@ -128,6 +128,7 @@ class Group extends Component {
         /** @param {Component} elem */
         this.add = (elem) => {
             this.domElement.appendChild(elem.domElement);
+            return this;
         };
         this.remove = (elem) => {
             this.domElement.removeChild(elem.domElement);
@@ -135,7 +136,6 @@ class Group extends Component {
         this.update();
     }
 }
-
 
 /**
  * @typedef {ComponentOptions} TextOptions
@@ -150,10 +150,7 @@ class Text extends Component {
         super(myOptions);
         // Component.call(this, myOptions);
         this.domElement = document.createElementNS("http://www.w3.org/2000/svg", 'text');
-        /** @param {Component} elem */
-        this.add = (elem) => {
-            this.domElement.appendChild(elem.domElement);
-        };
+        
         const superUpdate = this.update;
         this.update = () => {
             this.domElement.innerHTML = this.attributes.text;

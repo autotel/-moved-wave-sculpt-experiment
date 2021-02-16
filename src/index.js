@@ -1,7 +1,14 @@
 //DOM gui
-import drawBoard from "./scaffolding/drawBoard";
 import Draggable from "./DomInterfaces/components/Draggable";
 import PatchDisplay from "./DomInterfaces/PatchDisplay";
+import Canvas from "./scaffolding/Canvas";
+import TimeZoomer from "./DomInterfaces/TimeZoomer";
+
+const drawBoard=new Canvas();
+drawBoard.element.classList.add("drawboard");
+const navBoard=new Canvas();
+navBoard.element.classList.add("nav");
+
 
 //other interfaces
 import SoundPlayer from "./scaffolding/SoundPlayer";
@@ -11,7 +18,9 @@ const webInspectorInterface=new WebInspectorInterface();
 
 
 const patchDisplay = new PatchDisplay();
-drawBoard.add(patchDisplay);
+
+const timeZoomer = new TimeZoomer();
+navBoard.add(timeZoomer);
 
 const player=new SoundPlayer();
 
@@ -21,10 +30,12 @@ webInspectorInterface.onModuleCreated((newModule,newInterface,count)=>{
     drawBoard.add(newInterface);
 });
 
-Draggable.setCanvas(drawBoard.element);
+drawBoard.add(patchDisplay);
+
+Draggable.setCanvas();
 
 //pre-run a live-coded patch
-// import drumpat from "./patches/drumpat";
-import drumpat from "./patches/filterTester";
+import drumpat from "./patches/drumpat";
+// import drumpat from "./patches/filterTester";
 
 drumpat(webInspectorInterface);

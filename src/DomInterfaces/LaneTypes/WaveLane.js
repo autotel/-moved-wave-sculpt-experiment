@@ -28,6 +28,7 @@ class WaveLane extends Lane{
 
         const waveDisplay=this.waveDisplay = new WaveDisplay(translator);
         waveDisplay.domElement.classList.add("wave-display");
+        waveDisplay.domElement.classList.add("no-mouse");
         contents.add(waveDisplay);
         
 
