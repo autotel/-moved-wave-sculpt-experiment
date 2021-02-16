@@ -21,6 +21,7 @@ import {sampleRate} from "./vars";
  * @property {number} [reso]
  * @property {filterType} [type]
  * @property {0|1|2|3|4} [order]
+ * @property {boolean} [saturate]
  */
 
 /**
@@ -31,11 +32,17 @@ import {sampleRate} from "./vars";
  * @property {number} order 
 */
 
+function saturate1(val){
+    if(val>1) val=1; 
+    if(val<-1) val=-1;
+    return val;
+}
+
 class base{
     constructor(){
         this.reset=()=>{}
-        this.calculateSample=(sample,frequency,reso,gain,order)=>{
-            return sample;
+        this.calculateSample=(sample,frequency,reso,gain,order,saturate)=>{
+            return saturate?saturate1(sample):sample;
         }
     }
 }
@@ -49,7 +56,7 @@ class lp_boxcar extends base{
         this.reset=()=>{
             lastOutput=0;
         }
-        this.calculateSample=(sample,frequency,reso,gain,order)=>{
+        this.calculateSample=(sample,frequency,reso,gain,order,saturate)=>{
             //I actually don't know well how to calculate the cutoff frequency, I just made this simplistic guess:
             //a moving average roughly takes "weight" times to get quite close to the value
             let weighta = frequency/sampleRate;
@@ -57,7 +64,9 @@ class lp_boxcar extends base{
             const weightb = 1-weighta;
             let output = (sample * weighta + lastOutput * weightb);
             lastOutput = output;
-            return output * gain;
+            output*=gain;
+            
+            return saturate?saturate1(output):output;
         }
     }
 }
@@ -70,7 +79,7 @@ class hp_boxcar extends base{
         this.reset=()=>{
             lastOutput=0;
         }
-        this.calculateSample=(sample,frequency,reso,gain,order)=>{
+        this.calculateSample=(sample,frequency,reso,gain,order,saturate)=>{
             //I actually don't know well how to calculate the cutoff frequency, I just made this simplistic guess:
             //a moving average roughly takes "weight" times to get quite close to the value
             let weighta = frequency/sampleRate;
@@ -78,7 +87,8 @@ class hp_boxcar extends base{
             const weightb = 1-weighta;
             let output = (sample * weighta + lastOutput * weightb);
             lastOutput = output;
-            return (sample - output) * gain;
+            output=(sample - output) * gain
+            return saturate?saturate1(output):output;
         }
     }
 }
@@ -99,7 +109,7 @@ class lp_nboxcar extends base{
             dc=0;
         }
 
-        this.calculateSample=(sample,frequency,reso,gain,order)=>{
+        this.calculateSample=(sample,frequency,reso,gain,order,saturate)=>{
             if(frequency < 0) frequency=0;
             let weighta = frequency/sampleRate;
             if(weighta>1) weighta=1;
@@ -113,8 +123,8 @@ class lp_nboxcar extends base{
                 lastOutputs[pole] = currentIn * weighta + lastOutputs[pole] * weightb;
                 currentIn = lastOutputs[pole];
             }
-
-            return currentIn * gain - resoScaled * 0.8;
+            let output=currentIn * gain - resoScaled * 0.8;
+            return saturate?saturate1(output):output;
         }
     }
 }
@@ -130,7 +140,7 @@ class pinking extends base{
         this.reset=()=>{
             b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
         }
-        this.calculateSample=(sample,frequency,reso,gain,order)=>{
+        this.calculateSample=(sample,frequency,reso,gain,order,saturate)=>{
             let outSample=0;
             b0 = 0.99886 * b0 + sample * 0.0555179;
             if(order>1) b1 = 0.99332 * b1 + sample * 0.0750759;
@@ -141,7 +151,7 @@ class pinking extends base{
             outSample = b0 + b1 + b2 + b3 + b4 + b5 + b6 + sample * 0.5362;
             outSample *= gain;
             b6 = sample * 0.115926;
-            return outSample;
+            return saturate?saturate1(outSample):outSample;
         }
     }
 }
@@ -160,7 +170,7 @@ class lp_moog extends base{
             in1 = in2 = in3 = in4 = out1 = out2 = out3 = out4 = 0.0;
             msgcount=0;
         }
-        this.calculateSample=(sample,frequency,reso,gain,order)=>{
+        this.calculateSample=(sample,frequency,reso,gain,order,saturate)=>{
             if(frequency<0) frequency=0;
             let f = (frequency / sampleRate) * 1.16;
             
@@ -205,7 +215,7 @@ class lp_moog extends base{
             // if(isNaN(out4)) throw new Error("out4 is NaN");
             // if(isNaN(outSample)) throw new Error("outSample is NaN");
 
-            return outSample;
+            return saturate?saturate1(outSample):outSample;
         }
     }
 }
@@ -230,6 +240,7 @@ const defaultSettings={
     type:"lp_moog",
     order:1,
     frequency:100,
+    saturate:false,
 };
 
 const voz=(val)=>val?val:0;
@@ -274,7 +285,7 @@ class Filter extends Module{
             this.cacheObsolete();
             return this;
         };
-        /** @param {filterType} */
+        /** @param {filterType} to */
         this.setType = (to) => {
             settings.type = to;
             this.changed({
@@ -303,7 +314,7 @@ class Filter extends Module{
                 voz(frequencies[spl]) + settings.frequency,
                 voz(resos[spl]) + settings.reso,
                 voz(gains[spl]) + settings.gain,
-                order
+                order,settings.saturate
             ));
         
             this.changed({ cachedValues: this.cachedValues });

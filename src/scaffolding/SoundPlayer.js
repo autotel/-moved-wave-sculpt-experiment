@@ -46,7 +46,7 @@ class SoundPlayer{
                             0,
                             sliceStart-sliceEnd
                         );
-                        returnBuffer.push(...append);
+                        returnBuffer = returnBuffer.concat(append);
                     }
                 }
                 return returnBuffer;

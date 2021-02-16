@@ -5,10 +5,10 @@ class MixerDisplay extends GenericDisplay{
         super(options); 
 
         const levels=[
-            this.addParameterKnob("levela"),
-            this.addParameterKnob("levelb"),
-            this.addParameterKnob("levelc"),
-            this.addParameterKnob("leveld")
+            this.addKnob("levela"),
+            this.addKnob("levelb"),
+            this.addKnob("levelc"),
+            this.addKnob("leveld")
         ];
 
         levels.map((k)=>

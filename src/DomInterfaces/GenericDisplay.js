@@ -20,7 +20,7 @@ import round from "../utils/round";
  */
 class GenericDisplay extends WaveLane{
 
-    /** @param {Object<String,Model|string|number>} options */
+    /** @param {Object<String,Module|string|number>} options */
     constructor(options){
         const {model} = options;
         const settings=typicalLaneSettings(model);

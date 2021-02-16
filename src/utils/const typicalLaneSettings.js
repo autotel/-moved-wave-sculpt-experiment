@@ -1,6 +1,6 @@
-import Model from "../scaffolding/Model";
+import Module from "../SoundModules/Module";
 
-/**@param {Model} model */
+/**@param {Module} model */
 const typicalLaneSettings=(model)=>({
     x:0,y:0,
     centerAmplitude:0,rangeAmplitude:2,

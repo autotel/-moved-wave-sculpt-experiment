@@ -32,9 +32,10 @@ class OscillatorDisplay extends WaveLane{
 
         super(translator,settings);
 
-        const frequencyKnob = this.addParameterKnob("frequency");
-        const amplitudeKnob = this.addParameterKnob("amplitude");
-        const biasKnob = this.addParameterKnob("bias");
+        const frequencyKnob = this.addKnob("frequency");
+        const amplitudeKnob = this.addKnob("amplitude");
+        const biasKnob = this.addKnob("bias");
+        const lengthKnob = this.addKnob("length");
         // const xToFrequency = (x)=>{
         //     const pixelRange=settings.width;
         //     return Math.pow(2,(x/pixelRange)*15);

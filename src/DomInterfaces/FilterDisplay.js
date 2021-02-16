@@ -3,10 +3,11 @@ import GenericDisplay from "./GenericDisplay";
 class FilterDisplay extends GenericDisplay{
     constructor(options){
         super(options); 
-        this.addParameterKnob("gain");
-        this.addParameterKnob("reso");
-        this.addParameterKnob("frequency");
-        this.addParameterKnob("order");
+        this.addKnob("gain");
+        this.addKnob("reso");
+        this.addKnob("frequency");
+        this.addKnob("order");
+        this.addToggle("saturate");
 
     }
 }

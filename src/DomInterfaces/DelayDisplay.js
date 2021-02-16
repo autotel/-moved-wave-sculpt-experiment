@@ -4,10 +4,10 @@ class DelayDisplay extends GenericDisplay{
     constructor(options){
         super(options); 
 
-        const timeKnob = this.addParameterKnob("time");
-        const feedbackKnob = this.addParameterKnob("feedback");
-        const wetKnob = this.addParameterKnob("wet");
-        const dryKnob = this.addParameterKnob("dry");
+        const timeKnob = this.addKnob("time");
+        const feedbackKnob = this.addKnob("feedback");
+        const wetKnob = this.addKnob("wet");
+        const dryKnob = this.addKnob("dry");
 
         // timeKnob.step=1/10000;
         timeKnob.setDeltaCurve("periodseconds");

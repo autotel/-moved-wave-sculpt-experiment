@@ -38,12 +38,14 @@ class Knob extends Group{
         super(options);
 
         let nameText = new Text({
-            x:-options.radius,
-            y: options.radius + 5
+            x:0,
+            y: options.radius + 5,
+            'text-anchor':'middle'
         });
         let valueText = new Text({
-            x:-options.radius,
-            y: options.radius + 15
+            x:0,
+            y: options.radius + 15,
+            'text-anchor':'middle'
         });
 
         this.add(nameText);
@@ -148,11 +150,12 @@ class Knob extends Group{
             if(isNaN(pixValueOnDragStart)) pixValueOnDragStart=0;
             this.domElement.classList.add("active");
         }
+
         draggable.dragEndCallback=()=>{
             this.domElement.classList.remove("active");
         }
-        draggable.positionChanged=(newPosition)=>{
 
+        draggable.positionChanged=(newPosition)=>{
             //choose the lengthiest coord to define delta
             let theDistance = -newPosition.delta.y;
             let valueDelta = distanceToValue(theDistance);
@@ -176,12 +179,14 @@ class Knob extends Group{
         this.onChange=(cb)=>{
             changeCallbacks.push(cb);
         }
+
         const handleChanged=(changes)=> changeCallbacks.map((cb)=>cb(changes));
         
         this.updateGraphic=()=>{
             knobShape.set("transform",`rotate(${getAngle()})`);
             nameText.set("text",options.name);
             valueText.set("text","~"+(round(this.value,2)));
+
             if(options.min!==false&&options.max!==false){
                 remakeValueShape();
             }
@@ -208,6 +213,7 @@ class Knob extends Group{
                 propertyObject[parameterName] = value;
                 module.set(propertyObject);
             });
+
             module.onUpdate((changes)=>{
                 if(changes[parameterName]){
                     this.value=changes[parameterName];

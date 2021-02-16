@@ -139,6 +139,7 @@ class Group extends Component {
 
 /**
  * @typedef {ComponentOptions} TextOptions
+ * @property {"middle"|"left"|"right"} 'text-anchor'
  */
 class Text extends Component {
 

@@ -42,3 +42,7 @@ http://autotel.co/sound-sculpt/
 * remove reminiscent "NaNHz" from envelopeGenerator
 * add link from the hosted experiment to repository, and to my website.
 * implement the improved knobs interaction design (allows rotate/drag on same gesture)
+* refactors
+    * draggable, clickable, using attachment of event listeners instead of overriding callbacks
+    * create a consistent interface for attaching callbacks. not eventlisteners, because it produces "unpredictable" listener names, but i am currently implementing listeners separately everywhere.
+

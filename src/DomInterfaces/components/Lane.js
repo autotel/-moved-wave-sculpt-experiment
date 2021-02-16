@@ -8,6 +8,7 @@ import Module from "../../SoundModules/Module";
 import InputNode from "../../SoundModules/InputNode";
 import Hoverable from "./Hoverable";
 import Knob from "./Knob";
+import Toggle from "./Toggle";
 const VectorTypedef = require("../../scaffolding/Vector2");
 
 /**
@@ -75,13 +76,22 @@ class Lane extends Group{
             return this;
         }
 
-        let knobsCount = 0;
+        let controlsCount = 0;
         /** @param {string} parameterName */
-        this.addParameterKnob=(parameterName)=>{
-            const newKnob = new Knob({x:options.width - 50 * knobsCount++ - 70, y: 80});
-            newKnob.setToModuleParameter(model,parameterName);
-            this.contents.add(newKnob);
-            return newKnob;
+        this.addKnob=(parameterName)=>{
+            let newControl;
+            newControl = new Knob({x:options.width - 50 * controlsCount++ - 70, y: 80});
+            newControl.setToModuleParameter(model,parameterName);
+            this.contents.add(newControl);
+            return newControl;
+        }
+        /** @param {string} parameterName */
+        this.addToggle=(parameterName)=>{
+            let newControl;
+            newControl = new Toggle({x:options.width - 50 * controlsCount++ - 70, y: 80});
+            newControl.setToModuleParameter(model,parameterName);
+            this.contents.add(newControl);
+            return newControl;
         }
         
         const draggable = new Draggable(handleRect.domElement);
