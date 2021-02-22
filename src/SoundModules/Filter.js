@@ -222,7 +222,7 @@ class lp_moog extends base{
             let af = 1-f;
             let sqf = f*f;
 
-            let fb = gain * (1.0 - 0.15 * sqf);
+            let fb = reso * (1.0 - 0.15 * sqf);
 
             let outSample=0;
             sample -= out4 * fb;
@@ -237,12 +237,12 @@ class lp_moog extends base{
             out4 = out3 + 0.3 * in4 + af * out4; // Pole 4
             in4 = out3;
 
-            outSample = out4;
+            outSample = out4 * gain;
             // if(msgcount<20){
             //     msgcount++
             //     console.log({
             //         in1, in2, in3, in4, out1, out2, out3, out4,
-            //         sample,frequency,reso,gain,order,
+            //         sample,frequency,reso,reso,order,
             //         f,fb,outSample
             //     });
             // }else if(msgcount==20){
@@ -250,7 +250,7 @@ class lp_moog extends base{
             //     console.log("omitting the rest...");
             // }
             // if(isNaN(frequency)) throw new Error("frequency is NaN");
-            // if(isNaN(gain)) throw new Error("gain is NaN");
+            // if(isNaN(reso)) throw new Error("reso is NaN");
             // if(isNaN(fb)) throw new Error("fb is NaN");
             // if(isNaN(sample)) throw new Error("sample is NaN");
             // if(isNaN(in1)) throw new Error("in1 is NaN");
@@ -347,12 +347,12 @@ class Filter extends Module{
             //create an interface for the filter
             let filter = new filterProtos[settings.type]();
             const order = settings.order;
-            const frequencies = this.inputs.frequency.getValues();
-            const gains = this.inputs.gain.getValues();
-            const resos = this.inputs.reso.getValues();
+            const frequencies = this.inputs.frequency.getValues(recursion);
+            const gains = this.inputs.gain.getValues(recursion);
+            const resos = this.inputs.reso.getValues(recursion);
             
             this.cachedValues = [];
-            const inputValues=this.inputs.main.getValues();
+            const inputValues=this.inputs.main.getValues(recursion);
 
             filter.reset();
 

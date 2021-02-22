@@ -14,6 +14,7 @@ import { sampleRate } from "./vars";
  * @property {number} [length]
  * @property {Array<EnvelopePoint>} [points]
  * @property {boolean} [loop]
+ * @property {boolean} [monophonic]
  * @property {number} [gain]
  */
 
@@ -82,7 +83,7 @@ class Repeater extends Module {
 
             const lengthSamples = settings.length * sampleRate;
 
-            let inputSamples = this.inputs.main.getValues();
+            let inputSamples = this.inputs.main.getValues(recursion);
 
             let nextPoint = getNextPoint(0);
             let currentPoint = [0, 0];

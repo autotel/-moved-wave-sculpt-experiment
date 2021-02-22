@@ -6,6 +6,7 @@ It provides a more intuitive ontrol of timing, as it doesn't run on realtime.
 http://autotel.co/sound-sculpt/
 
 ## available uses
+
 * open ./dist/index.html to play
     * open developer console to change things with the patch (experimental)
     * type `modules.` and press "tab" key to get a list of available modules
@@ -31,20 +32,32 @@ http://autotel.co/sound-sculpt/
 
 ## todo:
 
-* there still are no interfaces to control some properties without the command line:
+### Number legend: 
+* priority order, 
+* utility (1: just an idea, 2: it would be nice, 3: it's required),
+* effort (1: easy fix, 2: a bit involved,  3: quite involved, 4: it's a whole new thing)
+
+1. 3 1 cli and module interface: deleting of modules
+1. 3 2 export patches, export wav.
+1. 2 1 connection should produce a recalculation
+1. 3 2 something is wrong with the mixer input levels scaling: some affect others.
+1. 2 3 there still are no interfaces to control some properties without the command line:
     * patching among modules
     * filter type selection
     * wave shape
-* envelopeGenerator shapes
-* export patches, export wav.
-* remove reminiscent "NaNHz" from envelopeGenerator
-* add link from the hosted experiment to repository, and to my website.
-* implement the improved knobs interaction design (allows rotate/drag on same gesture)
-* time navigation
-* some background for knobs lane, would lead to better contrast. Probably hiding/showing knobs
-* something is wrong with the mixer input levels scaling: some affect others.
-* refactors
+
+1. remove reminiscent "NaNHz" from envelopeGenerator
+1. wave lane should occupy all the window width (minus patch area, of course)
+1. fix bugs with time navigation
+1. envelopeGenerator shapes
+1. Multi modules, I would like to:
+    * be able to drag and drop one module over another and get them two in a group, navigated by tabs
+    * constructing a composite module, that has a dedicated interface to control the two
+    * possibility to have recursion
+1. refactors
     * draggable, clickable, using attachment of event listeners instead of overriding callbacks
     * create a consistent interface for attaching callbacks. not eventlisteners, because it produces "unpredictable" listener names, but i am currently implementing listeners separately everywhere.
     * placement of elements in each lane, and hierarchy
+1. implement the improved knobs interaction design (allows rotate/drag on same gesture)
 
+1. how 

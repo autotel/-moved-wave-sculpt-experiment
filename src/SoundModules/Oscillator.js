@@ -10,7 +10,8 @@ const defaultSettings={
     amplitude:1,
     bias:0,
     length:1,
-    frequency:1,
+    frequency:2,
+    phase:0,
     shape:"sin",
 };
 
@@ -20,6 +21,7 @@ const defaultSettings={
  * @property {number} [bias]
  * @property {number} [length]
  * @property {number} [frequency]
+ * @property {number} [phase]
  * @property {"sin"|"cos"|"ramp"|"noise"|"offset"} [shape]
  */
 /**
@@ -107,16 +109,25 @@ class Oscillator extends Module{
             return this;
         };
         
+        this.setPhase = (to) => {
+            return this.set({
+                phase: to
+            });
+        };
+        
         this.recalculate = (recursion = 0) => {
-            phaseAccumulator = 0;
+            phaseAccumulator = settings.phase;
             this.cachedValues=[];
             const lengthSamples = settings.length * sampleRate;
             if (!shapes[settings.shape])
-            throw new Error(`Wave shape function named ${settings.shape}, does not exist`);
+            throw new Error(`
+                Wave shape function named ${settings.shape}, does not exist. 
+                Try: ${Object.keys(shapes).join()}
+            `);
             
-            const freqInputValues = this.inputs.frequency.getValues();
-            const ampInputValues = this.inputs.amplitude.getValues();
-            const biasInputValues = this.inputs.bias.getValues();
+            const freqInputValues = this.inputs.frequency.getValues(recursion);
+            const ampInputValues = this.inputs.amplitude.getValues(recursion);
+            const biasInputValues = this.inputs.bias.getValues(recursion);
             
             //for noise, lets us have always the same noise. Frequency will be the seed
             rng=seedrandom(settings.frequency);

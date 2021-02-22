@@ -103,7 +103,7 @@ class Module extends Model{
         this.cacheObsolete = (calculate = true) => {
             useCache = false;
             this.changed({ useCache });
-            if(calculate) this.getValues();
+            if(calculate) this.getValues(0);
         };
         /**
          * used to get the values from the module, or to cause the module to recalculate its values.

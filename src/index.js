@@ -35,7 +35,8 @@ drawBoard.add(patchDisplay);
 Draggable.setCanvas();
 
 //pre-run a live-coded patch
-import drumpat from "./patches/drumpat";
+import drumpat from "./patches/rotator";
+// import drumpat from "./patches/drumpat";
 // import drumpat from "./patches/filterTester";
 
 drumpat(webInspectorInterface);

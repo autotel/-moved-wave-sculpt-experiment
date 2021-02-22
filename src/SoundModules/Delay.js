@@ -36,11 +36,11 @@ class Delay extends Module{
             this.cachedValues = [];
             let delayCache = [];
             
-            let inputValues = this.inputs.main.getValues();
+            let inputValues = this.inputs.main.getValues(recursion);
             let delayInSamples = Math.floor(sampleRate * settings.time);
 
-            let feedbackLevels = this.inputs.feedback.getValues();
-            let timeLevels = this.inputs.time.getValues();
+            let feedbackLevels = this.inputs.feedback.getValues(recursion);
+            let timeLevels = this.inputs.time.getValues(recursion);
             
             inputValues.map((value,sampleNumber)=>{
                 let len = delayCache.push(value);

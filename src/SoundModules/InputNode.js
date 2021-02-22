@@ -7,10 +7,10 @@ class InputNode {
         /** @type {undefined | Module} */
         this.input = undefined;
         this.owner = owner;
-        this.getValues = () => {
+        this.getValues = (recursion) => {
             // if(!this.input) throw new Error("requested getValues from nonconnected input");
             if (this.input)
-                return this.input.getValues();
+                return this.input.getValues(recursion);
             return [];
         };
         

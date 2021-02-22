@@ -5,20 +5,24 @@ import Delay from "../SoundModules/Delay";
 import EnvelopeGenerator from "../SoundModules/EnvelopeGenerator";
 import Chebyshev from "../SoundModules/Chebyshev";
 
-import GenericDisplay from "../DomInterfaces/GenericDisplay";
-import OscillatorDisplay from "../DomInterfaces/OscillatorDisplay";
-import EnvelopeGeneratorDisplay from "../DomInterfaces/EnvelopeGeneratorDisplay";
+import Model from "../scaffolding/Model";
+
 import Filter from "../SoundModules/Filter";
 import MixerTesselator from "../SoundModules/MixerTesselator";
-import Model from "../scaffolding/Model";
 import Module from "../SoundModules/Module";
 import Repeater from "../SoundModules/Repeater";
 import FilterDisplay from "../DomInterfaces/FilterDisplay";
+import InputNode from "../SoundModules/InputNode";
+import Hipparchus from "../SoundModules/Hipparchus";
+
 import DelayDisplay from "../DomInterfaces/DelayDisplay";
 import MixerDisplay from "../DomInterfaces/MixerDisplay";
-import InputNode from "../SoundModules/InputNode";
+import GenericDisplay from "../DomInterfaces/GenericDisplay";
+import OscillatorDisplay from "../DomInterfaces/OscillatorDisplay";
+import EnvelopeGeneratorDisplay from "../DomInterfaces/EnvelopeGeneratorDisplay";
 import ChebyshevDisplay from "../DomInterfaces/ChebyshevDisplay";
 import RepeaterDisplay from "../DomInterfaces/RepeaterDisplay";
+import HipparchusDisplay from "../DomInterfaces/HipparchusDisplay";
 
 
 class LiveCodingInterface{
@@ -53,6 +57,9 @@ class LiveCodingInterface{
             switch (protoname){
                 case "Oscillator":
                     newInterface=new OscillatorDisplay({model:newModule,name});
+                break;
+                case "Hipparchus":
+                    newInterface=new HipparchusDisplay({model:newModule,name});
                 break;
                 case "EnvelopeGenerator":
                     newInterface=new EnvelopeGeneratorDisplay({model:newModule,name});
@@ -94,9 +101,20 @@ class LiveCodingInterface{
             let instanceStrings = [];
             let connectionStrings = [];
             let settingStrings = [];
+            let autozoomStrings = [];
+            
+            /** @type {Array<Module>} */
+            let modulesList = [];
+
             Object.keys(this.modules).map((mname)=>{
-                /** @type {Module} */
-                let module = this.modules[mname];
+                modulesList.push(this.modules[mname]);
+            });
+
+            modulesList.sort((a,b)=>{
+                return a.getInterface().attributes.y - b.getInterface().attributes.y;
+            });
+            
+            modulesList.map((module)=>{
                 //make creation string
                 let constructorName = module.constructor.name;
                 let name = module.name;
@@ -114,10 +132,10 @@ class LiveCodingInterface{
                 });
                 const setts = JSON.stringify(module.settings,null, 2);
                 settingStrings.push('modules["'+name+'"].set('+setts+');');
-                settingStrings.push('modules["'+name+'"].getInterface().autoZoom();');
+                autozoomStrings.push('modules["'+name+'"].getInterface().autoZoom();');
 
             });
-            return [instanceStrings,connectionStrings,settingStrings].flat().join("\n").replace(/\"/g,"'");
+            return [instanceStrings,connectionStrings,settingStrings,autozoomStrings].flat().join("\n").replace(/\"/g,"'");
         }
 
         console.log(`use command "let myModule = create(<module>,<myName>)", where module is any of the prototypes contained in the "modules" object, and myname is a custom name you wish to give to this module. Type "modules" and then press enter to get the list of them.
@@ -136,6 +154,7 @@ class LiveCodingInterface{
             Chebyshev,
             Filter,
             Repeater,
+            Hipparchus,
         };
 
         Object.keys(this.possibleModules).map((mname)=>{
