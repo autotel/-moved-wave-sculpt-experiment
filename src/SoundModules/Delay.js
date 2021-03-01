@@ -1,5 +1,7 @@
 import Module from "./Module";
 import { sampleRate } from "./vars";
+import BasicDelay from "./operators/BasicDelay";
+import voz from "../utils/valueOrZero";
 
 /**
  * @namespace SoundModules.Module
@@ -30,11 +32,12 @@ class Delay extends Module{
         this.hasInput("feedback");
         this.hasInput("time");
 
+        let operator = new BasicDelay();
         
         this.recalculate = (recursion = 0) => {
 
             this.cachedValues = [];
-            let delayCache = [];
+            operator.reset();
             
             let inputValues = this.inputs.main.getValues(recursion);
             let delayInSamples = Math.floor(sampleRate * settings.time);
@@ -43,22 +46,26 @@ class Delay extends Module{
             let timeLevels = this.inputs.time.getValues(recursion);
             
             inputValues.map((value,sampleNumber)=>{
-                let len = delayCache.push(value);
-                let currentTimeLevel = timeLevels[sampleNumber] + delayInSamples;
-
-                if(!this.cachedValues[sampleNumber]) this.cachedValues[sampleNumber]=0;
+                this.cachedValues[sampleNumber] = 0;
                 
-                if(settings.dry>0){
-                    this.cachedValues[sampleNumber] += value * settings.dry;
+                let currentTimeLevel = voz(timeLevels[sampleNumber]) + delayInSamples;
+                
+                if(sampleNumber>currentTimeLevel){
+                    let timeAgo=sampleNumber - currentTimeLevel;
+                    value += (this.cachedValues[timeAgo] + inputValues[timeAgo])
+                        * (settings.feedback + voz(feedbackLevels[sampleNumber]));
                 }
-                if(len > currentTimeLevel){
-                    this.cachedValues[sampleNumber] += delayCache.shift() * settings.wet;
-                }
-                
-                delayCache[len - 2] += this.cachedValues[sampleNumber] 
-                    * (settings.feedback + feedbackLevels[sampleNumber]);
-                
 
+                this.cachedValues[sampleNumber]+=operator.calculateSample(value,currentTimeLevel);
+                
+            });
+
+            //mix dry and wet
+            this.cachedValues.map((val,sampleNumber)=>{
+
+                this.cachedValues[sampleNumber] = this.cachedValues[sampleNumber] * settings.wet 
+                    + inputValues[sampleNumber] * settings.dry;
+                
             });
 
             this.changed({ cachedValues: this.cachedValues });

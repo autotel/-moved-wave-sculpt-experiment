@@ -1,4 +1,7 @@
 import Module from "./Module";
+import { sampleRate } from "./vars";
+import BasicDelay from "./operators/BasicDelay";
+import voz from "../utils/valueOrZero";
 
 import Comb from "./operators/Comb"
 import HpBoxcar from "./operators/HpBoxcar"
@@ -8,12 +11,12 @@ import LpNBoxcar from "./operators/LpNBoxcar"
 import LpMoog from "./operators/LpMoog"
 import Operator from "./operators/Operator"
 import Pinking from "./operators/Pinking"
-import voz from "../utils/valueOrZero";
+import saturate1 from "../utils/saturate1";
 
-//todo: find more interesting filters. Eg. https://www.musicdsp.org/en/latest/Filters/index.html
 /**
- * @namespace SoundModules.Filter
+ * @namespace SoundModules.DelayWithFilter
  */
+
 /** @typedef {"none"
  *      |"LpBoxcar"
  *      |"HpBoxcar"
@@ -52,11 +55,11 @@ const filterProtos={
     Pinking
 }
 
-
-
-
-/** @type {FilterSettings} */
 const defaultSettings={
+    feedback:0.5,
+    time:0.2, //seconds
+    dry:1,
+    wet:0.5,
     gain:1,
     reso:0.2,
     length:1,
@@ -66,80 +69,103 @@ const defaultSettings={
     saturate:false,
 };
 
-
 /**
- * @class Filter 
+ * @class DelayWithFilter
  * @extends Module
  */
-class Filter extends Module{
-    /**
-     * @param {FilterSettings} userSettings
-     */
+class DelayWithFilter extends Module{
     constructor(userSettings = {}) {
-
         //apply default settings for all the settings user did not provide
         const settings = {};
         Object.assign(settings, defaultSettings);
         Object.assign(settings, userSettings);
-        
+
         super(settings);
 
         this.hasInput("main");
+        this.hasInput("feedback");
+        this.hasInput("time");
         this.hasInput("frequency");
         this.hasInput("gain");
         this.hasInput("reso");
 
+
         this.setOrder = (to) => {
-            settings.order = to;
-            this.changed({
+            return this.set({
                 order: to
             });
-            this.cacheObsolete();
-            return this;
         };
         this.setFrequency = (to) => {
-            settings.frequency = to;
-            this.changed({
+            return this.set({
                 frequency: to
             });
-            this.cacheObsolete();
-            return this;
         };
         /** @param {filterType} to */
         this.setType = (to) => {
-            settings.type = to;
-            this.changed({
+            return this.set({
                 type: to
             });
-            this.cacheObsolete();
-            return this;
         };
 
+        let delayOperator = new BasicDelay();
+        
         this.recalculate = (recursion = 0) => {
+
+            this.cachedValues = [];
             
-            //create an interface for the filter
+            //filter setup
             let filter = new filterProtos[settings.type]();
             const order = settings.order;
             const frequencies = this.inputs.frequency.getValues(recursion);
             const gains = this.inputs.gain.getValues(recursion);
             const resos = this.inputs.reso.getValues(recursion);
-            
-            this.cachedValues = [];
-            const inputValues=this.inputs.main.getValues(recursion);
-
             filter.reset();
 
-            this.cachedValues = inputValues.map((inputValue,sampleNumber)=>filter.calculateSample(
-                inputValue,
-                voz(frequencies[sampleNumber]) + settings.frequency,
-                voz(resos[sampleNumber]) + settings.reso,
-                voz(gains[sampleNumber]) + settings.gain,
-                order,settings.saturate
-            ));
-        
+            //delay setup
+            delayOperator.reset();
+            let inputValues = this.inputs.main.getValues(recursion);
+            let delayInSamples = Math.floor(sampleRate * settings.time);
+
+            let feedbackLevels = this.inputs.feedback.getValues(recursion);
+            let timeLevels = this.inputs.time.getValues(recursion);
+            
+            inputValues.map((value,sampleNumber)=>{
+                this.cachedValues[sampleNumber] = 0;
+                
+                let currentTimeLevel = Math.floor(
+                    voz(timeLevels[sampleNumber]) * sampleRate + delayInSamples
+                );
+
+                value = filter.calculateSample(
+                    value,
+                    voz(frequencies[sampleNumber]) + settings.frequency,
+                    voz(resos[sampleNumber]) + settings.reso,
+                    voz(gains[sampleNumber]) + settings.gain,
+                    order,settings.saturate
+                );
+
+                if(sampleNumber>currentTimeLevel){
+                    let timeAgo=sampleNumber - currentTimeLevel;
+                    value += (this.cachedValues[timeAgo])
+                        * (settings.feedback + voz(feedbackLevels[sampleNumber]));
+                    if(this.settings.saturate) value = saturate1(value);
+                }
+
+                this.cachedValues[sampleNumber]+=delayOperator.calculateSample(value,currentTimeLevel);
+                
+            });
+
+            //mix dry and wet
+            this.cachedValues.map((val,sampleNumber)=>{
+
+                this.cachedValues[sampleNumber] = this.cachedValues[sampleNumber] * settings.wet 
+                    + inputValues[sampleNumber] * settings.dry;
+                
+            });
+
             this.changed({ cachedValues: this.cachedValues });
         };
     }
 }
 
-export default Filter;
+export default DelayWithFilter;

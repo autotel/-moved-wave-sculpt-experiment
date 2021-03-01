@@ -62,14 +62,15 @@ class EnvelopeGenerator extends Module {
                 length: to
             });
         }
-        this.setPoints = (pointsList) => {
-            settings.points = pointsList;
-            this.changed({
-                points: settings.points
+        this.setPoints = (points) => {
+            return this.set({
+                points
             });
-            // console.log(pointsList);
-            this.cacheObsolete();
-            return this;
+        };
+        this.addPoint = (point=[0,0]) => {
+            return this.set({
+                points: settings.points.push(point)
+            });
         };
         const sortPointsByTime = () => {
             settings.points.sort((a, b) => a[0] - b[0]);

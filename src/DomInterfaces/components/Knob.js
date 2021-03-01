@@ -247,7 +247,7 @@ class Knob extends Group{
             return this;
         }
         /**
-         * @param {"integer"|"frequency"|"gain"|"channelvol"|"integer"} deltaCurve
+         * @param {"integer"|"frequency"|"gain"|"channelvol"|"integer"|"periodseconds"} deltaCurve
          **/
         this.setDeltaCurve=(deltaCurve)=>{
             options.deltaCurve=deltaCurve;

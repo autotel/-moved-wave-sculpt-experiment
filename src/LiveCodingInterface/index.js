@@ -2,6 +2,8 @@
 import Oscillator from "../SoundModules/Oscillator";
 import Mixer from "../SoundModules/Mixer";
 import Delay from "../SoundModules/Delay";
+import DelayWithFilter from "../SoundModules/DelayWithFilter";
+import NaiveReverb from "../SoundModules/NaiveReverb";
 import EnvelopeGenerator from "../SoundModules/EnvelopeGenerator";
 import Chebyshev from "../SoundModules/Chebyshev";
 
@@ -16,6 +18,8 @@ import InputNode from "../SoundModules/InputNode";
 import Hipparchus from "../SoundModules/Hipparchus";
 
 import DelayDisplay from "../DomInterfaces/DelayDisplay";
+import DelayWithFilterDisplay from "../DomInterfaces/DelayWithFilterDisplay";
+import ReverbDisplay from "../DomInterfaces/ReverbDisplay";
 import MixerDisplay from "../DomInterfaces/MixerDisplay";
 import GenericDisplay from "../DomInterfaces/GenericDisplay";
 import OscillatorDisplay from "../DomInterfaces/OscillatorDisplay";
@@ -75,6 +79,12 @@ class LiveCodingInterface{
                 break;
                 case "Delay":
                     newInterface=new DelayDisplay({model:newModule,name});
+                break;
+                case "DelayWithFilter":
+                    newInterface=new DelayWithFilterDisplay({model:newModule,name});
+                break;
+                case "NaiveReverb":
+                    newInterface=new ReverbDisplay({model:newModule,name});
                 break;
                 case "MixerTesselator":
                     newInterface=new MixerDisplay({model:newModule,name});
@@ -150,20 +160,34 @@ class LiveCodingInterface{
             Mixer,
             MixerTesselator,
             Delay,
+            DelayWithFilter,
             EnvelopeGenerator,
             Chebyshev,
             Filter,
             Repeater,
             Hipparchus,
+            NaiveReverb,
         };
 
         Object.keys(this.possibleModules).map((mname)=>{
             if(window[mname]===undefined) window[mname]=this.possibleModules[mname];
         });
         
-        window.create=(module,name)=>{return this.create(module,name)};
+        window.create=(module,name)=>{
+            if(!module) return Object.keys(this.possibleModules);
+            return this.create(module,name)
+        };
         window.modules=this.modules;
         window.dumpPatch=()=>{return dumpPatch()};
+        window.connect=(from,to)=>{
+            from=([from]).flat();
+            to=([to]).flat();
+            from.map((source)=>{
+                to.map((destination)=>{
+                    source.connectTo(destination);
+                })
+            });
+        }
 
     }
 }

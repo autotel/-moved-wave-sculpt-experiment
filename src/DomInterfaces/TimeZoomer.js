@@ -72,7 +72,7 @@ class TimeZoomer extends Group {
             return ValuePixelTranslator.change({ rangeSamples: l });
         };
         this.pan = (l) => {
-            console.log("pan",l);
+            // console.log("pan",l);
             return ValuePixelTranslator.change({ firstSample: l });
         };
     }

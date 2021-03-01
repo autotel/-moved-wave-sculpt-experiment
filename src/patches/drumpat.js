@@ -38,7 +38,7 @@ modules['filter'].set({
   'gain': 0.6799999999999999,
   'reso': 0.9400000000000001,
   'length': 1,
-  'type': 'hp_boxcar',
+  'type': 'HpBoxcar',
   'order': 1,
   'frequency': 36.66666666666667,
   'saturate': false
@@ -102,7 +102,7 @@ modules['noiseFilter'].set({
   'gain': 6.420000000000001,
   'reso': 0.7099999999999966,
   'length': 1,
-  'type': 'comb',
+  'type': 'Comb',
   'order': 2.000000000000001,
   'frequency': 341,
   'saturate': true

@@ -33,9 +33,11 @@ http://autotel.co/sound-sculpt/
 ## todo:
 
 ### Number legend: 
-* priority order, 
+* priority order (not necessarily the right order though)
 * utility (1: just an idea, 2: it would be nice, 3: it's required),
 * effort (1: easy fix, 2: a bit involved,  3: quite involved, 4: it's a whole new thing)
+
+### concrete 
 
 1. 3 1 cli and module interface: deleting of modules
 1. 3 2 export patches, export wav.
@@ -45,10 +47,15 @@ http://autotel.co/sound-sculpt/
     * patching among modules
     * filter type selection
     * wave shape
+1. 2 3 Create reverb effects
+1. 3 1 remove reminiscent "NaNHz" from envelopeGenerator
+1. 3 2 fix bugs with time navigation
+1. fix problem with delay feedback being double the time than first delay
 
-1. remove reminiscent "NaNHz" from envelopeGenerator
+### speculative / will not do yet
+
+1. throttle or otherwise reduce the amount of recalculations a bit, as I am observing that per change a module might recalculate more than once.
 1. wave lane should occupy all the window width (minus patch area, of course)
-1. fix bugs with time navigation
 1. envelopeGenerator shapes
 1. Multi modules, I would like to:
     * be able to drag and drop one module over another and get them two in a group, navigated by tabs
@@ -58,6 +65,8 @@ http://autotel.co/sound-sculpt/
     * draggable, clickable, using attachment of event listeners instead of overriding callbacks
     * create a consistent interface for attaching callbacks. not eventlisteners, because it produces "unpredictable" listener names, but i am currently implementing listeners separately everywhere.
     * placement of elements in each lane, and hierarchy
+1. How can I make stereophonic sounds? one possibility is to assign one sound player to each channel. There would have to be an interface to select the outputting lanes
 1. implement the improved knobs interaction design (allows rotate/drag on same gesture)
-
-1. how 
+1. could this tool be used to compose patterns?
+1. Could this be packed in a hardware that I can take to play?
+1. I want to learn how phase shifting works in complex signals

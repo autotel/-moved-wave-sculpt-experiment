@@ -31,18 +31,16 @@ class Mixer extends Module{
         
         this.recalculate = (recursion = 0) => {
             this.cachedValues = [];
+            let result=[];
             let first = true;
-            this.eachInput((input,number,inputName) => {
-                
+            this.eachInput((input,inputno,inputName) => {
                 const inputValues = input.getValues(recursion);
                 inputValues.map((val, index) => {
-                    const currentVal = this.cachedValues[index] ? this.cachedValues[index] : 0;
-                    this.cachedValues[index] = (val + currentVal) * amplitude * settings["level"+inputName];
-                    // if(isNaN(this.cachedValues[index])){
-                    //     throw new Error(`is NaN ${this.cachedValues[index]} += (${val} + ${currentVal}) * ${amplitude}`);
-                    // }
+                    if(!result[index]) result[index]=0;
+                    result[index] += (val) * amplitude * settings["level"+inputName];
                 });
             });
+            
             this.changed({ cachedValues: this.cachedValues });
         };
     }

@@ -59,7 +59,7 @@ export default function run(codeInterface) {
     'gain': 0.8599999999999999,
     'reso': 2.1500000000000004,
     'length': 1,
-    'type': 'hp_boxcar',
+    'type': 'HpBoxcar',
     'order': 1,
     'frequency': 283.6666666666627,
     'saturate': false
@@ -69,7 +69,7 @@ export default function run(codeInterface) {
     'gain': 1.5100000000000007,
     'reso': 21.32,
     'length': 1,
-    'type': 'lp_moog',
+    'type': 'LpMoog',
     'order': 10,
     'frequency': 705.2222222222247,
     'saturate': true
@@ -79,7 +79,7 @@ export default function run(codeInterface) {
     'gain': 0.08999999999999997,
     'reso': 2.0300000000000007,
     'length': 1,
-    'type': 'comb',
+    'type': 'Comb',
     'order': 5,
     'frequency': 447.5555555555555,
     'saturate': true

@@ -15,6 +15,7 @@ class MixerDisplay extends GenericDisplay{
             k.setMinMax(0,4)
             .setDeltaCurve("channelvol")
         );
+        
         options.model.triggerInitialState();
 
     }

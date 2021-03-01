@@ -1,4 +1,5 @@
 import Module from "./Module";
+import voz from "../utils/valueOrZero";
 
 /**
  * @namespace SoundModules.MixerTesselator
@@ -40,8 +41,8 @@ class MixerTesselator extends Module{
             this.eachInput((input,inputno,inputName) => {
                 const inputValues = input.getValues(recursion);
                 inputValues.map((val, index) => {
-                    const currentVal = result[index] ? result[index] : 0;
-                    result[index] = (val + currentVal) * amplitude * settings["level"+inputName];
+                    if(!result[index]) result[index]=0;
+                    result[index] += (val) * amplitude * settings["level"+inputName];
                 });
             });
             
