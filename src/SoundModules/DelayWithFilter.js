@@ -102,6 +102,9 @@ class DelayWithFilter extends Module{
         };
         /** @param {filterType} to */
         this.setType = (to) => {
+            if(!filterProtos[to]){
+                return Object.keys(filterProtos);
+            }
             return this.set({
                 type: to
             });

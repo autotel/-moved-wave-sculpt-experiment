@@ -21,14 +21,16 @@ class Mixer extends Module{
         const settings = {};
         Object.assign(settings, defaultSettings);
         Object.assign(settings, userSettings);
+
         const { amplitude } = settings;
-        super(settings);
         
+        super(settings);
+
         this.hasInput("a");
         this.hasInput("b");
         this.hasInput("c");
         this.hasInput("d");
-        
+
         this.recalculate = (recursion = 0) => {
             this.cachedValues = [];
             let result=[];
@@ -40,7 +42,8 @@ class Mixer extends Module{
                     result[index] += (val) * amplitude * settings["level"+inputName];
                 });
             });
-            
+            this.cachedValues=result;
+        
             this.changed({ cachedValues: this.cachedValues });
         };
     }

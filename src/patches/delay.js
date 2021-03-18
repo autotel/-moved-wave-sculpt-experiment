@@ -4,33 +4,32 @@ import LiveCodingInterface from "../LiveCodingInterface";
 
 /** @param {LiveCodingInterface} codeInterface */
 export default function run(codeInterface) {
-
-  create(possibleModules.Delay,'delay');
-  create(possibleModules.DelayWithFilter,'filteredDelay');
-  create(possibleModules.Filter,'noiseFilter');
-  create(possibleModules.Oscillator,'noise');
-  create(possibleModules.EnvelopeGenerator,'noiseEnvelope');
+  create(possibleModules.Delay, 'delay');
+  create(possibleModules.DelayWithFilter, 'filteredDelay');
+  create(possibleModules.Filter, 'noiseFilter');
+  create(possibleModules.Oscillator, 'noise');
+  create(possibleModules.EnvelopeGenerator, 'noiseEnvelope');
   modules['noise'].connectTo(modules['delay'].inputs.main);
   modules['noise'].connectTo(modules['filteredDelay'].inputs.main);
   modules['noiseEnvelope'].connectTo(modules['noise'].inputs.amplitude);
   modules['delay'].set({
-    'feedback': 1,
-    'time': 0.012790000000000003,
-    'dry': 1,
-    'wet': 1,
+    'feedback': 0.83,
+    'time': 0.01167222222222214,
+    'dry': 0.57,
+    'wet': 0.35,
     'diffusion': 0.01
   });
   modules['filteredDelay'].set({
-    'feedback': -0.99,
-    'time': 0.0031566666666666444,
-    'dry': 0.6000000000000001,
-    'wet': 0.62,
-    'gain': 0.2799999999999997,
-    'reso': 4.16,
+    'feedback': 0.9600000000000001,
+    'time': 0.007255555555555494,
+    'dry': 0.2900000000000002,
+    'wet': 1.4400000000000002,
+    'gain': 0.5499999999999998,
+    'reso': 2.0700000000000007,
     'length': 1,
     'type': 'LpMoog',
-    'order': 2,
-    'frequency': 424.0000000000039,
+    'order': 0,
+    'frequency': 10336,
     'saturate': true,
     'diffusion': 0.01
   });
@@ -61,16 +60,16 @@ export default function run(codeInterface) {
         0
       ],
       [
-        1598,
-        1
-      ],
-      [
         2315,
         0
       ],
       [
-        7111,
-        0
+        3142,
+        1.3833333333333333
+      ],
+      [
+        3913,
+        0.016666666666666666
       ],
       [
         22050,
@@ -80,6 +79,7 @@ export default function run(codeInterface) {
     'loop': false
   });
   modules['delay'].getInterface().autoZoom();
+  modules['filteredDelay'].getInterface().autoZoom();
   modules['noiseFilter'].getInterface().autoZoom();
   modules['noise'].getInterface().autoZoom();
   modules['noiseEnvelope'].getInterface().autoZoom();

@@ -42,6 +42,7 @@ import pat3 from "./patches/reverb1";
 import pat4 from "./patches/delay";
 import pat5 from "./patches/drumpat";
 import pat6 from "./patches/filterTester";
+import pat7 from "./patches/multireso";
 
 window.demos = {
     "rotator": ()=>pat1(webInspectorInterface),
@@ -50,6 +51,7 @@ window.demos = {
     "delay": ()=>pat4(webInspectorInterface),
     "drumpat": ()=>pat5(webInspectorInterface),
     "filterTester": ()=>pat6(webInspectorInterface),
+    "multireso": ()=>pat7(webInspectorInterface),
 }
 
 let hashBefore = window.location.hash;
