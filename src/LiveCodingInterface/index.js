@@ -29,10 +29,22 @@ import RepeaterDisplay from "../DomInterfaces/RepeaterDisplay";
 import HipparchusDisplay from "../DomInterfaces/HipparchusDisplay";
 
 
+function giveHelp(){
+
+    console.log(`
+    use command "create(<module>,<myName>)", where module is any of the prototypes contained in the "modules" object, and myname is a custom name you wish to give to this module. Type "modules" and then press enter to get the list of them.
+    Then type "modules.<myName>" and tab, to see the available methods.
+    `);
+    console.log(`instanced modules are present in modules array`);
+    console.log(`to display how to re-create the patch in screen, run "dumpPatch()". This is a good way to save patches for later use, too.`);
+
+}
+
 class LiveCodingInterface{
     constructor(){
         let count=0;
 
+        setTimeout(giveHelp,1000);
         const moduleCreationListeners = [];
 
         /** @param {Function} callback */
@@ -42,16 +54,26 @@ class LiveCodingInterface{
 
         this.modules = {};
 
+        let first=true;
         /** 
          * @param {string|false} name
          * @returns {Module} 
          **/
         this.create=function(Which,name=false){
+            if(first){
+                first=false;
+                let helpDom = document.getElementById("notes");
+                if(helpDom) helpDom.classList.add("hide");
+            }
+
             let protoname=Which.name;
-
+            
             if(!name) name=protoname+" "+count;
-            if(modules[name]) name = name+"_"+count;
+            let usableName = name.match(/[A-Za-z0-9]/gi).join("");
 
+            if(this.modules[usableName]) usableName = usableName+count;
+            
+            console.log(`this module will be available as "modules.${usableName}"`);
             
             const newModule=new Which();
             
@@ -99,7 +121,7 @@ class LiveCodingInterface{
 
             newModule.name = name;
             
-            this.modules[name]=newModule;
+            this.modules[usableName]=newModule;
             newInterface.handyPosition(count + 3);
 
             count++;
@@ -147,11 +169,6 @@ class LiveCodingInterface{
             });
             return [instanceStrings,connectionStrings,settingStrings,autozoomStrings].flat().join("\n").replace(/\"/g,"'");
         }
-
-        console.log(`use command "let myModule = create(<module>,<myName>)", where module is any of the prototypes contained in the "modules" object, and myname is a custom name you wish to give to this module. Type "modules" and then press enter to get the list of them.
-        Then type "myModule" and tab, to see the available methods.
-        `);
-        console.log(`instanced modules are present in modules array`);
 
         //export stuff to window, so that you can call it from webinspector
 

@@ -49,7 +49,7 @@ http://autotel.co/sound-sculpt/
     * wave shape
 1. 2 3 Create reverb effects
 1. 3 1 remove reminiscent "NaNHz" from envelopeGenerator
-1. 3 2 fix bugs with time navigation
+1. 3 2 fix bugs with time navigation, make wave display full width wide
 1. fix problem with delay feedback being double the time than first delay
 
 ### speculative / will not do yet

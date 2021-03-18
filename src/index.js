@@ -35,11 +35,38 @@ drawBoard.add(patchDisplay);
 Draggable.setCanvas();
 
 //pre-run a live-coded patch
-// import drumpat from "./patches/rotator";
-import drumpat from "./patches/goodstart";
-// import drumpat from "./patches/reverb1";
-// import drumpat from "./patches/delay";
-// import drumpat from "./patches/drumpat";
-// import drumpat from "./patches/filterTester";
 
-drumpat(webInspectorInterface);
+import pat1 from "./patches/rotator";
+import pat2 from "./patches/goodstart";
+import pat3 from "./patches/reverb1";
+import pat4 from "./patches/delay";
+import pat5 from "./patches/drumpat";
+import pat6 from "./patches/filterTester";
+
+window.demos = {
+    "rotator": ()=>pat1(webInspectorInterface),
+    "drumpat2": ()=>pat2(webInspectorInterface),
+    "reverb1": ()=>pat3(webInspectorInterface),
+    "delay": ()=>pat4(webInspectorInterface),
+    "drumpat": ()=>pat5(webInspectorInterface),
+    "filterTester": ()=>pat6(webInspectorInterface),
+}
+
+let hashBefore = window.location.hash;
+const hashchange=()=>{
+    if(window.location.hash){
+        let hashval = window.location.hash.slice(1);
+        if(window.demos[hashval]){
+            console.log("trying load of",hashval);
+            window.demos[hashval]();
+        }
+    }else{
+        // if(hashBefore){
+        //     window.location.reload();
+        // }
+    }
+}
+
+window.addEventListener('DOMContentLoaded', hashchange);
+
+window.addEventListener("hashchange",hashchange);
