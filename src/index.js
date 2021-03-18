@@ -61,12 +61,14 @@ const hashchange=()=>{
             window.demos[hashval]();
         }
     }else{
-        // if(hashBefore){
-        //     window.location.reload();
-        // }
+        if(hashBefore){
+            
+        }
     }
 }
 
 window.addEventListener('DOMContentLoaded', hashchange);
 
 window.addEventListener("hashchange",hashchange);
+
+window.onpopstate = ()=>window.location.reload();
