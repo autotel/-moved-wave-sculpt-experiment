@@ -84,7 +84,6 @@ class Path extends Component{
  * @property {number} [height]
  */
 class Rectangle extends Component {
-    
     /**
      * @param {RectangleOptions} myOptions
      **/

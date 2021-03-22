@@ -41,7 +41,7 @@ function giveHelp(){
 }
 
 class LiveCodingInterface{
-    constructor(){
+    constructor({drawBoard}){
         let count=0;
 
         setTimeout(giveHelp,1000);
@@ -79,43 +79,48 @@ class LiveCodingInterface{
             
             if(window[name]===undefined) window[name]=newModule;
 
+            const props = {
+                model:newModule,
+                name, drawBoard
+            }
+
             let newInterface;
             switch (protoname){
                 case "Oscillator":
-                    newInterface=new OscillatorDisplay({model:newModule,name});
+                    newInterface=new OscillatorDisplay(props);
                 break;
                 case "Hipparchus":
-                    newInterface=new HipparchusDisplay({model:newModule,name});
+                    newInterface=new HipparchusDisplay(props);
                 break;
                 case "EnvelopeGenerator":
-                    newInterface=new EnvelopeGeneratorDisplay({model:newModule,name});
+                    newInterface=new EnvelopeGeneratorDisplay(props);
                 break;
                 case "Repeater":
-                    newInterface=new RepeaterDisplay({model:newModule,name});
+                    newInterface=new RepeaterDisplay(props);
                 break;
                 case "Filter":
-                    newInterface=new FilterDisplay({model:newModule,name});
+                    newInterface=new FilterDisplay(props);
                 break;
                 case "Chebyshev":
-                    newInterface=new ChebyshevDisplay({model:newModule,name});
+                    newInterface=new ChebyshevDisplay(props);
                 break;
                 case "Delay":
-                    newInterface=new DelayDisplay({model:newModule,name});
+                    newInterface=new DelayDisplay(props);
                 break;
                 case "DelayWithFilter":
-                    newInterface=new DelayWithFilterDisplay({model:newModule,name});
+                    newInterface=new DelayWithFilterDisplay(props);
                 break;
                 case "NaiveReverb":
-                    newInterface=new ReverbDisplay({model:newModule,name});
+                    newInterface=new ReverbDisplay(props);
                 break;
                 case "MixerTesselator":
-                    newInterface=new MixerDisplay({model:newModule,name});
+                    newInterface=new MixerDisplay(props);
                 break;
                 case "Mixer":
-                    newInterface=new MixerDisplay({model:newModule,name});
+                    newInterface=new MixerDisplay(props);
                 break;
                 default:
-                    newInterface=new GenericDisplay({model:newModule,name});
+                    newInterface=new GenericDisplay(props);
             }
             moduleCreationListeners.map((cb)=>cb(newModule,newInterface,count));
 

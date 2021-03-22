@@ -17,7 +17,7 @@ class Module extends Model{
         // Model.call(this, settings);
         super(settings);
         this.unique = count ++;
-
+        this.name = this.constructor.name + "-" + this.unique;
         this.cachedValues = [];
         /** @type {Object<string, InputNode>} */
         this.inputs = {};

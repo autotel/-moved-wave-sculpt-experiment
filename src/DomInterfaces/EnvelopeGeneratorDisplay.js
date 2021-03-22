@@ -19,14 +19,14 @@ const vectorTypes = require("../scaffolding/Vector2");
  * @extends WaveLane
  */
 class EnvelopeGeneratorDisplay extends WaveLane{
-    /** @param {Object<String,Model|string|number>} options */
+    /** @param {import("./components/Lane").LaneOptions} options */
     constructor (options){
-        /** @type {EnvelopeGenerator} */
-        const model = options.model;
-        const settings=typicalLaneSettings(model);
+
+        const {model,drawBoard} = options;
+        const settings=typicalLaneSettings(model,drawBoard);
         //plave for defaults
         settings.name="Envelope";
-        Object.assign(settings,options);
+        Object.assign(settings,settings);
 
         const translator=new ValuePixelTranslator(settings);
         super(translator,settings);
@@ -97,7 +97,6 @@ class EnvelopeGeneratorDisplay extends WaveLane{
                 /**
                  * update the handle's point coordinates and cause
                  * this change to be reflected visually
-                 * @param {Array<number>} point [sample number, level]
                  */
                 this.handleModelChangedPoint = () => {
                     const point = this.point;

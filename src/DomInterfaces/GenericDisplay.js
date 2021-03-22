@@ -1,13 +1,7 @@
-import Sprite from "../scaffolding/Sprite";
 import { Circle, Line, Path, Text } from "../scaffolding/elements";
-
-import Lane from "./components/Lane";
-import Module from "../SoundModules/Module";
-import WaveDisplay from "./components/WaveDisplay";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
-import Model from "../scaffolding/Model";
 import Hoverable from "./components/Hoverable";
 import round from "../utils/round";
 
@@ -20,11 +14,11 @@ import round from "../utils/round";
  */
 class GenericDisplay extends WaveLane{
 
-    /** @param {Object<String,Module|string|number>} options */
+    /** @param {import("./components/Lane").LaneOptions} options */
     constructor(options){
-        const {model} = options;
-        const settings=typicalLaneSettings(model);
-        Object.assign(settings,options);
+        const {model,drawBoard} = options;
+        const settings=typicalLaneSettings(model,drawBoard);
+        Object.assign(settings,settings);
         const translator=new ValuePixelTranslator(settings);
         super(translator,settings);
         //lane has a contents sprite.

@@ -1,14 +1,16 @@
-import Sprite from "../../scaffolding/Sprite";
 import { Line, Rectangle, Path, Group, Text, Component } from "../../scaffolding/elements";
 import Draggable from "./Draggable";
-import Vector2 from "../../scaffolding/Vector2";
 import typicalLaneSettings from "../../utils/const typicalLaneSettings";
-import Model from "../../scaffolding/Model";
 import Module from "../../SoundModules/Module";
 import InputNode from "../../SoundModules/InputNode";
-import Hoverable from "./Hoverable";
 import Knob from "./Knob";
 import Toggle from "./Toggle";
+import Canvas from "../../scaffolding/Canvas";
+import placements from "../config/placement";
+import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
+
+const sizes = placements;
+
 const VectorTypedef = require("../../scaffolding/Vector2");
 
 /**
@@ -16,9 +18,14 @@ const VectorTypedef = require("../../scaffolding/Vector2");
  */
 
 /**
- * @typedef {MiniVector} LaneOptions
+ * @typedef {Object} LaneOptions
+ * @property {number} [x] 
+ * @property {number} [y] 
+ * @property {number} [width]
+ * @property {number} [height]
  * @property {Module} model
- * @property {string} name
+ * @property {string} [name]
+ * @property {Canvas} drawBoard
  * @exports LaneOptions
  */
 
@@ -29,20 +36,21 @@ const VectorTypedef = require("../../scaffolding/Vector2");
  * */
 class Lane extends Group {
     /**
+     * @param {ValuePixelTranslator} translator
      * @param {LaneOptions} options
      */
-    constructor(options) {
+    constructor(translator,options) {
 
-        const { model } = options;
-        const settings = typicalLaneSettings(model);
+        const { model, drawBoard } = options;
+        const settings = typicalLaneSettings(model,drawBoard);
+        Object.assign(settings, options);
 
-        super(options);
+        super(settings);
 
         this.domElement.classList.add("lane"),
 
             this.autoZoom = () => { }
 
-        Object.assign(settings, options);
         // this.settings=settings;
 
         /** @type {function[]} */
@@ -65,6 +73,7 @@ class Lane extends Group {
             height: settings.height,
             fill: "transparent",
         });
+
         handleRect.domElement.classList.add("lane-handle");
 
         //position this lane at a distance from top, proportional to it's height,
@@ -78,13 +87,14 @@ class Lane extends Group {
 
         let controlsCount = 0;
 
-        const widthPerControl = 50;
+        const widthPerControl = 40;
         const controlPanelTop = 10;
-        const controlPanelRight = 10;
+        const controlPanelRight = 30;
         const controlPanelHeight = 70;
         const controlsCenterTop = 26;
         const controlPanelBackground = new Rectangle();
         const controlPanel = new Group();
+
         let controlPanelAppended = false;
         const updateControlsBg = () => {
             if (controlsCount > 0 && !controlPanelAppended) {
@@ -94,8 +104,8 @@ class Lane extends Group {
             }
             const cc1 = controlsCount + 1;
             controlPanel.attributes.class="control-panel";
-            controlPanel.attributes.width = widthPerControl * cc1;
-            controlPanel.attributes.x = options.width - widthPerControl * cc1 - controlPanelRight;
+            controlPanel.attributes.width = controlPanelWidth;
+            controlPanel.attributes.x = options.width - controlPanelWidth - controlPanelRight;
             controlPanel.attributes.y = controlPanelTop;
             controlPanel.attributes.height = controlPanelHeight;
 
@@ -106,41 +116,38 @@ class Lane extends Group {
             controlPanel.update();
             controlPanelBackground.update();
         }
+        let controlPanelWidth = 20;
+        
         /** @param {Component} component */
         this.appendToControlPanel = (component,width=widthPerControl) => {
             controlsCount++;
             updateControlsBg();
-            component.attributes.x= widthPerControl * controlsCount;
+
+            controlPanelWidth += width/2;
+            component.attributes.x= controlPanelWidth;
             component.attributes.y= controlsCenterTop;
+            controlPanelWidth += width/2;
+
             component.update();
             controlPanel.add(component);
         }
         /** @param {string} parameterName */
         this.addKnob = (parameterName) => {
-            let newControl;
-            controlsCount++;
-            updateControlsBg();
-            newControl = new Knob({
-                x: widthPerControl * controlsCount, 
-                y: controlsCenterTop
-            });
+            const newControl = new Knob();
+            this.appendToControlPanel(newControl);
             newControl.setToModuleParameter(model, parameterName);
             controlPanel.add(newControl);
             return newControl;
         }
         /** @param {string} parameterName */
         this.addToggle = (parameterName) => {
-            let newControl;
-            controlsCount++;
-            updateControlsBg();
-            newControl = new Toggle({
-                x: widthPerControl * controlsCount, 
-                y: controlsCenterTop
-            });
+            const newControl = new Toggle();
+            this.appendToControlPanel(newControl);
             newControl.setToModuleParameter(model, parameterName);
             controlPanel.add(newControl);
             return newControl;
         }
+
 
         const draggable = new Draggable(handleRect.domElement);
         draggable.setPosition(settings);
@@ -149,7 +156,6 @@ class Lane extends Group {
             this.set("y", newPosition.y);
             handleMoved();
             return;
-
 
             // handleRect.attributes.x = settings.x;
             handleRect.attributes.y = settings.y;
@@ -174,11 +180,9 @@ class Lane extends Group {
         this.add(this.contents);
         /** @typedef {{x:number,y:number,input:InputNode,absolute:MiniVector}} inputPosition */
         /** @type {Object<String,inputPosition>|undefined} */
-        let inputPositions;
+        const inputPositions={};
         /** @returns {Object<String,inputPosition>} */
         this.getInputPositions = () => {
-            // if(!inputPositions) {
-            inputPositions = {};
             Object.keys(model.inputs).map((inputName, index) => {
                 const newInputPosition = {
                     x: settings.width + 10,
@@ -188,6 +192,7 @@ class Lane extends Group {
                 };
                 newInputPosition.absolute.x = newInputPosition.x + settings.x;
                 newInputPosition.absolute.y = newInputPosition.y + settings.y;
+                if(inputPositions[inputName]) delete inputPositions[inputName];
                 inputPositions[inputName] = newInputPosition;
             });
             // }
@@ -207,8 +212,8 @@ class Lane extends Group {
         };
 
 
-        /** @param {inputPosition} inputPosition */
-        const InputGraph = function (inputPosition, name, num, container) {
+        const InputGraph = function (inputPositions, name, container) {
+            const inputPosition = inputPositions[name];
             const optxt = new Text({
                 x: inputPosition.x + 10, y: inputPosition.y + 5,
                 text: name,
@@ -221,33 +226,65 @@ class Lane extends Group {
                 height: 10,
             });
             container.add(rect);
+            this.updatePosition = () =>{
+
+                optxt.set("x",inputPositions[name].x + 10);
+                rect.set("x",inputPositions[name].x - 5);
+            }
         }
 
-
-        /** @param {MiniVector} position */
-        const OutputGraph = function (position, container) {
-
+        const OutputGraph = function (parent,container) {
+            let position=parent.getOutputPosition();
             const rect = new Rectangle({
                 x: position.x,
                 y: position.y,
                 width: 80,
                 height: 10,
             });
-            container.add(rect);
 
+            container.add(rect);
+            this.updatePosition=()=>{
+                position=parent.getOutputPosition();
+                rect.set("x",position.x);
+            }
         }
 
-        this.getInputPositions()
-        Object.keys(inputPositions).map((a, b) => {
-            new InputGraph(inputPositions[a], a, b, this.contents)
+        this.getInputPositions();
+        const myInputGraphs = Object.keys(inputPositions).map((name)=>{
+            return new InputGraph(inputPositions, name, this.contents)
         });
-        const myOutputGraph = new OutputGraph(this.getOutputPosition(), this.contents);
+        const myOutputGraph = new OutputGraph(this,this.contents);
 
+
+        const updateSize = () => {
+            const newWidth = drawBoard.size.width - sizes.patcher.width;
+            settings.width = newWidth;
+            translator.change({
+                width:newWidth
+            });
+
+            this.getInputPositions();
+            myInputGraphs.forEach((ig)=>ig.updatePosition());
+            myOutputGraph.updatePosition();
+        }
+
+        translator.onChange(()=>{
+            const newWidth=translator.settings.width;
+            handleRect.set("width",newWidth);
+
+            controlPanel.set(
+                "x",
+                newWidth - controlPanelWidth - controlPanelRight
+            );
+        });
+
+        drawBoard.size.onChange(()=>updateSize());
 
         const title = new Text({
             x: 10, y: 0,
             text: settings.name
         });
+
         this.contents.add(title);
     }
 };

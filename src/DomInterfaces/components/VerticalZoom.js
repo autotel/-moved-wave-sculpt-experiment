@@ -91,6 +91,10 @@ class VerticalZoom extends Group{
                 });
 
             }
+            if(changes.width){
+                readoutText.set("x",settings.width + 5);
+                handleRect.set("x", settings.width-zoomSettings.width);
+            }
         });
 
         const superSet = this.set;

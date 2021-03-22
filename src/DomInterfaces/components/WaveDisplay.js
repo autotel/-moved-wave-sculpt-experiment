@@ -17,13 +17,13 @@ class WaveDisplay extends Path{
         
 
         const superSet = this.set;
-
+        /** 
+         * @param {String} what
+         * @param {any} value
+         */
         this.set = (what,value) => {
-            const {
-                rangeAmplitude
-            }=settings;
-
-            if (what == "wave") {
+            
+            if (what == "wave" || what == "width") {
                 const theWave = value;
                 let str = `M ${0},${settings.height / 2}`;
                 
@@ -31,6 +31,7 @@ class WaveDisplay extends Path{
                     settings.width,
                     translator.sampleNumberToX(theWave.length)
                 );
+                
                 //todo: take whichever has less: pixels or samples.
                 //when multi samples per pixel, use max and a filled area
                 //otherwise, it's a line

@@ -1,8 +1,7 @@
 import Module from "../SoundModules/Module";
 import { Line, Path, Group } from "../scaffolding/elements";
-import Lane from "./components/Lane";
 import InputNode from "../SoundModules/InputNode";
-import Sprite from "../scaffolding/Sprite";
+import Canvas from "../scaffolding/Canvas";
 const pathTypes = require("../scaffolding/elements");
 
 /** @typedef {pathTypes.PathOptions} PathOptions */
@@ -24,7 +23,12 @@ const pathTypes = require("../scaffolding/elements");
  * @extends Group
  */
 class PatchDisplay extends Group{
-    constructor(){
+    /** 
+     * @param {Canvas} drawBoard 
+     * 
+     * */
+
+    constructor(drawBoard){
         super();
         /** @type {Path[]} */
         const lines=[];
@@ -102,10 +106,10 @@ class PatchDisplay extends Group{
                 });
             });
 
-            lines.map((line)=>{
+            lines.forEach((line)=>{
                 Object.assign(line.attributes,{d:""});
             });
-            coords.map((coord,i)=>{
+            coords.forEach((coord,i)=>{
                 if(!lines[i]){
                     lines[i]=new Path();
                     lines[i].domElement.addEventListener('click',(evt)=>lines[i].domElement.classList.toggle("highlight"));
@@ -115,11 +119,18 @@ class PatchDisplay extends Group{
                 lines[i].attributes.class="patchcord";
             });
 
-            lines.map((line)=>{
+            lines.forEach((line)=>{
                 line.update();
             });
 
+            drawBoard.size.onChange(()=>{
+                updatePatchLines();
+            });
+
+
         }
+
+
 
     }
 }

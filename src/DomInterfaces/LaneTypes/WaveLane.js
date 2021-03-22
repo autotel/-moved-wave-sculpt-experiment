@@ -13,16 +13,16 @@ import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
 class WaveLane extends Lane{
     /**
      * @param {ValuePixelTranslator} translator
-     * @param {WaveLaneOptions} options
+     * @param {import("../components/Lane").LaneOptions} options
      */
     constructor(translator,options){
-        const {model}=options;
-        const settings=typicalLaneSettings(model);
+        const {model,drawBoard}=options;
+        const settings=typicalLaneSettings(model,drawBoard);
         //plave for defaults
         settings.name="Wave";
-        Object.assign(settings,options);
+        Object.assign(settings,settings);
+        super(translator,options);
         
-        super(settings);
 
         const contents=this.contents;
 
@@ -59,6 +59,10 @@ class WaveLane extends Lane{
                 waveDisplay.set("wave",changes.cachedValues);
             }
         });
+
+        // drawBoard.size.onChange(()=>{
+            // waveDisplay.set("width",drawBoard.size.width);
+        // });
 
         /**
          * handy function that sets the ValuePixelTranslator (i.e. zoom/pan) 

@@ -9,6 +9,7 @@ import WaveLane from "./LaneTypes/WaveLane";
 import Model from "../scaffolding/Model";
 import Repeater from "../SoundModules/Repeater";
 import { sampleRate } from "../SoundModules/vars";
+import Canvas from "../scaffolding/Canvas";
 const vectorTypes = require("../scaffolding/Vector2");
 /** @typedef {vectorTypes.MiniVector} MiniVector
 /**
@@ -19,14 +20,17 @@ const vectorTypes = require("../scaffolding/Vector2");
  * @extends WaveLane
  */
 class RepeaterDisplay extends WaveLane{
-    /** @param {Object<String,Model|string|number>} options */
+    /**
+     * @param {object} options
+     * @param {Repeater} options.model
+     * @param {Canvas} options.drawBoard
+     **/
     constructor (options){
-        /** @type {Repeater} */
-        const model = options.model;
-        const settings=typicalLaneSettings(model);
+        const {model,drawBoard} = options;
+        const settings=typicalLaneSettings(model,drawBoard);
         //plave for defaults
         settings.name="Repeater";
-        Object.assign(settings,options);
+        Object.assign(settings,settings);
 
         const translator=new ValuePixelTranslator(settings);
         super(translator,settings);
@@ -96,7 +100,6 @@ class RepeaterDisplay extends WaveLane{
                 /**
                  * update the handle's point coordinates and cause
                  * this change to be reflected visually
-                 * @param {Array<number>} point [sample number, level]
                  */
                 this.handleModelChangedPoint = () => {
                     const point = this.point;

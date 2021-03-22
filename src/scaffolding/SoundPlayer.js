@@ -6,12 +6,10 @@ import { Rectangle, Path, Group } from "./elements";
 
 class SoundPlayer{
     constructor(){
-
-
         /** @type {AudioBufferSourceNode|false} */
         var source=false;
         const myGain = audioContext.createGain();
-        myGain.gain.value=0.6;
+        myGain.gain.value=1;
         myGain.connect(audioContext.destination);
         
         /** @type {Module|false} */
@@ -95,7 +93,6 @@ class SoundPlayer{
 
         magicPlayer.connect(myGain);
 
-
         let position={
             x:-15,
             y:-10,
@@ -103,9 +100,12 @@ class SoundPlayer{
             height:20,
             spacing:5,
         }
+
         const everyPlayButton=[];
         /** @param {Module} module */
         this.appendModule = (module)=>{
+
+
             console.log("module appended to player");
             //rect
             let c1=`${position.x}, ${position.y}`;
@@ -125,21 +125,25 @@ class SoundPlayer{
 
             let path = new Path({
                 d: `M ${c1}
-                    L ${c1} ${c2} 
-                    L ${c2} ${c3} 
-                    L ${c3} ${c4}
+                    L ${c2} 
+                    L ${c3} 
+                    L ${c4}
                     z
                     M ${c5}
-                    L ${c5} ${c6}
-                    L ${c6} ${c7}
+                    L ${c6}
+                    L ${c7}
                     z`,
             });
+
 
             playButton.add(path);
 
             playButton.domElement.setAttribute("class","button play");
             everyPlayButton.push(playButton);
-            module.getInterface().appendToControlPanel(playButton);
+            module.getInterface().appendToControlPanel(
+                playButton,
+                position.width + 10
+            );
             
             module.onUpdate((changes)=>{
                 if(changes.cachedValues){

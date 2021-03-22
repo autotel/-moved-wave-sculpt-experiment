@@ -12,21 +12,23 @@ navBoard.element.classList.add("nav");
 
 //other interfaces
 import SoundPlayer from "./scaffolding/SoundPlayer";
-import WebInspectorInterface from "./LiveCodingInterface"
+import LiveCodingInterface from "./LiveCodingInterface"
 
-const webInspectorInterface=new WebInspectorInterface();
+const webInspectorInterface=new LiveCodingInterface({drawBoard});
 
 
-const patchDisplay = new PatchDisplay();
+const patchDisplay = new PatchDisplay(drawBoard);
 
 const timeZoomer = new TimeZoomer();
 navBoard.add(timeZoomer);
 
 const player=new SoundPlayer();
+const downloader = new SoundDownloader();
 
 webInspectorInterface.onModuleCreated((newModule,newInterface,count)=>{
     patchDisplay.appendModules(newModule);
     player.appendModule(newModule);
+    downloader.appendModule(newModule);
     drawBoard.add(newInterface);
 });
 
@@ -43,6 +45,7 @@ import pat4 from "./patches/delay";
 import pat5 from "./patches/drumpat";
 import pat6 from "./patches/filterTester";
 import pat7 from "./patches/multireso";
+import SoundDownloader from "./scaffolding/SoundDownloader";
 
 window.demos = {
     "rotator": ()=>pat1(webInspectorInterface),

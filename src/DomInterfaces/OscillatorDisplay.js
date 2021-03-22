@@ -5,11 +5,11 @@ import Draggable from "./components/Draggable";
 import Vector2 from "../scaffolding/Vector2";
 import Oscillator from "../SoundModules/Oscillator";
 import round from "../utils/round";
-import WaveDisplay from "./components/WaveDisplay";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
 import Model from "../scaffolding/Model";
+import Canvas from "../scaffolding/Canvas";
 
 /**
  * @namespace DomInterface.OscillatorDisplay
@@ -20,13 +20,17 @@ import Model from "../scaffolding/Model";
  * @extends WaveLane
  */
 class OscillatorDisplay extends WaveLane{
-    /** @param {Object<String,Model|string|number>} options */
+    /**
+     * @param {object} options
+     * @param {Oscillator} options.model
+     * @param {Canvas} options.drawBoard
+     **/
     constructor (options){
-        const model = options.model;
-        const settings=typicalLaneSettings(model);
+        const {model,drawBoard} = options;
+        const settings=typicalLaneSettings(model,drawBoard);
         //plave for defaults
         settings.name="Oscillator";
-        Object.assign(settings,options);
+        Object.assign(settings,settings);
 
         const translator=new ValuePixelTranslator(settings);
 

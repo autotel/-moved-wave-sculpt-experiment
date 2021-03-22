@@ -5,11 +5,11 @@ import Draggable from "./components/Draggable";
 import Vector2 from "../scaffolding/Vector2";
 import Hipparchus from "../SoundModules/Hipparchus";
 import round from "../utils/round";
-import WaveDisplay from "./components/WaveDisplay";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
 import Model from "../scaffolding/Model";
+import Canvas from "../scaffolding/Canvas";
 
 /**
  * @namespace DomInterface.HipparchusDisplay
@@ -20,17 +20,21 @@ import Model from "../scaffolding/Model";
  * @extends WaveLane
  */
 class HipparchusDisplay extends WaveLane{
-    /** @param {Object<String,Model|string|number>} options */
+    /**
+     * @param {object} options
+     * @param {Hipparchus} options.model
+     * @param {Canvas} options.drawBoard
+     **/
     constructor (options){
-        const model = options.model;
-        const settings=typicalLaneSettings(model);
+        const {model,drawBoard} = options;
+        const settings=typicalLaneSettings(model,drawBoard);
         //plave for defaults
         settings.name="Hipparchus";
-        Object.assign(settings,options);
+        Object.assign(settings,settings);
 
         const translator=new ValuePixelTranslator(settings);
 
-        super(translator,settings);
+        super(translator,options);
 
         this.addKnob("rotation").setMinMax(0,2);
         this.addKnob("gain").setMinMax(0,2);

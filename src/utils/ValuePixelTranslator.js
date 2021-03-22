@@ -33,7 +33,6 @@ class ValuePixelTranslator {
         const modelSettings = model.settings;
         this.settings=settings;
         
-        Object.seal(this.settings);
         let changedListeners = [];
         /**
          * @param {Function}  callback
