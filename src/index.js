@@ -45,6 +45,7 @@ import pat4 from "./patches/delay";
 import pat5 from "./patches/drumpat";
 import pat6 from "./patches/filterTester";
 import pat7 from "./patches/multireso";
+import pat8 from "./patches/wave1";
 import SoundDownloader from "./scaffolding/SoundDownloader";
 
 window.demos = {
@@ -55,6 +56,7 @@ window.demos = {
     "drumpat": ()=>pat5(webInspectorInterface),
     "filterTester": ()=>pat6(webInspectorInterface),
     "multireso": ()=>pat7(webInspectorInterface),
+    "wavefolder": ()=>pat8(webInspectorInterface),
 }
 
 let hashBefore = window.location.hash;

@@ -6,6 +6,7 @@ import DelayWithFilter from "../SoundModules/DelayWithFilter";
 import NaiveReverb from "../SoundModules/NaiveReverb";
 import EnvelopeGenerator from "../SoundModules/EnvelopeGenerator";
 import Chebyshev from "../SoundModules/Chebyshev";
+import WaveFolder from "../SoundModules/WaveFolder";
 
 import Model from "../scaffolding/Model";
 
@@ -27,6 +28,7 @@ import EnvelopeGeneratorDisplay from "../DomInterfaces/EnvelopeGeneratorDisplay"
 import ChebyshevDisplay from "../DomInterfaces/ChebyshevDisplay";
 import RepeaterDisplay from "../DomInterfaces/RepeaterDisplay";
 import HipparchusDisplay from "../DomInterfaces/HipparchusDisplay";
+import WaveFolderDisplay from "../DomInterfaces/WaveFolderDisplay";
 
 
 function giveHelp(){
@@ -91,6 +93,9 @@ class LiveCodingInterface{
                 break;
                 case "Hipparchus":
                     newInterface=new HipparchusDisplay(props);
+                break;
+                case "WaveFolder":
+                    newInterface=new WaveFolderDisplay(props);
                 break;
                 case "EnvelopeGenerator":
                     newInterface=new EnvelopeGeneratorDisplay(props);
@@ -188,6 +193,7 @@ class LiveCodingInterface{
             Filter,
             Repeater,
             Hipparchus,
+            WaveFolder,
             NaiveReverb,
         };
 
@@ -196,7 +202,10 @@ class LiveCodingInterface{
         });
         
         window.create=(module,name)=>{
-            if(!module) return Object.keys(this.possibleModules);
+            if(!module){
+                console.error("create: provided module is",module);
+                return Object.keys(this.possibleModules);
+            }
             return this.create(module,name)
         };
         window.modules=this.modules;
