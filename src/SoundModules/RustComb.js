@@ -24,9 +24,9 @@ const defaultSettings={
     feedback:0.9,
     nativeProcessor:undefined,
 };
-//TODO: only third order is producing anything useful
+
 /**
- * @class RustComb 
+ * @class RustComb an example that utilizes Rust to process the audio
  * @extends Module
  */
 class RustComb extends Module{
@@ -62,7 +62,6 @@ class RustComb extends Module{
 
 
         this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
 
             const {
                 frequency,
@@ -72,12 +71,13 @@ class RustComb extends Module{
             } = settings;
 
             const inputValues = this.inputs.main.getValues(recursion);
-
-            nativeProcessor.arrCombFilter(
+            /** @type {Float64Array} */
+            let f64arr = nativeProcessor.arrCombFilter(
                 inputValues,frequency,dampening_inverse,dampening,feedback
             );
+            this.cachedValues = Array.from(f64arr);
             
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
         };
     }
 }

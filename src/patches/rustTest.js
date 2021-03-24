@@ -4,30 +4,29 @@ import LiveCodingInterface from "../LiveCodingInterface";
 
 /** @param {LiveCodingInterface} codeInterface */
 export default function run(codeInterface) {
-  create(possibleModules.RustComb, 'rustcomb');
-  create(possibleModules.Oscillator, 'osc1');
-  modules['osc1'].connectTo(modules['rustcomb'].inputs.main);
-  modules['rustcomb'].set({
-    'frequency': 418.4444444444444,
-    'dampening_inverse': 0.71,
-    'dampening': 0.8200000000000001,
-    'feedback': 1.37,
-    'nativeProcessor': {
-      'ready': false
-    }
-  });
-  modules['osc1'].set({
-    'amplitude': 1,
-    'bias': 0,
-    'length': 0.02999999999999998,
-    'frequency': 2247.7777777777756,
-    'phase': 0,
-    'shape': 'ramp',
-    'nativeProcessor': {
-      'ready': false
-    }
-  });
-  modules['rustcomb'].getInterface().autoZoom();
-  modules['osc1'].getInterface().autoZoom();
-  dumpPatch();
+  create(possibleModules.RustComb,'rustcomb');
+create(possibleModules.Oscillator,'osc1');
+modules['osc1'].connectTo(modules['rustcomb'].inputs.main);
+modules['rustcomb'].set({
+  'frequency': 145.02222222222224,
+  'dampening_inverse': 0.53,
+  'dampening': 0.28,
+  'feedback': 1.36,
+  'nativeProcessor': {
+    'ready': false
+  }
+});
+modules['osc1'].set({
+  'amplitude': 0.24,
+  'bias': 0,
+  'length': 1.2,
+  'frequency': 12.844444444444353,
+  'phase': 0,
+  'shape': 'ramp',
+  'nativeProcessor': {
+    'ready': false
+  }
+});
+modules['rustcomb'].getInterface().autoZoom();
+modules['osc1'].getInterface().autoZoom();
 }

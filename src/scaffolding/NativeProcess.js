@@ -28,12 +28,20 @@ class NativeProcess {
         this.add=(a,b)=>notReady("NativeProcess add");
         /**
          * @param {number} values
+         * @returns {Float64Array} result
          **/
-        this.arrGenSin=((duration,frequency)=>notReady("NativeProcess arrSin"));
+        this.arrGenSin=((duration,frequency)=>{
+            notReady("NativeProcess arrSin")
+            return new Float64Array();
+        });
         /**
          * @param {Array<number>} values
+         * @returns {Float64Array} result
          **/
-        this.arrCombFilter=((...p)=>notReady("NativeProcess arrSin"));
+        this.arrCombFilter=((...p)=>{
+            notReady("NativeProcess arrSin")
+            return new Float64Array();
+        });
     }
 
 }

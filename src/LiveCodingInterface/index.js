@@ -91,7 +91,7 @@ class LiveCodingInterface{
 
             const props = {
                 model:newModule,
-                intendedName:nameForAccess, drawBoard
+                name:nameForAccess, drawBoard
             }
 
             let newInterface;
