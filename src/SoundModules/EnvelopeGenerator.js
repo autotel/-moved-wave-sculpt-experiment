@@ -90,7 +90,10 @@ class EnvelopeGenerator extends Module {
             return ret;
         }
         this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
+            const lengthSamples = settings.length * sampleRate;
+            
+            this.cachedValues = new Float32Array(lengthSamples);
+
             sortPointsByTime();
             /** @returns {EnvelopePoint|false} */
             const getNextPoint = (spl) => {
@@ -105,7 +108,6 @@ class EnvelopeGenerator extends Module {
                 return false;
             }
 
-            const lengthSamples = settings.length * sampleRate;
 
             let nextPoint = getNextPoint(0);
             let currentPoint = [0, 0];

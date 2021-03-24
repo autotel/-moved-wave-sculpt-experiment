@@ -14,6 +14,15 @@ class RustProcessor extends NativeProcess{
                 sampleRate,samplesArray,
                 frequency,dampening_inverse,dampening,feedback
             );
+
+            this.freeverb = (values,...p) => {
+                let ret = new Float32Array(values.length);
+                let freeverb = new lib.Freeverb(sampleRate);
+                freeverb.process(values,values,ret,ret);
+                return ret;
+            }
+
+
             this._handleReady(this);
         });
 

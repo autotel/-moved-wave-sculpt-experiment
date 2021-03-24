@@ -96,9 +96,9 @@ class Hipparchus extends Module {
             let yIn = this.inputs.y.getValues(recursion);
             let rotationIn = this.inputs.rotation.getValues(recursion);
 
-            this.cachedValues=[];
+            this.cachedValues = new Float32Array(xIn.length);
 
-            xIn.map((x,sampleNumber)=>{
+            xIn.forEach((x,sampleNumber)=>{
                 let y = voz(yIn[sampleNumber]);
                 let rotationSample = voz(rotationIn[sampleNumber]);
 

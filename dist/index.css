@@ -59,6 +59,10 @@ svg .wave-display {
 svg .lane-handle {
   fill: rgba(9, 22, 34, 0.56);
   stroke-width: 0;
+  cursor: grab;
+}
+svg .lane-handle.dragging {
+  cursor: grabbing;
 }
 svg .hover-text {
   pointer-events: none;

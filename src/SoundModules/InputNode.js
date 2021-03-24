@@ -7,6 +7,7 @@ class InputNode {
         /** @type {undefined | Module} */
         this.input = undefined;
         this.owner = owner;
+        /** @returns {Float32Array} */
         this.getValues = (recursion) => {
             // if(!this.input) throw new Error("requested getValues from nonconnected input");
             if (this.input)

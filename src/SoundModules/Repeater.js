@@ -65,8 +65,10 @@ class Repeater extends Module {
         }
 
         this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
 
+            const lengthSamples = settings.length * sampleRate;
+            this.cachedValues = new Float32Array(lengthSamples);
+            
             sortPointsByTime();
             /** @returns {EnvelopePoint|false} */
             const getNextPoint = (spl) => {
@@ -81,7 +83,6 @@ class Repeater extends Module {
                 return false;
             }
 
-            const lengthSamples = settings.length * sampleRate;
 
             let inputSamples = this.inputs.main.getValues(recursion);
 

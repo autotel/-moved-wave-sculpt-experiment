@@ -117,8 +117,9 @@ class Oscillator extends Module{
         
         this.recalculate = (recursion = 0) => {
             phaseAccumulator = settings.phase;
-            this.cachedValues=[];
             const lengthSamples = settings.length * sampleRate;
+            this.cachedValues = new Float32Array(lengthSamples);
+
             if (!shapes[settings.shape])
             throw new Error(`
                 Wave shape function named ${settings.shape}, does not exist. 

@@ -8,6 +8,7 @@ import EnvelopeGenerator from "../SoundModules/EnvelopeGenerator";
 import Chebyshev from "../SoundModules/Chebyshev";
 import WaveFolder from "../SoundModules/WaveFolder";
 import RustComb from "../SoundModules/RustComb";
+import RustFreeverb from "../SoundModules/RustFreeverb";
 import Filter from "../SoundModules/Filter";
 import MixerTesselator from "../SoundModules/MixerTesselator";
 import Module from "../SoundModules/Module";
@@ -219,6 +220,7 @@ class LiveCodingInterface{
             WaveFolder,
             RustComb,
             NaiveReverb,
+            RustFreeverb,
         };
 
         Object.keys(this.possibleModules).map((mname)=>{

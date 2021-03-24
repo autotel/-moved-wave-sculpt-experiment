@@ -80,7 +80,6 @@ class NaiveReverb extends Module{
         const tap1 = new ReverbTap();
         
         this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
 
             let delayCache = [];
             
@@ -93,8 +92,11 @@ class NaiveReverb extends Module{
             tap1.time = settings.time;
             tap1.diffusion = settings.diffusion;
             tap1.reset();
+
+
+            this.cachedValues = new Float32Array(inputValues.length);
             
-            inputValues.map((value,sampleNumber)=>{
+            inputValues.forEach((value,sampleNumber)=>{
                 this.cachedValues[sampleNumber]=0;
                 
                 if(isNaN(value)) value = 0;

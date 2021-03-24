@@ -29,8 +29,8 @@ function Canvas(){
     let doSize=false;
     setInterval(()=>{
         if(doSize){
-            this.size.width=window.outerWidth;
-            this.size.height=window.outerHeight;
+            this.size.width=window.innerWidth;
+            this.size.height=window.innerHeight;
             sizeChangeCallbacks.forEach((callback)=>callback());
             doSize=false;
             console.log("recalc size");

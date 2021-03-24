@@ -23,7 +23,6 @@ import voz from "../utils/valueOrZero";
 
 /** 
  * @typedef {Object} FilterSettings
- * @property {number} [length]
  * @property {number} [frequency]
  * @property {number} [gain]
  * @property {number} [reso]
@@ -59,7 +58,6 @@ const filterProtos={
 const defaultSettings={
     gain:1,
     reso:0.2,
-    length:1,
     type:"LpMoog",
     order:1,
     frequency:100,
@@ -127,9 +125,9 @@ class Filter extends Module{
             const frequencies = this.inputs.frequency.getValues(recursion);
             const gains = this.inputs.gain.getValues(recursion);
             const resos = this.inputs.reso.getValues(recursion);
-            
-            this.cachedValues = [];
             const inputValues=this.inputs.main.getValues(recursion);
+            
+            this.cachedValues = new Float32Array(inputValues.length);
 
             filter.reset();
 

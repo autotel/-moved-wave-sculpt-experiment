@@ -35,12 +35,11 @@ class MixerTesselator extends Module{
         this.hasInput("d");
 
         this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
             let result=[];
             let first = true;
             this.eachInput((input,inputno,inputName) => {
                 const inputValues = input.getValues(recursion);
-                inputValues.map((val, index) => {
+                inputValues.forEach((val, index) => {
                     if(!result[index]) result[index]=0;
                     result[index] += (val) * amplitude * settings["level"+inputName];
                 });
@@ -49,7 +48,7 @@ class MixerTesselator extends Module{
             let lengthSamples=result.length;
             let half = Math.floor(lengthSamples/2);
             
-            this.cachedValues = result.map((v,i)=>{
+            this.cachedValues = new Float32Array(result.map((v,i)=>{
                 let awindow = Math.cos(2 * Math.PI * i/lengthSamples) / 2 + 0.5;
                 let window = 1 - awindow; 
                 if(i>half){
@@ -59,7 +58,7 @@ class MixerTesselator extends Module{
                 }else{
                     return v;
                 }
-            });
+            }));
 
             this.changed({ cachedValues: this.cachedValues });
         };

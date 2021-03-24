@@ -51,12 +51,12 @@ class WaveFolder extends Module{
 
 
         this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
             const {
                 amplitude, bias, fold,
             } = settings;
             const halffold = fold/2;
             const inputValues = this.inputs.main.getValues(recursion);
+            
             this.cachedValues = inputValues.map((val)=>{
                 const result = (
                     actualModulo(

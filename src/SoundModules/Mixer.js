@@ -32,17 +32,19 @@ class Mixer extends Module{
         this.hasInput("d");
 
         this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
+            
+
             let result=[];
             let first = true;
             this.eachInput((input,inputno,inputName) => {
                 const inputValues = input.getValues(recursion);
-                inputValues.map((val, index) => {
+                inputValues.forEach((val, index) => {
                     if(!result[index]) result[index]=0;
                     result[index] += (val) * amplitude * settings["level"+inputName];
                 });
             });
-            this.cachedValues=result;
+
+            this.cachedValues = new Float32Array(result);
         
             this.changed({ cachedValues: this.cachedValues });
         };

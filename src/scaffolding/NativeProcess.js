@@ -43,6 +43,14 @@ class NativeProcess {
             notReady("NativeProcess arrSin")
             return new Float64Array();
         });
+        /**
+         * @param {Array<number>} values
+         * @returns {Float64Array} result
+         **/
+        this.freeverb=((...p)=>{
+            notReady("NativeProcess arrSin")
+            return new Float64Array();
+        });
     }
 
 }

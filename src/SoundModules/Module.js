@@ -19,7 +19,8 @@ class Module extends Model{
         super(settings);
         this.unique = count ++;
         this.name = this.constructor.name + "-" + this.unique;
-        this.cachedValues = [];
+        /** @type {Float32Array} */
+        this.cachedValues = new Float32Array([0]);
         /** @type {Object<string, InputNode>} */
         this.inputs = {};
         /** @type {Set<InputNode>} */
@@ -32,10 +33,15 @@ class Module extends Model{
         this.hasInput = (inputName) => {
             this.inputs[inputName] = new InputNode(this);
         };
-
+        /**
+         * @callback eachInputCallback
+         * @param {InputNode} input
+         * @param {number} index
+         * @param {string} name
+         */
         /**
          * @function eachInput run a callback function for each of the InputNodes. This saves the trouble of iterating each input. This function is intended to be called only from within the recalculate function.
-         * @param {Function} callback
+         * @param {eachInputCallback} callback
          */
         this.eachInput = (callback) => {
             Object.keys(this.inputs).forEach((inputName, index) => {
@@ -108,7 +114,7 @@ class Module extends Model{
         };
         /**
          * used to get the values from the module, or to cause the module to recalculate its values.
-         * @returns {Array<number>} the sound array, sample by sample.
+         * @returns {Float32Array} the sound array, sample by sample.
          * The samples will get recalculated if it's useCache flag is set to true. Otherwise, this function will return the cached samples.
          * The user can also get the cached samples by simply getting the `cachedValues` property, in which case one might get outdated samples.
          */
@@ -133,7 +139,7 @@ class Module extends Model{
          *  this.recalculate has to fill the this.cachedValues array
          */
         this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
+            this.cachedValues = new Float32Array([0]);
             this.changed({ cachedValues: this.cachedValues });
         };
 

@@ -4,11 +4,11 @@ import NativeProcess from "../scaffolding/NativeProcess";
 import requireParameter from "../utils/requireParameter";
 
 /**
- * @namespace SoundModules.RustComb
+ * @namespace SoundModules.RustFreeverb
  */
 
 /** 
- * @typedef {Object} RustCombSettings
+ * @typedef {Object} RustFreeverbSettings
  * @property {number} [frequency]
  * @property {number} [dampening_inverse]
  * @property {number} [dampening]
@@ -16,7 +16,7 @@ import requireParameter from "../utils/requireParameter";
  * @property {NativeProcess} nativeProcessor
  */
 
-/** @type {RustCombSettings} */
+/** @type {RustFreeverbSettings} */
 const defaultSettings={
     frequency:5,
     dampening_inverse:0.5,
@@ -26,12 +26,12 @@ const defaultSettings={
 };
 
 /**
- * @class RustComb an example that utilizes Rust to process the audio
+ * @class RustFreeverb an example that utilizes Rust to process the audio
  * @extends Module
  */
-class RustComb extends Module{
+class RustFreeverb extends Module{
     /**
-     * @param {RustCombSettings} userSettings
+     * @param {RustFreeverbSettings} userSettings
      */
     constructor(userSettings) {
         requireParameter(userSettings.nativeProcessor,"nativeProcessor");
@@ -57,7 +57,8 @@ class RustComb extends Module{
         this.setFeedback = (to) => {
             return this.set({feedback:to});
         };
-   
+
+        const actualModulo = (a,m) => ((a%m)+m)%m;       
 
         this.recalculate = (recursion = 0) => {
             if(!nativeProcessor.ready){
@@ -79,8 +80,8 @@ class RustComb extends Module{
             if (frequency == 0) frequency = 0.1/sampleRate;
 
             this.cachedValues = new Float32Array(
-                nativeProcessor.arrCombFilter(
-                    inputValues,frequency,dampening_inverse,dampening,feedback
+                nativeProcessor.freeverb(
+                    inputValues
                 )
             );
             
@@ -89,4 +90,4 @@ class RustComb extends Module{
     }
 }
 
-export default RustComb;
+export default RustFreeverb;

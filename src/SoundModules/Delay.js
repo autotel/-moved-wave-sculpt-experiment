@@ -36,7 +36,6 @@ class Delay extends Module{
         
         this.recalculate = (recursion = 0) => {
 
-            this.cachedValues = [];
             operator.reset();
             
             let inputValues = this.inputs.main.getValues(recursion);
@@ -44,8 +43,10 @@ class Delay extends Module{
 
             let feedbackLevels = this.inputs.feedback.getValues(recursion);
             let timeLevels = this.inputs.time.getValues(recursion);
+
+            this.cachedValues = new Float32Array(inputValues.length);
             
-            inputValues.map((value,sampleNumber)=>{
+            inputValues.forEach((value,sampleNumber)=>{
                 this.cachedValues[sampleNumber] = 0;
                 
                 let currentTimeLevel = voz(timeLevels[sampleNumber]) + delayInSamples;
@@ -57,11 +58,10 @@ class Delay extends Module{
                 }
 
                 this.cachedValues[sampleNumber]+=operator.calculateSample(value,currentTimeLevel);
-                
             });
 
             //mix dry and wet
-            this.cachedValues.map((val,sampleNumber)=>{
+            this.cachedValues.forEach((val,sampleNumber)=>{
 
                 this.cachedValues[sampleNumber] = this.cachedValues[sampleNumber] * settings.wet 
                     + inputValues[sampleNumber] * settings.dry;
