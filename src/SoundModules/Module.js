@@ -1,6 +1,7 @@
 import {maxRecursion} from "./vars";
 import Model from "../scaffolding/Model";
 import InputNode from "./InputNode";
+import measureExec from "../utils/measureExec";
 
 let count = 0;
 
@@ -123,6 +124,10 @@ class Module extends Model{
             }
             return this.cachedValues;
         };
+
+        
+        let measureCalculationTime = false;
+
         /** 
          * Calculate the output samples, filling the cachedValues property. This function is extended by each different Module with their own calculation function
          *  this.recalculate has to fill the this.cachedValues array
@@ -131,6 +136,17 @@ class Module extends Model{
             this.cachedValues = [];
             this.changed({ cachedValues: this.cachedValues });
         };
+
+        this.measureCalculationTime = () => {
+            if(measureCalculationTime) return false;
+            let originalRecalculateFn = this.recalculate;
+            this.recalculate = (...p) => {
+                let inter = measureExec(()=>originalRecalculateFn(...p));
+                console.log(inter);
+                return inter;
+            }
+        }
+
         /**
          * Trigger all the model change functions, so that any other object listening to this model's properties get the initial status of the module.
          */

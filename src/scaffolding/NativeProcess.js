@@ -23,6 +23,7 @@ class NativeProcess {
 
         this._handleReady=(caller)=>{
             onReadyCallbacks.forEach((callback)=>callback(caller));
+            this.ready=true;
         }
 
         this.add=(a,b)=>notReady("NativeProcess add");

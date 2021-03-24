@@ -116,6 +116,7 @@ Draggable.setCanvas=(canvas=document)=>{
     const mouse = Draggable.mouse;
 
     canvas.addEventListener("mousemove",(evt)=>{
+        evt.preventDefault();
         // @ts-ignore
         mouse.x=evt.clientX;
         // @ts-ignore
@@ -129,6 +130,7 @@ Draggable.setCanvas=(canvas=document)=>{
     });
 
     canvas.addEventListener("mousedown", (evt)=>{
+        evt.preventDefault();
         mouse.pressed=true;
         //@ts-ignore
         mouse.dragStartPosition.set({x:evt.clientX,y:evt.clientY});

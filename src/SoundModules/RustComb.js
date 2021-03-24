@@ -60,25 +60,32 @@ class RustComb extends Module{
 
         const actualModulo = (a,m) => ((a%m)+m)%m;       
 
-
         this.recalculate = (recursion = 0) => {
-            nativeProcessor.onReady(()=>{
-                const {
-                    frequency,
-                    dampening_inverse,
-                    dampening,
-                    feedback,
-                } = settings;
+            if(!nativeProcessor.ready){
+                nativeProcessor.onReady(()=>{
+                    this.recalculate(recursion);
+                });
+                return;
+            }
 
-                const inputValues = this.inputs.main.getValues(recursion);
-                /** @type {Float64Array} */
-                let f64arr = nativeProcessor.arrCombFilter(
-                    inputValues,frequency,dampening_inverse,dampening,feedback
-                );
-                this.cachedValues = Array.from(f64arr);
-                
-                this.changed({ cachedValues: this.cachedValues });
-            });
+            let {
+                frequency,
+                dampening_inverse,
+                dampening,
+                feedback,
+            } = settings;
+
+            const inputValues = this.inputs.main.getValues(recursion);
+
+            if (frequency == 0) frequency = 0.1/sampleRate;
+
+            /** @type {Float64Array} */
+            let f64arr = nativeProcessor.arrCombFilter(
+                inputValues,frequency,dampening_inverse,dampening,feedback
+            );
+            this.cachedValues = Array.from(f64arr);
+            
+            this.changed({ cachedValues: this.cachedValues });
         };
     }
 }
