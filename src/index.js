@@ -4,8 +4,9 @@ import PatchDisplay from "./DomInterfaces/PatchDisplay";
 import Canvas from "./scaffolding/Canvas";
 import TimeZoomer from "./DomInterfaces/TimeZoomer";
 
-import('./rust/pkg/index').then(module => {
-    console.log(module)
+import('./rust/pkg/').then((lib) => {
+    // lib is the wasm library you can now use.
+    console.log(`2 + 2 = ${lib.add(2, 2)}`)
 })
 
 const drawBoard=new Canvas();
