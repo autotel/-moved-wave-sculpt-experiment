@@ -3,11 +3,14 @@ import Draggable from "./DomInterfaces/components/Draggable";
 import PatchDisplay from "./DomInterfaces/PatchDisplay";
 import Canvas from "./scaffolding/Canvas";
 import TimeZoomer from "./DomInterfaces/TimeZoomer";
+import RustProcessor from "./rust";
 
-import('./rust/pkg/').then((lib) => {
-    // lib is the wasm library you can now use.
-    console.log(`2 + 2 = ${lib.add(2, 2)}`)
-})
+const nativeProcessor = new RustProcessor();
+
+nativeProcessor.onReady((nativeProcess)=>{
+    console.log("1+2=",nativeProcess.add(1,2));
+    console.log("sine",nativeProcess.arrGenSin(0.5,2));
+});
 
 const drawBoard=new Canvas();
 drawBoard.element.classList.add("drawboard");
@@ -19,7 +22,10 @@ navBoard.element.classList.add("nav");
 import SoundPlayer from "./scaffolding/SoundPlayer";
 import LiveCodingInterface from "./LiveCodingInterface"
 
-const webInspectorInterface=new LiveCodingInterface({drawBoard});
+const webInspectorInterface=new LiveCodingInterface({
+    drawBoard,
+    nativeProcessor
+});
 
 
 const patchDisplay = new PatchDisplay(drawBoard);
@@ -51,6 +57,7 @@ import pat5 from "./patches/drumpat";
 import pat6 from "./patches/filterTester";
 import pat7 from "./patches/multireso";
 import pat8 from "./patches/wave1";
+import pat9 from "./patches/rustTest";
 import SoundDownloader from "./scaffolding/SoundDownloader";
 
 window.demos = {
@@ -62,6 +69,7 @@ window.demos = {
     "filterTester": ()=>pat6(webInspectorInterface),
     "multireso": ()=>pat7(webInspectorInterface),
     "wavefolder": ()=>pat8(webInspectorInterface),
+    "rustTest": ()=>pat9(webInspectorInterface),
 }
 
 let hashBefore = window.location.hash;
@@ -84,3 +92,9 @@ window.addEventListener('DOMContentLoaded', hashchange);
 window.addEventListener("hashchange",hashchange);
 
 window.onpopstate = ()=>window.location.reload();
+
+
+setTimeout(()=>{
+    //prevent an anoying message casted by the current dev server.
+    window.socket=()=>{}
+},500);

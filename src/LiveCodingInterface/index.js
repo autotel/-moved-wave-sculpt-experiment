@@ -1,4 +1,4 @@
-
+//actual sound modules
 import Oscillator from "../SoundModules/Oscillator";
 import Mixer from "../SoundModules/Mixer";
 import Delay from "../SoundModules/Delay";
@@ -7,9 +7,7 @@ import NaiveReverb from "../SoundModules/NaiveReverb";
 import EnvelopeGenerator from "../SoundModules/EnvelopeGenerator";
 import Chebyshev from "../SoundModules/Chebyshev";
 import WaveFolder from "../SoundModules/WaveFolder";
-
-import Model from "../scaffolding/Model";
-
+import RustComb from "../SoundModules/RustComb";
 import Filter from "../SoundModules/Filter";
 import MixerTesselator from "../SoundModules/MixerTesselator";
 import Module from "../SoundModules/Module";
@@ -18,6 +16,7 @@ import FilterDisplay from "../DomInterfaces/FilterDisplay";
 import InputNode from "../SoundModules/InputNode";
 import Hipparchus from "../SoundModules/Hipparchus";
 
+//for interfaces
 import DelayDisplay from "../DomInterfaces/DelayDisplay";
 import DelayWithFilterDisplay from "../DomInterfaces/DelayWithFilterDisplay";
 import ReverbDisplay from "../DomInterfaces/ReverbDisplay";
@@ -29,7 +28,11 @@ import ChebyshevDisplay from "../DomInterfaces/ChebyshevDisplay";
 import RepeaterDisplay from "../DomInterfaces/RepeaterDisplay";
 import HipparchusDisplay from "../DomInterfaces/HipparchusDisplay";
 import WaveFolderDisplay from "../DomInterfaces/WaveFolderDisplay";
+import RustCombDisplay from "../DomInterfaces/RustCombDisplay";
 
+//for typing
+import Canvas from "../scaffolding/Canvas";
+import NativeProcess from "../scaffolding/NativeProcess";
 
 function giveHelp(){
 
@@ -43,7 +46,12 @@ function giveHelp(){
 }
 
 class LiveCodingInterface{
-    constructor({drawBoard}){
+    /**
+     * @param {Object} globals
+     * @param {Canvas} globals.drawBoard
+     * @param {NativeProcess} globals.nativeProcessor
+     */
+    constructor({drawBoard,nativeProcessor}){
         let count=0;
 
         setTimeout(giveHelp,1000);
@@ -58,10 +66,10 @@ class LiveCodingInterface{
 
         let first=true;
         /** 
-         * @param {string|false} name
+         * @param {string|false} intendedName
          * @returns {Module} 
          **/
-        this.create=function(Which,name=false){
+        this.create=function(Which,intendedName=false){
             if(first){
                 first=false;
                 let helpDom = document.getElementById("notes");
@@ -69,22 +77,21 @@ class LiveCodingInterface{
             }
 
             let protoname=Which.name;
-            if(!name) name=protoname+" "+count;
+            if(!intendedName) intendedName=protoname+" "+count;
+            let nameForAccess = intendedName.match(/[A-Za-z0-9]/gi).join("");
 
-            let usableName = name.match(/[A-Za-z0-9]/gi).join("");
-
-            if(this.modules[usableName]) usableName = usableName+count;
+            if(this.modules[nameForAccess]) nameForAccess = nameForAccess+count;
             
-            console.log(`this module will be available as "modules.${usableName}"`);
+            console.log(`this module will be available as "modules.${nameForAccess}"`);
             
-            const newModule=new Which();
+            const newModule=new Which({nativeProcessor});
 
-            this.modules[usableName]=newModule;
-            if(window[name]===undefined) window[name]=newModule;
+            this.modules[nameForAccess]=newModule;
+            if(window[intendedName]===undefined) window[intendedName]=newModule;
 
             const props = {
                 model:newModule,
-                name:usableName, drawBoard
+                intendedName:nameForAccess, drawBoard
             }
 
             let newInterface;
@@ -97,6 +104,9 @@ class LiveCodingInterface{
                 break;
                 case "WaveFolder":
                     newInterface=new WaveFolderDisplay(props);
+                break;
+                case "RustComb":
+                    newInterface=new RustCombDisplay(props);
                 break;
                 case "EnvelopeGenerator":
                     newInterface=new EnvelopeGeneratorDisplay(props);
@@ -144,6 +154,13 @@ class LiveCodingInterface{
             let settingStrings = [];
             let autozoomStrings = [];
             
+            /*
+            TODO:replace moduleList type from Array<Module> into Array of [module,name]
+            so that we dont need to run "findModulesName" on each iteration of modulesList.map
+
+            */
+
+
             /** @type {Array<Module>} */
             let modulesList = [];
 
@@ -154,22 +171,29 @@ class LiveCodingInterface{
             modulesList.sort((a,b)=>{
                 return a.getInterface().attributes.y - b.getInterface().attributes.y;
             });
+
+            const findModulesName = (module)=>{
+                let keys = Object.keys(this.modules)
+                return keys.find((keyName)=>this.modules[keyName]===module);
+            }
             
             modulesList.map((module)=>{
                 //make creation string
                 let constructorName = module.constructor.name;
-                let name = module.name;
+                let name = findModulesName(module);
                 instanceStrings.push(`create(possibleModules.${constructorName},"${name}");`);
                 /** @type {Set<InputNode>} */
                 let outputs=module.outputs;
                 outputs.forEach((inputNode)=>{
                     /** @type {Module} */
                     let inputNodeOwner = inputNode.owner;
+
+                    let inputNodeOwnerName=findModulesName(inputNodeOwner);
                     /* the key under which this inputNode is kept in owner module */
                     let inputNodeNameInOwner = Object.keys(inputNodeOwner.inputs)
                         .find((inputName)=>inputNodeOwner.inputs[inputName]===inputNode);
                     
-                    connectionStrings.push(`modules["${name}"].connectTo(modules["${this.modules[inputNodeOwner.name].name}"].inputs.${inputNodeNameInOwner});`);
+                    connectionStrings.push(`modules["${name}"].connectTo(modules["${inputNodeOwnerName}"].inputs.${inputNodeNameInOwner});`);
                 });
                 const setts = JSON.stringify(module.settings,null, 2);
                 settingStrings.push('modules["'+name+'"].set('+setts+');');
@@ -193,6 +217,7 @@ class LiveCodingInterface{
             Repeater,
             Hipparchus,
             WaveFolder,
+            RustComb,
             NaiveReverb,
         };
 

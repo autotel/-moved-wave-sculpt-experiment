@@ -8,3 +8,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wasm-bindgen = "0.2"
+
+[dependencies.synthrs]
+git = "https://github.com/gyng/synthrs"
+rev = "265ca00eac6213bf8aacb7f076fb199ec0d8c521"
