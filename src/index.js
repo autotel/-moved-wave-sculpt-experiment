@@ -4,6 +4,10 @@ import PatchDisplay from "./DomInterfaces/PatchDisplay";
 import Canvas from "./scaffolding/Canvas";
 import TimeZoomer from "./DomInterfaces/TimeZoomer";
 
+import('./rust/pkg/index').then(module => {
+    console.log(module)
+})
+
 const drawBoard=new Canvas();
 drawBoard.element.classList.add("drawboard");
 const navBoard=new Canvas();
