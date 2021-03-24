@@ -30,7 +30,7 @@ class OscillatorDisplay extends WaveLane{
         const settings=typicalLaneSettings(model,drawBoard);
         //plave for defaults
         settings.name="Oscillator";
-        Object.assign(settings,settings);
+        Object.assign(settings,options);
 
         const translator=new ValuePixelTranslator(settings);
 

@@ -1,3 +1,4 @@
 node_modules
 doc
 /upload.sh
+dist/*.module.wasm

@@ -69,8 +69,8 @@ class LiveCodingInterface{
             }
 
             let protoname=Which.name;
-            
             if(!name) name=protoname+" "+count;
+
             let usableName = name.match(/[A-Za-z0-9]/gi).join("");
 
             if(this.modules[usableName]) usableName = usableName+count;
@@ -78,12 +78,13 @@ class LiveCodingInterface{
             console.log(`this module will be available as "modules.${usableName}"`);
             
             const newModule=new Which();
-            
+
+            this.modules[usableName]=newModule;
             if(window[name]===undefined) window[name]=newModule;
 
             const props = {
                 model:newModule,
-                name, drawBoard
+                name:usableName, drawBoard
             }
 
             let newInterface;
@@ -129,9 +130,7 @@ class LiveCodingInterface{
             }
             moduleCreationListeners.map((cb)=>cb(newModule,newInterface,count));
 
-            newModule.name = name;
             
-            this.modules[usableName]=newModule;
             newInterface.handyPosition(count + 3);
 
             count++;

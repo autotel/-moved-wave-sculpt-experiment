@@ -30,7 +30,7 @@ class HipparchusDisplay extends WaveLane{
         const settings=typicalLaneSettings(model,drawBoard);
         //plave for defaults
         settings.name="Hipparchus";
-        Object.assign(settings,settings);
+        Object.assign(settings,options);
 
         const translator=new ValuePixelTranslator(settings);
 

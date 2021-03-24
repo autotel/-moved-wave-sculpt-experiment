@@ -26,7 +26,7 @@ class EnvelopeGeneratorDisplay extends WaveLane{
         const settings=typicalLaneSettings(model,drawBoard);
         //plave for defaults
         settings.name="Envelope";
-        Object.assign(settings,settings);
+        Object.assign(settings,options);
 
         const translator=new ValuePixelTranslator(settings);
         super(translator,settings);

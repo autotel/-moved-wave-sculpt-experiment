@@ -20,7 +20,7 @@ class WaveLane extends Lane{
         const settings=typicalLaneSettings(model,drawBoard);
         //plave for defaults
         settings.name="Wave";
-        Object.assign(settings,settings);
+        Object.assign(settings,options);
         super(translator,options);
         
 
