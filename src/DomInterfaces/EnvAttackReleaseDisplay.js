@@ -7,18 +7,18 @@ import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
 import Model from "../scaffolding/Model";
-import EnvelopeGenerator from "../SoundModules/EnvelopeGenerator";
+import EnvAttackRelease from "../SoundModules/EnvAttackRelease";
 import { sampleRate } from "../SoundModules/vars";
 const vectorTypes = require("../scaffolding/Vector2");
 /** @typedef {vectorTypes.MiniVector} MiniVector
 /**
- * @namespace DomInterface.EnvelopeGeneratorDisplay
+ * @namespace DomInterface.EnvAttackReleaseDisplay
  */
 /** 
- * @class EnvelopeGeneratorDisplay
+ * @class EnvAttackReleaseDisplay
  * @extends WaveLane
  */
-class EnvelopeGeneratorDisplay extends WaveLane{
+class EnvAttackReleaseDisplay extends WaveLane{
     /** @param {import("./components/Lane").LaneOptions} options */
     constructor (options){
 
@@ -31,20 +31,23 @@ class EnvelopeGeneratorDisplay extends WaveLane{
         const translator=new ValuePixelTranslator(settings);
         super(translator,settings);
 
-
-        const lengthKnob = this.addKnob("length");
-        const loopToggle = this.addToggle("loop");
-
+        this.addKnob("attack").setMinMax(0,1000);
+        this.addKnob("release").setMinMax(0,1000);
+        this.addKnob("amplitude");
+        this.addKnob("attackShape");
+        this.addKnob("releaseShape");
 
         //lane has a contents sprite.
         const contents=this.contents;
 
+        //note that we use seconds in these handles,
+        //as opposed to envGenerrator whose points are based on sample number
         class Handle extends Circle {
             constructor(settings){
                 let circleSettings = {r:10};
                 Object.apply(circleSettings,settings);
                 super(circleSettings);
-                this.point=[0,0];
+                
                 const draggable = this.draggable = new Draggable(this.domElement);
                 
                 /** @param {MiniVector} pos */
@@ -59,47 +62,13 @@ class EnvelopeGeneratorDisplay extends WaveLane{
                  * @param {MiniVector} pos
                  **/
                 this.handleGuiChangedPoint = (pos) =>{
-                    let changes = {};
-                    //display the change in the gui
-                    this.attributes.cx=pos.x;
-                    this.attributes.cy=pos.y;
-                    this.update();
-
-                    //update the point belonging to the model
-                    this.point[0]=translator.xToSampleNumber(pos.x);
-                    this.point[1]=translator.yToAmplitude(pos.y);
-
-                    //let the model know of the change
-                    let newPoints=handles.map((h)=>h.point);//.sort();
-                    // model.setPoints(model.settings.points);
-
-                    changes.points=newPoints;
-
-                    //find the last handle, so that it's used to set the length of the envelope
-                    let latestSpl = 0;
-                    handles.map((handle)=>{
-                        if(handle.point[0]>latestSpl) latestSpl=handle.point[0];
-                    }); 
-
-                    //to use last point as length selector
-                    // if(!model.settings.loop)
-                    //     changes.length=(latestSpl / sampleRate);
-
-                    model.set(changes);
+                    
                 }
                 /**
                  * update the handle's point coordinates and cause
                  * this change to be reflected visually
                  */
                 this.handleModelChangedPoint = () => {
-                    const point = this.point;
-                    let pos = {
-                        x:translator.sampleNumberToX(point[0]),
-                        y:translator.amplitudeToY(point[1]),
-                    }
-                    draggable.setPosition(pos,false);
-                    this.attributes.cx=pos.x;
-                    this.attributes.cy=pos.y;
                     this.update();
                 }
 
@@ -116,44 +85,78 @@ class EnvelopeGeneratorDisplay extends WaveLane{
         
         const handles=[
             new Handle(),
+            new Handle(),
         ];
 
-        //udpate the display of the draggable points according to the provided poits list and the translator
-        function updatePointsPositions(points){
-            points.map((point,index)=>{
-                if(!handles[index]){
-                    handles[index]=new Handle();
-                    handles[index].point=point;
-                }
-                handles[index].handleModelChangedPoint();
-                handles[index].activate();
+        handles[0].handleGuiChangedPoint = function(pos){
+            model.set({
+                attack: translator.xToSeconds(pos.x),
+                amplitude: translator.yToAmplitude(pos.y),
             });
-            //undisplay remaining handles, if any
-            for(let index = points.length; index < handles.length; index++){
-                handles[index].deactivate();
-            }
+            
+        }
+        handles[1].handleGuiChangedPoint = function(pos){
+            model.set({
+                release: translator.xToSeconds(pos.x) - model.settings.attack,
+            });
         }
 
+        handles[0].handleModelChangedPoint = function(){
+            let pos = {
+                x:translator.secondsToX(model.settings.attack),
+                y:translator.amplitudeToY(model.settings.amplitude),
+            }
+            this.draggable.setPosition(pos,false);
+            this.attributes.cx=pos.x;
+            this.attributes.cy=pos.y;
+            this.update();
+        }
+
+        handles[1].handleModelChangedPoint = function(){
+            let pos = {
+                x:translator.secondsToX(model.settings.release + model.settings.attack),
+                y:translator.amplitudeToY(0),
+            }
+            this.draggable.setPosition(pos,false);
+            this.attributes.cx=pos.x;
+            this.attributes.cy=pos.y;
+            this.update();
+        }
         
         handles.map((handle)=>{
-            const frequencyDraggable=handle.draggable;
             handle.activate();
         });
 
+        function updatePointsPositions({
+            attack,
+            release,
+            amplitude,
+        }){
+            if(attack){
+                handles[0].handleModelChangedPoint();
+                handles[1].handleModelChangedPoint();
+            }
+            if(amplitude){
+                handles[0].handleModelChangedPoint();
+            }
+            if(release){
+                handles[1].handleModelChangedPoint();
+            }
+        }
+
         //helps moving points according to zoom level
         translator.onChange((changes)=>{
-            updatePointsPositions(model.settings.points);
+            updatePointsPositions(model.settings);
+            handles.forEach((handle)=>handle.handleModelChangedPoint());
         });
         
         //let us represent changes in the module graphically
         model.onUpdate((changes)=>{
-            if(changes.points){
-                updatePointsPositions(changes.points);
-            }
+            updatePointsPositions(changes);
         });
 
         model.triggerInitialState();
     }
 };
 
-export default EnvelopeGeneratorDisplay;
+export default EnvAttackReleaseDisplay;

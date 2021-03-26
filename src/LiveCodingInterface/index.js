@@ -5,6 +5,7 @@ import Delay from "../SoundModules/Delay";
 import DelayWithFilter from "../SoundModules/DelayWithFilter";
 import NaiveReverb from "../SoundModules/NaiveReverb";
 import EnvelopeGenerator from "../SoundModules/EnvelopeGenerator";
+import EnvAttackRelease from "../SoundModules/EnvAttackRelease";
 import Chebyshev from "../SoundModules/Chebyshev";
 import WaveFolder from "../SoundModules/WaveFolder";
 import RustComb from "../SoundModules/RustComb";
@@ -13,23 +14,53 @@ import Filter from "../SoundModules/Filter";
 import MixerTesselator from "../SoundModules/MixerTesselator";
 import Module from "../SoundModules/Module";
 import Repeater from "../SoundModules/Repeater";
-import FilterDisplay from "../DomInterfaces/FilterDisplay";
 import InputNode from "../SoundModules/InputNode";
 import Hipparchus from "../SoundModules/Hipparchus";
 
 //for interfaces
+import GenericDisplay from "../DomInterfaces/GenericDisplay";
+import MixerDisplay from "../DomInterfaces/MixerDisplay";
 import DelayDisplay from "../DomInterfaces/DelayDisplay";
 import DelayWithFilterDisplay from "../DomInterfaces/DelayWithFilterDisplay";
 import ReverbDisplay from "../DomInterfaces/ReverbDisplay";
-import MixerDisplay from "../DomInterfaces/MixerDisplay";
-import GenericDisplay from "../DomInterfaces/GenericDisplay";
-import OscillatorDisplay from "../DomInterfaces/OscillatorDisplay";
 import EnvelopeGeneratorDisplay from "../DomInterfaces/EnvelopeGeneratorDisplay";
+import OscillatorDisplay from "../DomInterfaces/OscillatorDisplay";
+import EnvAttackReleaseDisplay from "../DomInterfaces/EnvAttackReleaseDisplay";
 import ChebyshevDisplay from "../DomInterfaces/ChebyshevDisplay";
 import RepeaterDisplay from "../DomInterfaces/RepeaterDisplay";
 import HipparchusDisplay from "../DomInterfaces/HipparchusDisplay";
 import WaveFolderDisplay from "../DomInterfaces/WaveFolderDisplay";
 import RustCombDisplay from "../DomInterfaces/RustCombDisplay";
+import FilterDisplay from "../DomInterfaces/FilterDisplay";
+
+
+const modulesAndTheirInterfaces = {}
+
+function registerModuleAndItsInterface (ModuleProto,InterfaceProto){
+    modulesAndTheirInterfaces[ModuleProto.name] = [
+        ModuleProto,InterfaceProto
+    ];
+};
+
+registerModuleAndItsInterface(Oscillator,OscillatorDisplay);
+registerModuleAndItsInterface(Mixer,MixerDisplay);
+registerModuleAndItsInterface(Delay,DelayDisplay);
+registerModuleAndItsInterface(DelayWithFilter,DelayWithFilterDisplay);
+registerModuleAndItsInterface(NaiveReverb,ReverbDisplay);
+registerModuleAndItsInterface(EnvelopeGenerator,EnvelopeGeneratorDisplay);
+registerModuleAndItsInterface(EnvAttackRelease,EnvAttackReleaseDisplay);
+registerModuleAndItsInterface(Chebyshev,ChebyshevDisplay);
+registerModuleAndItsInterface(WaveFolder,WaveFolderDisplay);
+registerModuleAndItsInterface(RustComb,RustCombDisplay);
+registerModuleAndItsInterface(RustFreeverb,false);
+registerModuleAndItsInterface(Filter,false);
+registerModuleAndItsInterface(MixerTesselator,);
+registerModuleAndItsInterface(Module,false);
+registerModuleAndItsInterface(Repeater,RepeaterDisplay);
+registerModuleAndItsInterface(Filter,FilterDisplay);
+registerModuleAndItsInterface(InputNode,false);
+registerModuleAndItsInterface(Hipparchus,HipparchusDisplay);
+
 
 //for typing
 import Canvas from "../scaffolding/Canvas";
@@ -96,52 +127,15 @@ class LiveCodingInterface{
             }
 
             let newInterface;
-            switch (protoname){
-                case "Oscillator":
-                    newInterface=new OscillatorDisplay(props);
-                break;
-                case "Hipparchus":
-                    newInterface=new HipparchusDisplay(props);
-                break;
-                case "WaveFolder":
-                    newInterface=new WaveFolderDisplay(props);
-                break;
-                case "RustComb":
-                    newInterface=new RustCombDisplay(props);
-                break;
-                case "EnvelopeGenerator":
-                    newInterface=new EnvelopeGeneratorDisplay(props);
-                break;
-                case "Repeater":
-                    newInterface=new RepeaterDisplay(props);
-                break;
-                case "Filter":
-                    newInterface=new FilterDisplay(props);
-                break;
-                case "Chebyshev":
-                    newInterface=new ChebyshevDisplay(props);
-                break;
-                case "Delay":
-                    newInterface=new DelayDisplay(props);
-                break;
-                case "DelayWithFilter":
-                    newInterface=new DelayWithFilterDisplay(props);
-                break;
-                case "NaiveReverb":
-                    newInterface=new ReverbDisplay(props);
-                break;
-                case "MixerTesselator":
-                    newInterface=new MixerDisplay(props);
-                break;
-                case "Mixer":
-                    newInterface=new MixerDisplay(props);
-                break;
-                default:
-                    newInterface=new GenericDisplay(props);
+
+            if(modulesAndTheirInterfaces[protoname][1]){
+                newInterface = new modulesAndTheirInterfaces[protoname][1](props);
+            }else{
+                newInterface=new GenericDisplay(props);
             }
+
             moduleCreationListeners.map((cb)=>cb(newModule,newInterface,count));
 
-            
             newInterface.handyPosition(count + 3);
 
             count++;
@@ -206,22 +200,14 @@ class LiveCodingInterface{
 
         //export stuff to window, so that you can call it from webinspector
 
-        window.possibleModules=this.possibleModules={
-            Oscillator,
-            Mixer,
-            MixerTesselator,
-            Delay,
-            DelayWithFilter,
-            EnvelopeGenerator,
-            Chebyshev,
-            Filter,
-            Repeater,
-            Hipparchus,
-            WaveFolder,
-            RustComb,
-            NaiveReverb,
-            RustFreeverb,
-        };
+        this.possibleModules = {};
+        Object.keys(
+            modulesAndTheirInterfaces
+        ).forEach((modName)=>{
+            this.possibleModules[modName] = modulesAndTheirInterfaces[modName][0];
+        });
+        
+        window.possibleModules=this.possibleModules;
 
         Object.keys(this.possibleModules).map((mname)=>{
             if(window[mname]===undefined) window[mname]=this.possibleModules[mname];

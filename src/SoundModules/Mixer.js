@@ -10,6 +10,7 @@ const defaultSettings={
     levelb:0.25,
     levelc:0.25,
     leveld:0.25,
+    saturate:true,
 };
 /**
  * @class Mixer
@@ -44,7 +45,12 @@ class Mixer extends Module{
                 });
             });
 
-            this.cachedValues = new Float32Array(result);
+            this.cachedValues = new Float32Array(result.map((n)=>{
+                if(n>1) return 1;
+                if(n<-1) return -1;
+                if(isNaN(n)) return 0;
+                return n;
+            }));
         
             this.changed({ cachedValues: this.cachedValues });
         };

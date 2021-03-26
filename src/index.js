@@ -49,27 +49,12 @@ Draggable.setCanvas();
 
 //pre-run a live-coded patch
 
-import pat1 from "./patches/rotator";
-import pat2 from "./patches/goodstart";
-import pat3 from "./patches/reverb1";
-import pat4 from "./patches/delay";
-import pat5 from "./patches/drumpat";
-import pat6 from "./patches/filterTester";
-import pat7 from "./patches/multireso";
-import pat8 from "./patches/wave1";
-import pat9 from "./patches/rustTest";
+import pat1 from "./patches/drummaker";
+
 import SoundDownloader from "./scaffolding/SoundDownloader";
 
 window.demos = {
-    "rotator": ()=>pat1(webInspectorInterface),
-    "drumpat2": ()=>pat2(webInspectorInterface),
-    "reverb1": ()=>pat3(webInspectorInterface),
-    "delay": ()=>pat4(webInspectorInterface),
-    "drumpat": ()=>pat5(webInspectorInterface),
-    "filterTester": ()=>pat6(webInspectorInterface),
-    "multireso": ()=>pat7(webInspectorInterface),
-    "wavefolder": ()=>pat8(webInspectorInterface),
-    "rustTest": ()=>pat9(webInspectorInterface),
+    "drummaker": ()=>pat1(webInspectorInterface),
 }
 
 let hashBefore = window.location.hash;
