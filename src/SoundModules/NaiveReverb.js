@@ -79,15 +79,15 @@ class NaiveReverb extends Module{
 
         const tap1 = new ReverbTap();
         
-        this.recalculate = (recursion = 0) => {
+        this.recalculate = async (recursion = 0) => {
 
             let delayCache = [];
             
-            let inputValues = this.inputs.main.getValues(recursion);
+            let inputValues = await this.inputs.main.getValues(recursion);
             let delayInSamples = Math.floor(sampleRate * settings.time);
 
-            let feedbackLevels = this.inputs.feedback.getValues(recursion);
-            let timeLevels = this.inputs.time.getValues(recursion);
+            let feedbackLevels = await this.inputs.feedback.getValues(recursion);
+            let timeLevels = await this.inputs.time.getValues(recursion);
             
             tap1.time = settings.time;
             tap1.diffusion = settings.diffusion;
@@ -120,7 +120,8 @@ class NaiveReverb extends Module{
                 }
             });
             
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

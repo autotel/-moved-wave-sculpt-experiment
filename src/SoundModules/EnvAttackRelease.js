@@ -61,7 +61,7 @@ class EnvelopeAttackRelease extends Module{
             });
         }
         
-        this.recalculate = (recursion = 0) => {
+        this.recalculate = async(recursion = 0) => {
             
             let envLength = settings.attack + settings.release;
             let envLengthSpls = Math.floor(sampleRate * envLength);
@@ -71,19 +71,19 @@ class EnvelopeAttackRelease extends Module{
 
             this.cachedValues = new Float32Array(envLengthSpls);
 
-            numberwang({
-                envLength,
-                envLengthSpls,
-                attackSpls,
-                releaseSpls,
-            });
+            // numberwang({
+            //     envLength,
+            //     envLengthSpls,
+            //     attackSpls,
+            //     releaseSpls,
+            // });
 
 
             delete settings.nativeProcessor;
             delete settings.attackCurve;
             delete settings.releaseCurve;
 
-            numberwang(settings);
+            // numberwang(settings);
             
             //attack phase
             for(let sampleNumber = 0; sampleNumber < attackSpls; sampleNumber++){
@@ -97,7 +97,8 @@ class EnvelopeAttackRelease extends Module{
                 this.cachedValues[sampleNumber] = shapeFunction(position, settings.releaseShape) * settings.amplitude;
             }
 
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

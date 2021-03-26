@@ -115,7 +115,7 @@ class Oscillator extends Module{
             });
         };
         
-        this.recalculate = (recursion = 0) => {
+        this.recalculate = async (recursion = 0) => {
             phaseAccumulator = settings.phase;
             const lengthSamples = settings.length * sampleRate;
             this.cachedValues = new Float32Array(lengthSamples);
@@ -126,9 +126,9 @@ class Oscillator extends Module{
                 Try: ${Object.keys(shapes).join()}
             `);
             
-            const freqInputValues = this.inputs.frequency.getValues(recursion);
-            const ampInputValues = this.inputs.amplitude.getValues(recursion);
-            const biasInputValues = this.inputs.bias.getValues(recursion);
+            const freqInputValues = await this.inputs.frequency.getValues(recursion);
+            const ampInputValues = await this.inputs.amplitude.getValues(recursion);
+            const biasInputValues = await this.inputs.bias.getValues(recursion);
             
             //for noise, lets us have always the same noise. Frequency will be the seed
             rng=seedrandom(settings.frequency);
@@ -140,7 +140,8 @@ class Oscillator extends Module{
                 this.cachedValues[a] = shapes[settings.shape](freq, amp, bias);
             }
 
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

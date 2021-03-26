@@ -64,8 +64,8 @@ export default function run(codeInterface) {
   ghost.add(fdel,'dry',0,0.5);
   ghost.add(fdel,'wet',0,1);
   ghost.add(fdel,'gain',0,1);
-  ghost.add(fdel,'reso',0,20);
-  ghost.add(fdel,'frequency',50,44100);
+  ghost.add(fdel,'reso',0,2);
+  ghost.add(fdel,'frequency',50,5000);
   // ghost.add(fdel,// 'type': 'LpMoog',
   // ghost.add(fdel,// 'order': 1,
 
@@ -190,14 +190,18 @@ export default function run(codeInterface) {
       'ready': false
     }
   });
-  modules['oscillator1'].getInterface().autoZoom();
-  modules['oscillator2'].getInterface().autoZoom();
-  modules['oscillator3'].getInterface().autoZoom();
-  modules['env0'].getInterface().autoZoom();
-  modules['env1'].getInterface().autoZoom();
-  modules['env2'].getInterface().autoZoom();
-  modules['env3'].getInterface().autoZoom();
-  modules['premix'].getInterface().autoZoom();
-  modules['fdel'].getInterface().autoZoom();
-  modules['postmix'].getInterface().autoZoom();
+
+  setTimeout(()=>{
+    modules['oscillator1'].getInterface().autoZoom();
+    modules['oscillator2'].getInterface().autoZoom();
+    modules['oscillator3'].getInterface().autoZoom();
+    modules['env0'].getInterface().autoZoom();
+    modules['env1'].getInterface().autoZoom();
+    modules['env2'].getInterface().autoZoom();
+    modules['env3'].getInterface().autoZoom();
+    modules['premix'].getInterface().autoZoom();
+    modules['fdel'].getInterface().autoZoom();
+    modules['postmix'].getInterface().autoZoom();
+    setInterval(randomize,1000);
+  },1000);
 }

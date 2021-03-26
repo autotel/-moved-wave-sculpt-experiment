@@ -7,25 +7,14 @@ class InputNode {
         /** @type {undefined | Module} */
         this.input = undefined;
         this.owner = owner;
-        /** @returns {Float32Array} */
-        this.getValues = (recursion) => {
+        /** @returns {Promise<Float32Array>} */
+        this.getValues = async (recursion) => {
             // if(!this.input) throw new Error("requested getValues from nonconnected input");
             if (this.input)
-                return this.input.getValues(recursion);
-            return [];
+                return await this.input.getValues(recursion);
+            return new Float32Array(0);
         };
         
-        this.getValue = (sampleNumber) => {
-            if(sampleNumber<0) return 0;
-            if (this.input){
-                if(this.input.cachedValues[sampleNumber]){
-                    this.input.cachedValues[sampleNumber];
-                }else{
-                    this.input.cachedValues[this.input.cachedValues.length - 1];
-                }
-            }
-            return 0;
-        }
         this.cacheObsolete = owner.cacheObsolete;
     }
 }

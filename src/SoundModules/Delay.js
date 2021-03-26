@@ -34,11 +34,11 @@ class Delay extends Module{
 
         let operator = new BasicDelay();
         
-        this.recalculate = (recursion = 0) => {
+        this.recalculate = async (recursion = 0) => {
 
             operator.reset();
             
-            let inputValues = this.inputs.main.getValues(recursion);
+            let inputValues = await this.inputs.main.getValues(recursion);
             let delayInSamples = Math.floor(sampleRate * settings.time);
 
             let feedbackLevels = this.inputs.feedback.getValues(recursion);
@@ -68,7 +68,8 @@ class Delay extends Module{
                 
             });
 
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

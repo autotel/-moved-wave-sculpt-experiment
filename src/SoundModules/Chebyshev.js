@@ -60,13 +60,11 @@ class Chebyshev extends Module{
             return this;
         };
 
-        this.recalculate = (recursion = 0) => {
-            //only one input, thus we need not to add or anything
-            this.eachInput((input) => {
-                const inputValues = input.getValues(recursion);
-                this.cachedValues = inputValues.map(orders[settings.order]);
-            });
-            this.changed({ cachedValues: this.cachedValues });
+        this.recalculate = async (recursion = 0) => {
+            const inputValues = await this.inputs.main.getValues(recursion);
+            this.cachedValues = inputValues.map(orders[settings.order]);
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

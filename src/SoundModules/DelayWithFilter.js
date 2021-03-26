@@ -112,16 +112,14 @@ class DelayWithFilter extends Module{
 
         let delayOperator = new BasicDelay();
         
-        this.recalculate = (recursion = 0) => {
-
-            
+        this.recalculate = async(recursion = 0) => {
             //filter setup
             let filter = new filterProtos[settings.type]();
             const order = settings.order;
-            const frequencies = this.inputs.frequency.getValues(recursion);
-            const gains = this.inputs.gain.getValues(recursion);
-            const resos = this.inputs.reso.getValues(recursion);
-            const inputValues = this.inputs.main.getValues(recursion);
+            const frequencies = await this.inputs.frequency.getValues(recursion);
+            const gains = await this.inputs.gain.getValues(recursion);
+            const resos = await this.inputs.reso.getValues(recursion);
+            const inputValues = await this.inputs.main.getValues(recursion);
             
             this.cachedValues = new Float32Array(inputValues.length);
 
@@ -168,7 +166,8 @@ class DelayWithFilter extends Module{
                 
             });
 
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

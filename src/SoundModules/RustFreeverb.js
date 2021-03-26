@@ -24,7 +24,6 @@ const defaultSettings={
     feedback:0.9,
     nativeProcessor:undefined,
 };
-
 /**
  * @class RustFreeverb an example that utilizes Rust to process the audio
  * @extends Module
@@ -60,7 +59,7 @@ class RustFreeverb extends Module{
 
         const actualModulo = (a,m) => ((a%m)+m)%m;       
 
-        this.recalculate = (recursion = 0) => {
+        this.recalculate = async(recursion = 0) => {
             if(!nativeProcessor.ready){
                 nativeProcessor.onReady(()=>{
                     this.recalculate(recursion);
@@ -75,7 +74,7 @@ class RustFreeverb extends Module{
                 feedback,
             } = settings;
 
-            const inputValues = this.inputs.main.getValues(recursion);
+            const inputValues = await this.inputs.main.getValues(recursion);
 
             if (frequency == 0) frequency = 0.1/sampleRate;
 
@@ -84,8 +83,8 @@ class RustFreeverb extends Module{
                     inputValues
                 )
             );
-            
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

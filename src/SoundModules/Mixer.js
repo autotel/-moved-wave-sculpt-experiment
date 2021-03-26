@@ -32,18 +32,21 @@ class Mixer extends Module{
         this.hasInput("c");
         this.hasInput("d");
 
-        this.recalculate = (recursion = 0) => {
+        this.recalculate = async (recursion = 0) => {
             
 
             let result=[];
             let first = true;
-            this.eachInput((input,inputno,inputName) => {
-                const inputValues = input.getValues(recursion);
-                inputValues.forEach((val, index) => {
-                    if(!result[index]) result[index]=0;
-                    result[index] += (val) * amplitude * settings["level"+inputName];
-                });
-            });
+            
+            await Promise.all(
+                this.eachInput(async(input,inputno,inputName) => {
+                    const inputValues = await input.getValues(recursion);
+                    inputValues.forEach((val, index) => {
+                        if(!result[index]) result[index]=0;
+                        result[index] += (val) * amplitude * settings["level"+inputName];
+                    });
+                })
+            );
 
             this.cachedValues = new Float32Array(result.map((n)=>{
                 if(n>1) return 1;
@@ -52,7 +55,8 @@ class Mixer extends Module{
                 return n;
             }));
         
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

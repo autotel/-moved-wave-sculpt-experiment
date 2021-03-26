@@ -51,14 +51,14 @@ class WaveFolder extends Module{
         const actualModulo = (a,m) => ((a%m)+m)%m;       
 
 
-        this.recalculate = (recursion = 0) => {
+        this.recalculate = async(recursion = 0) => {
             const {
                 amplitude, bias, fold,
             } = settings;
             
 
-            const inputValues = this.inputs.main.getValues(recursion);
-            const foldValues = this.inputs.fold.getValues(recursion);
+            const inputValues = await this.inputs.main.getValues(recursion);
+            const foldValues = await this.inputs.fold.getValues(recursion);
             
             let currentFoldEnvelope = 0;
 
@@ -76,7 +76,8 @@ class WaveFolder extends Module{
                 ) / currentFold;
                 return result * amplitude;
             });
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

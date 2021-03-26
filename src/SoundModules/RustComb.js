@@ -59,7 +59,7 @@ class RustComb extends Module{
         };
    
 
-        this.recalculate = (recursion = 0) => {
+        this.recalculate = async (recursion = 0) => {
             if(!nativeProcessor.ready){
                 nativeProcessor.onReady(()=>{
                     this.recalculate(recursion);
@@ -74,7 +74,7 @@ class RustComb extends Module{
                 feedback,
             } = settings;
 
-            const inputValues = this.inputs.main.getValues(recursion);
+            const inputValues = await this.inputs.main.getValues(recursion);
 
             if (frequency == 0) frequency = 0.1/sampleRate;
 
@@ -84,7 +84,8 @@ class RustComb extends Module{
                 )
             );
             
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }
