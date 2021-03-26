@@ -6,24 +6,23 @@ const randomNumberGenerator=seedrandom("lhad");
 //using lpf and seeded random, we can get smooth changing random number. 
 const ContinuousRandomGenerator = function(){
     const lowPass = new LpBoxcar();
+    lowPass.setSampleRate(1);
     lowPass.reset(randomNumberGenerator());
     this.get=()=>{
         return lowPass.calculateSample(
             randomNumberGenerator(),
-            1/200,0,1,1,true
+            1/20,0,1,1,true
         );
     }
 }
 
 /**
- * @typedef {Array<number>} Range
- * @typedef {Object<string,Range>} LatentSpace
- */
-/**
- * @typedef {Object} ModuleLatentSpace
- * @property {LatentSpace} ChangeableParameterList.latentSpace
- * @property {Module} ChangeableParameterList.module
- * @property {ContinuousRandomGenerator} ChangeableParameterList.rng
+ * @typedef {Object} Tweakable
+ * @property {Module} module
+ * @property {String} key
+ * @property {number} min
+ * @property {number} range
+ * @property {ContinuousRandomGenerator} noiseGen low-passed noise generator
  */
 
 
@@ -34,29 +33,35 @@ class Ghost {
 
         /**
          * @param {Module} module to changte
-         * @param {LatentSpace} latentSpace what parameters to change and their ranges
-         * @example ghost.add(osc1,{frequency:[90,480]})
+         * @param {string} settingKey what parameter to change
+         * @param {number} minimum value
+         * @param {number} maximum value
+         * @example ghost.add(osc1,"frequency",90,480)
          */
 
-        /** @type {Array<ModuleLatentSpace>} */
+        /** @type {Array<Tweakable>} */
         const changeableParameters = [];
-        this.add = (module, latentSpace) => {
-            const rng = new ContinuousRandomGenerator();
+        this.add = (module, settingKey,minimum,maximum) => {
             changeableParameters.push({
-                module,latentSpace,rng
+                module,
+                key:settingKey,
+                min:minimum,
+                range:maximum-minimum,
+                noiseGen:new ContinuousRandomGenerator(),
             });
         }
         
         this.generateRandom = () => {
-            changeableParameters.forEach((mls)=>{
-                let settings = {}
-                const rng = mls.rng;
-                Object.keys(mls.latentSpace).forEach((key)=>{
-                    /** @type {number} */
-                    let settingRange = mls.latentSpace[key][1] - mls.latentSpace[key][0];
-                    settings[key] = rng.get() * settingRange + mls.latentSpace[key][0]
-                });
-                mls.module.set(settings);
+            changeableParameters.forEach((changeable)=>{
+                const normalValue = changeable.noiseGen.get();
+                const mappedValue = normalValue * changeable.range + changeable.min;
+                // console.log({
+                //     normalValue,
+                //     mappedValue,
+                // });
+                let setObj = {};
+                setObj[changeable.key] = mappedValue;
+                changeable.module.set(setObj);
             });
         }
     }

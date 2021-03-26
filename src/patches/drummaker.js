@@ -19,85 +19,61 @@ export default function run(codeInterface) {
   create(possibleModules.DelayWithFilter, 'fdel');
   create(possibleModules.Mixer, 'postmix');
 
-  ghost.add(postmix,{
-    levela:[0,0.25],
-    levelb:[0,0.25],
-    levelc:[0,0.25],
-    leveld:[0,0.25],
-  });
+  ghost.add(postmix,"levela",0,0.25);
+  ghost.add(postmix,"levelb",0,0.25);
+  ghost.add(postmix,"levelc",0,0.25);
+  ghost.add(postmix,"leveld",0,0.25);
 
-  ghost.add(premix,{
-    levela:[0,0.25],
-    levelb:[0,0.25],
-    levelc:[0,0.25],
-    leveld:[0,0.25],
-  });
+  ghost.add(premix,"levela",0,0.5);
+  ghost.add(premix,"levelb",0,0.5);
 
-  ghost.add(oscillator1,{
-    frequency:[80,2000],
-    phase:[0,1],
-  });
+
+  ghost.add(env0,'attack',0,0.1);
+  ghost.add(env0,'release',0,0.9);
+  ghost.add(env0,'amplitude',0,0.9);
+  ghost.add(env0,'attackShape',0.01,2);
+  ghost.add(env0,'releaseShape',-2,2);
+
+  ghost.add(env1,'attack',0,0.5);
+  ghost.add(env1,'release',0,0.5);
+  ghost.add(env1,'amplitude',0,1200);
+  ghost.add(env1,'attackShape',0.01,2);
+  ghost.add(env1,'releaseShape',-2,2);
   
-  ghost.add(oscillator3,{
-    frequency:[10,44100],
-  });
+  ghost.add(env2,'attack',0,0.5);
+  ghost.add(env2,'release',0,5);
+  ghost.add(env2,'amplitude',0,240);
+  ghost.add(env2,'attackShape',0.01,2);
+  ghost.add(env2,'releaseShape',-2,2);
+  
+  ghost.add(env3,'attack',0.01,0.1);
+  ghost.add(env3,'release',0,0.9);
+  ghost.add(env3,'amplitude',0,0.1);
+  ghost.add(env3,'attackShape',0.01,2);
+  ghost.add(env3,'releaseShape',-2,2);
 
-  ghost.add(env0,{
-    'attack': [0,0.1],
-    'release': [0,0.9],
-    'amplitude': [0,0.9],
-    'attackShape': [0.01,2],
-    'releaseShape': [-2,2]
-  });
+  ghost.add(env4,'attack',0,0.1);
+  ghost.add(env4,'release',0,0.9);
+  ghost.add(env4,'amplitude',0,0.5);
+  ghost.add(env4,'attackShape',0.01,2);
+  ghost.add(env4,'releaseShape',-2,2);
+  
 
-  ghost.add(env1,{
-    'attack': [0,0.5],
-    'release': [0,0.5],
-    'amplitude': [0,1200],
-    'attackShape': [0.01,2],
-    'releaseShape': [-2,2]
-  });
-
-  ghost.add(env2,{
-    'attack': [0,0.5],
-    'release': [0,5],
-    'amplitude': [0,240],
-    'attackShape': [0.01,2],
-    'releaseShape': [-2,2]
-  });
-
-  ghost.add(env3,{
-    'attack': [0.01,0.1],
-    'release': [0,0.9],
-    'amplitude': [0,0.1],
-    'attackShape': [0.01,2],
-    'releaseShape': [-2,2]
-  });
-
-  ghost.add(env4,{
-    'attack': [0,0.1],
-    'release': [0,0.9],
-    'amplitude': [0,0.5],
-    'attackShape': [0.01,2],
-    'releaseShape': [-2,2]
-  });
-  ghost.add(fdel,{
-    'feedback': [0,0.7],
-    'time': [1e-320,0.1],
-    'dry': [0,0.5],
-    'wet': [0,1],
-    'gain': [0,1],
-    'reso': [0,20],
-    // 'type': 'LpMoog',
-    // 'order': 1,
-    'frequency': [50,44100],
-  });
+  ghost.add(fdel,'feedback',0,0.7);
+  ghost.add(fdel,'time',1e-320,0.1);
+  ghost.add(fdel,'dry',0,0.5);
+  ghost.add(fdel,'wet',0,1);
+  ghost.add(fdel,'gain',0,1);
+  ghost.add(fdel,'reso',0,20);
+  ghost.add(fdel,'frequency',50,44100);
+  // ghost.add(fdel,// 'type': 'LpMoog',
+  // ghost.add(fdel,// 'order': 1,
 
   window.randomize = (()=>{
     ghost.generateRandom();
     setTimeout(()=>{
       Object.keys(modules).forEach((key)=>modules[key].getInterface().autoZoom());
-    },200);
+    },5);
   
   });
 
