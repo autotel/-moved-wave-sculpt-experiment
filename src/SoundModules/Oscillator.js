@@ -1,6 +1,6 @@
 import Module from "./Module";
 import {sampleRate} from "./vars";
-import seedrandom from "seedrandom";
+import OscillatorOperator from "./operators/OscillatorOperator";
 
 /**
  * @namespace SoundModules.Oscillator
@@ -38,46 +38,9 @@ class Oscillator extends Module{
         Object.assign(settings, defaultSettings);
         Object.assign(settings, userSettings);
         let first = true;
-        let phaseAccumulator = 0;
-        const accumulatePhase = (frequency) => {
-            phaseAccumulator += frequency / sampleRate;
-        };
-        
-        let rng=seedrandom();
-
-        const shapes = {
-            sin: (frequency, amplitude,bias) => {
-                accumulatePhase(frequency);
-                return Math.sin(phaseAccumulator * Math.PI * 2) * amplitude
-                    + bias;
-            },
-            cos: (frequency, amplitude,bias) => {
-                accumulatePhase(frequency);
-                return Math.cos(phaseAccumulator * Math.PI * 2) * amplitude
-                    + bias;
-            },
-            ramp: (frequency, amplitude,bias) => {
-                accumulatePhase(frequency);
-                return (phaseAccumulator % 1 - 0.5) * amplitude
-                    + bias;
-            },
-            square: (frequency, amplitude,bias) => {
-                accumulatePhase(frequency);
-                return (((phaseAccumulator % 1 ) > 0.5)?1:-1) * amplitude
-                    + bias;
-            },
-            noise: (frequency, amplitude,bias) => {
-                accumulatePhase(frequency);
-                return (rng() - 0.5) * amplitude
-                    + bias;
-            },
-            offset: (frequency, amplitude,bias) => {
-                accumulatePhase(frequency);
-                return amplitude + bias;
-            }, 
-        };
-
         super(settings);
+
+        let operator = new OscillatorOperator();
 
         this.hasInput("frequency");
         this.hasInput("amplitude");
@@ -101,11 +64,18 @@ class Oscillator extends Module{
         };
         
         this.setShape = (to) => {
-            settings.shape = to;
-            this.changed({
-                shape: to
-            });
-            this.cacheObsolete();
+            try{
+                //this one is just to get the error right away.
+                //the shape is actually set in the recalculate to ensure
+                //sync
+                operator.setShape(to);
+                this.changed({
+                    shape: to
+                });
+                this.cacheObsolete();
+            }catch(e){
+                throw e;
+            }
             return this;
         };
         
@@ -116,28 +86,21 @@ class Oscillator extends Module{
         };
         
         this.recalculate = (recursion = 0) => {
-            phaseAccumulator = settings.phase;
             const lengthSamples = settings.length * sampleRate;
             this.cachedValues = new Float32Array(lengthSamples);
 
-            if (!shapes[settings.shape])
-            throw new Error(`
-                Wave shape function named ${settings.shape}, does not exist. 
-                Try: ${Object.keys(shapes).join()}
-            `);
+            operator.setShape(settings.shape);
+            operator.setPhase(settings.phase);
             
             const freqInputValues = this.inputs.frequency.getValues(recursion);
             const ampInputValues = this.inputs.amplitude.getValues(recursion);
             const biasInputValues = this.inputs.bias.getValues(recursion);
             
-            //for noise, lets us have always the same noise. Frequency will be the seed
-            rng=seedrandom(settings.frequency);
-
             for (let a = 0; a < lengthSamples; a++) {
                 const freq = (freqInputValues[a] || 0) + settings.frequency;
                 const amp = (ampInputValues[a] || 0) + settings.amplitude;
                 const bias = (biasInputValues[a] || 0) + settings.bias;
-                this.cachedValues[a] = shapes[settings.shape](freq, amp, bias);
+                this.cachedValues[a] = operator.calculateSample(freq, amp, bias);
             }
 
             // this.changed({ cachedValues: this.cachedValues });
