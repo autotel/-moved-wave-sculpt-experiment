@@ -2,7 +2,7 @@ import Module from "./SoundModules/Module";
 import seedrandom from "seedrandom";
 import LpBoxcar from "./SoundModules/operators/LpBoxcar";
 
-const randomNumberGenerator=seedrandom("lhad");
+const randomNumberGenerator=seedrandom("098789");
 //using lpf and seeded random, we can get smooth changing random number. 
 const ContinuousRandomGenerator = function(){
     const lowPass = new LpBoxcar();
