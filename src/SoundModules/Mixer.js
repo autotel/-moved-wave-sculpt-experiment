@@ -46,7 +46,7 @@ class Mixer extends Module{
 
             this.cachedValues = new Float32Array(result);
         
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
         };
     }
 }

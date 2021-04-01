@@ -66,7 +66,7 @@ class Chebyshev extends Module{
                 const inputValues = input.getValues(recursion);
                 this.cachedValues = inputValues.map(orders[settings.order]);
             });
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
         };
     }
 }

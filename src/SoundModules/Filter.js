@@ -139,7 +139,7 @@ class Filter extends Module{
                 order,settings.saturate
             ));
         
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
         };
     }
 }

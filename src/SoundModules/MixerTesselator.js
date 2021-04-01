@@ -60,7 +60,7 @@ class MixerTesselator extends Module{
                 }
             }));
 
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
         };
     }
 }

@@ -102,7 +102,7 @@ class Repeater extends Module {
                 ] * settings.gain * currentPoint[1];
             }
 
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
         };
     }
 }
