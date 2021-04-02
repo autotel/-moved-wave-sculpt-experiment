@@ -89,16 +89,16 @@ class Hipparchus extends Module {
         }
 
 
-        this.recalculate = (recursion = 0) => {
+        this.recalculate = async (recursion = 0) => {
 
             let gain = settings.gain;
-            let xIn = this.inputs.x.getValues(recursion);
-            let yIn = this.inputs.y.getValues(recursion);
-            let rotationIn = this.inputs.rotation.getValues(recursion);
+            let xIn = await this.inputs.x.getValues(recursion);
+            let yIn = await this.inputs.y.getValues(recursion);
+            let rotationIn = await this.inputs.rotation.getValues(recursion);
 
-            this.cachedValues=[];
+            this.cachedValues = new Float32Array(xIn.length);
 
-            xIn.map((x,sampleNumber)=>{
+            xIn.forEach((x,sampleNumber)=>{
                 let y = voz(yIn[sampleNumber]);
                 let rotationSample = voz(rotationIn[sampleNumber]);
 
@@ -112,7 +112,8 @@ class Hipparchus extends Module {
 
             });
 
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

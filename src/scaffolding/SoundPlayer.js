@@ -33,14 +33,18 @@ class SoundPlayer{
                     let sliceStart = start;
                     let sliceEnd = (start+length) % myModule.cachedValues.length
     
-                    returnBuffer = myModule.cachedValues.slice(
+                    returnBuffer = Array.from(
+                        myModule.cachedValues
+                    ).slice(
                         start,
                         start+length
                     );
     
                     //if the current period will reach beyond the length of audio loop
                     if(sliceEnd<sliceStart){
-                        let append = myModule.cachedValues.slice(
+                        let append = Array.from(
+                            myModule.cachedValues
+                        ).slice(
                             0,
                             sliceStart-sliceEnd
                         );

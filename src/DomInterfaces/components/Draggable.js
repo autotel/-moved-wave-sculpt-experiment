@@ -31,6 +31,7 @@ function Draggable(domElement){
     domElement.addEventListener("mouseenter",(evt)=>{
         Draggable.mouse.isHovering=this;
         domElement.classList.add("active");
+        this.mouseEnterCallback(evt);
     });
     
     domElement.addEventListener("mouseleave",(evt)=>{
@@ -38,6 +39,8 @@ function Draggable(domElement){
             domElement.classList.remove("active");
         }
         Draggable.mouse.isHovering=false;
+
+        this.mouseLeaveCallback(evt);
     });
 
     /** do not override */
@@ -74,6 +77,10 @@ function Draggable(domElement){
     this.dragStartCallback=(mouse)=>{
     }
     this.dragEndCallback=(mouse)=>{
+    }
+    this.mouseEnterCallback=(mouse)=>{
+    }
+    this.mouseLeaveCallback=(mouse)=>{
     }
 
     /**
@@ -116,6 +123,7 @@ Draggable.setCanvas=(canvas=document)=>{
     const mouse = Draggable.mouse;
 
     canvas.addEventListener("mousemove",(evt)=>{
+        evt.preventDefault();
         // @ts-ignore
         mouse.x=evt.clientX;
         // @ts-ignore
@@ -129,6 +137,7 @@ Draggable.setCanvas=(canvas=document)=>{
     });
 
     canvas.addEventListener("mousedown", (evt)=>{
+        evt.preventDefault();
         mouse.pressed=true;
         //@ts-ignore
         mouse.dragStartPosition.set({x:evt.clientX,y:evt.clientY});

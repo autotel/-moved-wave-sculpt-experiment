@@ -112,27 +112,27 @@ class DelayWithFilter extends Module{
 
         let delayOperator = new BasicDelay();
         
-        this.recalculate = (recursion = 0) => {
-
-            this.cachedValues = [];
-            
+        this.recalculate = async(recursion = 0) => {
             //filter setup
             let filter = new filterProtos[settings.type]();
             const order = settings.order;
-            const frequencies = this.inputs.frequency.getValues(recursion);
-            const gains = this.inputs.gain.getValues(recursion);
-            const resos = this.inputs.reso.getValues(recursion);
-            filter.reset();
+            const frequencies = await this.inputs.frequency.getValues(recursion);
+            const gains = await this.inputs.gain.getValues(recursion);
+            const resos = await this.inputs.reso.getValues(recursion);
+            const inputValues = await this.inputs.main.getValues(recursion);
+            
+            this.cachedValues = new Float32Array(inputValues.length);
 
+            filter.reset();
+            
             //delay setup
             delayOperator.reset();
-            let inputValues = this.inputs.main.getValues(recursion);
             let delayInSamples = Math.floor(sampleRate * settings.time);
 
             let feedbackLevels = this.inputs.feedback.getValues(recursion);
             let timeLevels = this.inputs.time.getValues(recursion);
             
-            inputValues.map((value,sampleNumber)=>{
+            inputValues.forEach((value,sampleNumber)=>{
                 this.cachedValues[sampleNumber] = 0;
                 
                 let currentTimeLevel = Math.floor(
@@ -159,14 +159,15 @@ class DelayWithFilter extends Module{
             });
 
             //mix dry and wet
-            this.cachedValues.map((val,sampleNumber)=>{
+            this.cachedValues.forEach((val,sampleNumber)=>{
 
                 this.cachedValues[sampleNumber] = this.cachedValues[sampleNumber] * settings.wet 
                     + inputValues[sampleNumber] * settings.dry;
                 
             });
 
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

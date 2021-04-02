@@ -64,9 +64,11 @@ class Repeater extends Module {
             this.changed({ points: settings.points });
         }
 
-        this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
+        this.recalculate = async (recursion = 0) => {
 
+            const lengthSamples = settings.length * sampleRate;
+            this.cachedValues = new Float32Array(lengthSamples);
+            
             sortPointsByTime();
             /** @returns {EnvelopePoint|false} */
             const getNextPoint = (spl) => {
@@ -81,9 +83,8 @@ class Repeater extends Module {
                 return false;
             }
 
-            const lengthSamples = settings.length * sampleRate;
 
-            let inputSamples = this.inputs.main.getValues(recursion);
+            let inputSamples = await this.inputs.main.getValues(recursion);
 
             let nextPoint = getNextPoint(0);
             let currentPoint = [0, 0];
@@ -101,7 +102,8 @@ class Repeater extends Module {
                 ] * settings.gain * currentPoint[1];
             }
 
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

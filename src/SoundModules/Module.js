@@ -1,6 +1,8 @@
 import {maxRecursion} from "./vars";
 import Model from "../scaffolding/Model";
 import InputNode from "./InputNode";
+import measureExec from "../utils/measureExec";
+import promiseDebounce from "../utils/promiseDebounceFunction";
 
 let count = 0;
 
@@ -18,7 +20,8 @@ class Module extends Model{
         super(settings);
         this.unique = count ++;
         this.name = this.constructor.name + "-" + this.unique;
-        this.cachedValues = [];
+        /** @type {Float32Array} */
+        this.cachedValues = new Float32Array([0]);
         /** @type {Object<string, InputNode>} */
         this.inputs = {};
         /** @type {Set<InputNode>} */
@@ -31,17 +34,23 @@ class Module extends Model{
         this.hasInput = (inputName) => {
             this.inputs[inputName] = new InputNode(this);
         };
-
+        /**
+         * @callback eachInputCallback
+         * @param {InputNode} input
+         * @param {number} index
+         * @param {string} name
+         */
         /**
          * @function eachInput run a callback function for each of the InputNodes. This saves the trouble of iterating each input. This function is intended to be called only from within the recalculate function.
-         * @param {Function} callback
+         * @param {eachInputCallback} callback
+         * @returns {Array<Promise>|Array} 
          */
         this.eachInput = (callback) => {
-            Object.keys(this.inputs).forEach((inputName, index) => {
+            return Object.keys(this.inputs).map((inputName, index) => {
                 const input = this.inputs[inputName];
                 if (input.input)
-                    callback(input, index, inputName);
-            });
+                    return callback(input, index, inputName);
+            }).filter((v)=>v!==undefined);
         };
 
         this.eachOutput = (callback) => {
@@ -107,30 +116,52 @@ class Module extends Model{
         };
         /**
          * used to get the values from the module, or to cause the module to recalculate its values.
-         * @returns {Array<number>} the sound array, sample by sample.
+         * @returns {Promise<Float32Array>} the sound array, sample by sample.
          * The samples will get recalculated if it's useCache flag is set to true. Otherwise, this function will return the cached samples.
          * The user can also get the cached samples by simply getting the `cachedValues` property, in which case one might get outdated samples.
          */
-        this.getValues = (recursion = 0) => {
-            if (recursion > maxRecursion)
-                throw new Error("max recursion reached");
-            if (!useCache) {
-                this.recalculate(recursion + 1);
-                this.changed({ cachedValues: this.cachedValues });
-                this.useCache();
-                //if my cache changes, it means all my output modules need recalculation
-                this.outputs.forEach((outputModule) => outputModule.cacheObsolete());
-            }
-            return this.cachedValues;
-        };
+        this.getValues = promiseDebounce((recursion = 0)=>{
+            return new Promise((resolve,reject)=>{
+                if (recursion > maxRecursion)
+                    reject (new Error("max recursion reached"));
+                if (!useCache) {
+                    this.recalculate(recursion + 1).then(()=>{
+                        this.changed({ cachedValues: this.cachedValues });
+                        this.useCache();
+                        //if my cache changes, it means all my output modules need recalculation
+                        this.outputs.forEach((outputModule) => outputModule.cacheObsolete());
+                        resolve(this.cachedValues);
+                    });
+                }else{
+                    resolve(this.cachedValues);
+                }
+            });
+        },20);
+
+        
+        let measureCalculationTime = false;
+
         /** 
          * Calculate the output samples, filling the cachedValues property. This function is extended by each different Module with their own calculation function
          *  this.recalculate has to fill the this.cachedValues array
+         * @param {number} recursion
+         * @returns {Promise} the recalc result 
          */
-        this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
+        this.recalculate = async (recursion = 0) => {
+            this.cachedValues = new Float32Array([0]);
             this.changed({ cachedValues: this.cachedValues });
         };
+
+        this.measureCalculationTime = () => {
+            if(measureCalculationTime) return false;
+            let originalRecalculateFn = this.recalculate;
+            this.recalculate = async(...p) => {
+                let inter = measureExec(()=>originalRecalculateFn(...p));
+                console.log(inter);
+                return inter;
+            }
+        }
+
         /**
          * Trigger all the model change functions, so that any other object listening to this model's properties get the initial status of the module.
          */

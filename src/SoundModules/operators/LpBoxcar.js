@@ -7,14 +7,19 @@ class LpBoxcar extends Operator{
     constructor(){
         super();
         let lastOutput = 0;
-
-        this.reset=()=>{
-            lastOutput=0;
+        let mySampleRate = sampleRate;
+        this.reset=(to=0)=>{
+            lastOutput=to;
         }
+        
+        this.setSampleRate = (nsl)=>{
+            mySampleRate = nsl;
+        }
+
         this.calculateSample=(sample,frequency,reso,gain,order,saturate)=>{
             //I actually don't know well how to calculate the cutoff frequency, I just made this simplistic guess:
             //a moving average roughly takes "weight" times to get quite close to the value
-            let weighta = frequency/sampleRate;
+            let weighta = frequency/mySampleRate;
             if(weighta>1) weighta=1;
             const weightb = 1-weighta;
             let output = (sample * weighta + lastOutput * weightb);

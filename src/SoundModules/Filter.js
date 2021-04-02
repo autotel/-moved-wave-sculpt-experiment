@@ -23,7 +23,6 @@ import voz from "../utils/valueOrZero";
 
 /** 
  * @typedef {Object} FilterSettings
- * @property {number} [length]
  * @property {number} [frequency]
  * @property {number} [gain]
  * @property {number} [reso]
@@ -59,7 +58,6 @@ const filterProtos={
 const defaultSettings={
     gain:1,
     reso:0.2,
-    length:1,
     type:"LpMoog",
     order:1,
     frequency:100,
@@ -119,17 +117,17 @@ class Filter extends Module{
             return this;
         };
 
-        this.recalculate = (recursion = 0) => {
+        this.recalculate = async (recursion = 0) => {
             
             //create an interface for the filter
             let filter = new filterProtos[settings.type]();
             const order = settings.order;
-            const frequencies = this.inputs.frequency.getValues(recursion);
-            const gains = this.inputs.gain.getValues(recursion);
-            const resos = this.inputs.reso.getValues(recursion);
+            const frequencies = await this.inputs.frequency.getValues(recursion);
+            const gains = await this.inputs.gain.getValues(recursion);
+            const resos = await this.inputs.reso.getValues(recursion);
+            const inputValues=await this.inputs.main.getValues(recursion);
             
-            this.cachedValues = [];
-            const inputValues=this.inputs.main.getValues(recursion);
+            this.cachedValues = new Float32Array(inputValues.length);
 
             filter.reset();
 
@@ -141,7 +139,8 @@ class Filter extends Module{
                 order,settings.saturate
             ));
         
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

@@ -34,22 +34,23 @@ class MixerTesselator extends Module{
         this.hasInput("c");
         this.hasInput("d");
 
-        this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
+        this.recalculate = async (recursion = 0) => {
             let result=[];
             let first = true;
-            this.eachInput((input,inputno,inputName) => {
-                const inputValues = input.getValues(recursion);
-                inputValues.map((val, index) => {
-                    if(!result[index]) result[index]=0;
-                    result[index] += (val) * amplitude * settings["level"+inputName];
-                });
-            });
-            
+            await Promise.all(
+                this.eachInput(async (input,inputno,inputName) => {
+                    const inputValues = await input.getValues(recursion);
+                    inputValues.forEach((val, index) => {
+                        if(!result[index]) result[index]=0;
+                        result[index] += (val) * amplitude * settings["level"+inputName];
+                    });
+                })
+            );
+                
             let lengthSamples=result.length;
             let half = Math.floor(lengthSamples/2);
             
-            this.cachedValues = result.map((v,i)=>{
+            this.cachedValues = new Float32Array(result.map((v,i)=>{
                 let awindow = Math.cos(2 * Math.PI * i/lengthSamples) / 2 + 0.5;
                 let window = 1 - awindow; 
                 if(i>half){
@@ -59,9 +60,10 @@ class MixerTesselator extends Module{
                 }else{
                     return v;
                 }
-            });
+            }));
 
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

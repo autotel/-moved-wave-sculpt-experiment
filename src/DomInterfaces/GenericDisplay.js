@@ -18,7 +18,7 @@ class GenericDisplay extends WaveLane{
     constructor(options){
         const {model,drawBoard} = options;
         const settings=typicalLaneSettings(model,drawBoard);
-        Object.assign(settings,settings);
+        Object.assign(settings,options);
         const translator=new ValuePixelTranslator(settings);
         super(translator,settings);
         //lane has a contents sprite.

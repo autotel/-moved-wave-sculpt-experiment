@@ -47,6 +47,7 @@ class Lane extends Group {
 
         super(settings);
 
+
         this.domElement.classList.add("lane"),
 
             this.autoZoom = () => { }

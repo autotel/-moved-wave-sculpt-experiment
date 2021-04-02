@@ -26,7 +26,7 @@ class EnvelopeGeneratorDisplay extends WaveLane{
         const settings=typicalLaneSettings(model,drawBoard);
         //plave for defaults
         settings.name="Envelope";
-        Object.assign(settings,settings);
+        Object.assign(settings,options);
 
         const translator=new ValuePixelTranslator(settings);
         super(translator,settings);
@@ -38,13 +38,6 @@ class EnvelopeGeneratorDisplay extends WaveLane{
 
         //lane has a contents sprite.
         const contents=this.contents;
-
-        const readoutText =  new Text({
-            class:"freq-times-amp",
-            x:10, y:settings.height,
-            text:"---",
-        });
-        contents.add(readoutText);
 
         class Handle extends Circle {
             constructor(settings){
@@ -154,19 +147,6 @@ class EnvelopeGeneratorDisplay extends WaveLane{
         
         //let us represent changes in the module graphically
         model.onUpdate((changes)=>{
-            if(
-                changes.frequency!==undefined ||
-                changes.amplitude!==undefined
-            ){
-                readoutText.set("text",
-                    `${
-                        round(model.settings.frequency,4)
-                    }Hz; ${
-                        round(model.settings.amplitude,4)
-                    }U ${
-                        model.settings.frequency>(settings.rangeSamples/10)?"(ALIASED)":""
-                    }`);
-            }
             if(changes.points){
                 updatePointsPositions(changes.points);
             }

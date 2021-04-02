@@ -89,8 +89,11 @@ class EnvelopeGenerator extends Module {
             // return pointa[1]+pointb[1] * position / 44100;
             return ret;
         }
-        this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
+        this.recalculate = async (recursion = 0) => {
+            const lengthSamples = settings.length * sampleRate;
+            
+            this.cachedValues = new Float32Array(lengthSamples);
+
             sortPointsByTime();
             /** @returns {EnvelopePoint|false} */
             const getNextPoint = (spl) => {
@@ -105,7 +108,6 @@ class EnvelopeGenerator extends Module {
                 return false;
             }
 
-            const lengthSamples = settings.length * sampleRate;
 
             let nextPoint = getNextPoint(0);
             let currentPoint = [0, 0];
@@ -128,7 +130,8 @@ class EnvelopeGenerator extends Module {
                 }
             }
 
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

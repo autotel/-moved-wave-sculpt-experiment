@@ -36,6 +36,7 @@ class WaveFolder extends Module{
         super(settings);
 
         this.hasInput("main");
+        this.hasInput("fold");
 
         this.setPreamp = (to) => {
             return this.set({amplitude:to});
@@ -50,23 +51,33 @@ class WaveFolder extends Module{
         const actualModulo = (a,m) => ((a%m)+m)%m;       
 
 
-        this.recalculate = (recursion = 0) => {
-            this.cachedValues = [];
+        this.recalculate = async(recursion = 0) => {
             const {
                 amplitude, bias, fold,
             } = settings;
-            const halffold = fold/2;
-            const inputValues = this.inputs.main.getValues(recursion);
-            this.cachedValues = inputValues.map((val)=>{
+            
+
+            const inputValues = await this.inputs.main.getValues(recursion);
+            const foldValues = await this.inputs.fold.getValues(recursion);
+            
+            let currentFoldEnvelope = 0;
+
+            this.cachedValues = inputValues.map((val,sampleNumber)=>{
+                if(foldValues[sampleNumber] !== undefined) currentFoldEnvelope = foldValues[sampleNumber];
+                
+                const currentFold = fold + currentFoldEnvelope;
+                const halffold = currentFold/2;
+
                 const result = (
                     actualModulo(
-                        ( val + fold + bias),
-                        fold
+                        ( val + currentFold + bias),
+                        currentFold
                     ) - halffold
-                ) / fold;
+                ) / currentFold;
                 return result * amplitude;
             });
-            this.changed({ cachedValues: this.cachedValues });
+            // this.changed({ cachedValues: this.cachedValues });
+            //return this.cachedValues;
         };
     }
 }

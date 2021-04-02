@@ -40,22 +40,20 @@ http://autotel.co/sound-sculpt/
 ### concrete 
 
 1. 3 1 cli and module interface: deleting of modules
-1. 3 2 export patches, export wav.
 1. 2 1 connection should produce a recalculation
-1. 3 2 something is wrong with the mixer input levels scaling: some affect others.
 1. 2 3 there still are no interfaces to control some properties without the command line:
     * patching among modules
     * filter type selection
     * wave shape
 1. 2 3 Create reverb effects
 1. 3 1 remove reminiscent "NaNHz" from envelopeGenerator
-1. 3 2 fix bugs with time navigation, make wave display full width wide
+1. 3 2 fix bugs with time navigation
 1. fix problem with delay feedback being double the time than first delay
 
 ### speculative / will not do yet
 
+1. 1 3 change the way recalculations are propagated to allow asynchronous
 1. throttle or otherwise reduce the amount of recalculations a bit, as I am observing that per change a module might recalculate more than once.
-1. wave lane should occupy all the window width (minus patch area, of course)
 1. envelopeGenerator shapes
 1. Multi modules, I would like to:
     * be able to drag and drop one module over another and get them two in a group, navigated by tabs

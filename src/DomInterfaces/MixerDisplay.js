@@ -10,6 +10,7 @@ class MixerDisplay extends GenericDisplay{
             this.addKnob("levelc"),
             this.addKnob("leveld")
         ];
+        const saturate = this.addToggle("saturate");
 
         levels.map((k)=>
             k.setMinMax(0,4)

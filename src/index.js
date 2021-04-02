@@ -3,10 +3,18 @@ import Draggable from "./DomInterfaces/components/Draggable";
 import PatchDisplay from "./DomInterfaces/PatchDisplay";
 import Canvas from "./scaffolding/Canvas";
 import TimeZoomer from "./DomInterfaces/TimeZoomer";
+import RustProcessor from "./rust";
 
-const drawBoard=new Canvas();
+const nativeProcessor = new RustProcessor();
+
+nativeProcessor.onReady((nativeProcess) => {
+    console.log("1+2=", nativeProcess.add(1, 2));
+    console.log("sine", nativeProcess.arrGenSin(0.5, 2));
+});
+
+const drawBoard = new Canvas();
 drawBoard.element.classList.add("drawboard");
-const navBoard=new Canvas();
+const navBoard = new Canvas();
 navBoard.element.classList.add("nav");
 
 
@@ -14,7 +22,10 @@ navBoard.element.classList.add("nav");
 import SoundPlayer from "./scaffolding/SoundPlayer";
 import LiveCodingInterface from "./LiveCodingInterface"
 
-const webInspectorInterface=new LiveCodingInterface({drawBoard});
+const webInspectorInterface = new LiveCodingInterface({
+    drawBoard,
+    nativeProcessor
+});
 
 
 const patchDisplay = new PatchDisplay(drawBoard);
@@ -22,10 +33,10 @@ const patchDisplay = new PatchDisplay(drawBoard);
 const timeZoomer = new TimeZoomer();
 navBoard.add(timeZoomer);
 
-const player=new SoundPlayer();
+const player = new SoundPlayer();
 const downloader = new SoundDownloader();
 
-webInspectorInterface.onModuleCreated((newModule,newInterface,count)=>{
+webInspectorInterface.onModuleCreated((newModule, newInterface, count) => {
     patchDisplay.appendModules(newModule);
     player.appendModule(newModule);
     downloader.appendModule(newModule);
@@ -38,44 +49,124 @@ Draggable.setCanvas();
 
 //pre-run a live-coded patch
 
-import pat1 from "./patches/rotator";
-import pat2 from "./patches/goodstart";
-import pat3 from "./patches/reverb1";
-import pat4 from "./patches/delay";
-import pat5 from "./patches/drumpat";
-import pat6 from "./patches/filterTester";
-import pat7 from "./patches/multireso";
-import pat8 from "./patches/wave1";
+import pat1 from "./patches/drummaker";
+
 import SoundDownloader from "./scaffolding/SoundDownloader";
 
 window.demos = {
-    "rotator": ()=>pat1(webInspectorInterface),
-    "drumpat2": ()=>pat2(webInspectorInterface),
-    "reverb1": ()=>pat3(webInspectorInterface),
-    "delay": ()=>pat4(webInspectorInterface),
-    "drumpat": ()=>pat5(webInspectorInterface),
-    "filterTester": ()=>pat6(webInspectorInterface),
-    "multireso": ()=>pat7(webInspectorInterface),
-    "wavefolder": ()=>pat8(webInspectorInterface),
+    "drummaker": () => pat1(webInspectorInterface),
+    "kik": () => {
+        create(possibleModules.Oscillator, 'osc1');
+        create(possibleModules.EnvelopeAttackRelease, 'env1');
+        create(possibleModules.EnvelopeAttackRelease, 'env2');
+        modules['env1'].connectTo(modules['osc1'].inputs.amplitude);
+        modules['env2'].connectTo(modules['osc1'].inputs.frequency);
+        modules['osc1'].set({
+            'amplitude': 0,
+            'bias': 0,
+            'length': 1,
+            'frequency': 1.7777777777777781,
+            'phase': 0,
+            'shape': 'sin',
+            'nativeProcessor': {
+                'ready': true
+            }
+        });
+        modules['env1'].set({
+            'attack': 0.026961451247165532,
+            'release': 0.337437641723356,
+            'amplitude': 0.457793034018502,
+            'attackShape': 1,
+            'releaseShape': 0.42000000000000015
+        });
+        modules['env2'].set({
+            'attack': 0.011111111111111112,
+            'release': 0.20002267573696147,
+            'amplitude': 200.27912293593687,
+            'attackShape': 0.6799999999999999,
+            'releaseShape': 4.880000000000001
+        });
+        setTimeout(() => {
+            modules['osc1'].getInterface().autoZoom();
+            modules['env1'].getInterface().autoZoom();
+            modules['env2'].getInterface().autoZoom();
+        }, 200);
+    },
+    "nicetimbres": () => {
+
+
+        const randomnum = ()=> Math.round(Math.random() * 10 - 5) / 10
+
+        create(possibleModules.HarmonicsOscillator,'harmosc');
+        create(possibleModules.EnvelopeGenerator,'timbrenv');
+        
+        // modules['timbrenv'].connectTo(modules['harmosc'].inputs.interval2);
+        // modules['timbrenv'].connectTo(modules['harmosc'].inputs.interval3);
+
+        modules['harmosc'].set({
+          'amplitude': 1,
+          'bias': 0,
+          'length': 2,
+          'frequency': 110,
+          'phase': 0,
+          'shape': 'sin',
+          'interval1': 0,
+          'interval2': randomnum(),
+          'interval3': randomnum(),
+          'interval4': 0,
+          'nativeProcessor': {
+            'ready': true
+          }
+        });
+        modules['timbrenv'].set({
+          'amplitude': 1,
+          'bias': 0,
+          'length': 2,
+          'points': [
+            [
+              0,
+              randomnum()
+            ],
+            [
+              88200,
+              randomnum()
+            ]
+          ],
+          'loop': false,
+          'nativeProcessor': {
+            'ready': true
+          }
+        });
+        setTimeout(()=>{
+            modules['harmosc'].getInterface().autoZoom();
+            modules['timbrenv'].getInterface().autoZoom();
+        },100);
+    }
 }
 
 let hashBefore = window.location.hash;
-const hashchange=()=>{
-    if(window.location.hash){
+const hashchange = () => {
+    if (window.location.hash) {
         let hashval = window.location.hash.slice(1);
-        if(window.demos[hashval]){
-            console.log("trying load of",hashval);
+        if (window.demos[hashval]) {
+            console.log("trying load of", hashval);
             window.demos[hashval]();
         }
-    }else{
-        if(hashBefore){
-            
+    } else {
+        if (hashBefore) {
+
         }
     }
 }
 
 window.addEventListener('DOMContentLoaded', hashchange);
 
-window.addEventListener("hashchange",hashchange);
+window.addEventListener("hashchange", hashchange);
 
-window.onpopstate = ()=>window.location.reload();
+window.onpopstate = () => window.location.reload();
+
+
+setTimeout(() => {
+    //prevent an anoying message casted by the current dev server.
+    window.socket = () => { }
+}, 500);
