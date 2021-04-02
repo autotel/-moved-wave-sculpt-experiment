@@ -4,6 +4,8 @@ doc
 dist/main.js
 dist/*.module.wasm
 dist/*.main.js
+dist/*.map.css
+dist/*.map.js
 src/rust/target/*
 pkg/*
 pkg

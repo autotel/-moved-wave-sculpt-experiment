@@ -73,9 +73,10 @@ class RustFreeverb extends Module{
                 worker = new Worker(new URL('./workers/rustFreeverb.js', import.meta.url));;
 
                 worker.onmessage = ({ data }) => {
-                    console.log("rust freeverb received",data);
 
                     if(data.audioArray){
+
+                        console.log("rust freeverb audio",data);
                         this.cachedValues=data.audioArray;
                         this.changed({ cachedValues: this.cachedValues });
                         this.signalWorkReady();
@@ -83,7 +84,7 @@ class RustFreeverb extends Module{
                         worker=false;
                     }
                     if(data.log){
-                        console.log(data.log);
+                        console.log("rust worker log",data.log);
                     }
                 };
 

@@ -21,11 +21,7 @@ self.onmessage = ({data}) => {
             inputValues,
         } = data;
 
-        const lengthSamples = inputValues.length;
-        const audioArray = new Float64Array(lengthSamples);
-
-
-        this.cachedValues = new Float64Array(
+        const audioArray = new Float64Array(
             rustProcessor.freeverb(
                 inputValues
             )
