@@ -92,9 +92,15 @@ class Oscillator extends Module{
             operator.setShape(settings.shape);
             operator.setPhase(settings.phase);
             
-            const freqInputValues = await this.inputs.frequency.getValues(recursion);
-            const ampInputValues = await this.inputs.amplitude.getValues(recursion);
-            const biasInputValues = await this.inputs.bias.getValues(recursion);
+            const [
+                freqInputValues,
+                ampInputValues,
+                biasInputValues
+            ] = await Promise.all([
+                this.inputs.frequency.getValues(recursion),
+                this.inputs.amplitude.getValues(recursion),
+                this.inputs.bias.getValues(recursion)
+            ]);
             
             for (let a = 0; a < lengthSamples; a++) {
                 const freq = (freqInputValues[a] || 0) + settings.frequency;

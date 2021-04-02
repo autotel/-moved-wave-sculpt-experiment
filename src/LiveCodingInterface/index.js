@@ -1,5 +1,6 @@
 //actual sound modules
 import Oscillator from "../SoundModules/Oscillator";
+import HarmonicsOscillator from "../SoundModules/HarmonicsOscillator";
 import Mixer from "../SoundModules/Mixer";
 import Delay from "../SoundModules/Delay";
 import DelayWithFilter from "../SoundModules/DelayWithFilter";
@@ -25,6 +26,7 @@ import DelayWithFilterDisplay from "../DomInterfaces/DelayWithFilterDisplay";
 import ReverbDisplay from "../DomInterfaces/ReverbDisplay";
 import EnvelopeGeneratorDisplay from "../DomInterfaces/EnvelopeGeneratorDisplay";
 import OscillatorDisplay from "../DomInterfaces/OscillatorDisplay";
+import HarmonicsOscillatorDisplay from "../DomInterfaces/HarmonicsOscillatorDisplay";
 import EnvAttackReleaseDisplay from "../DomInterfaces/EnvAttackReleaseDisplay";
 import ChebyshevDisplay from "../DomInterfaces/ChebyshevDisplay";
 import RepeaterDisplay from "../DomInterfaces/RepeaterDisplay";
@@ -43,6 +45,7 @@ function registerModuleAndItsInterface (ModuleProto,InterfaceProto){
 };
 
 registerModuleAndItsInterface(Oscillator,OscillatorDisplay);
+registerModuleAndItsInterface(HarmonicsOscillator,HarmonicsOscillatorDisplay);
 registerModuleAndItsInterface(Mixer,MixerDisplay);
 registerModuleAndItsInterface(Delay,DelayDisplay);
 registerModuleAndItsInterface(DelayWithFilter,DelayWithFilterDisplay);
