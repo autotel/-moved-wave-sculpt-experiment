@@ -1,11 +1,8 @@
 node_modules
 doc
 /upload.sh
-dist/main.js
-dist/*.module.wasm
-dist/*.main.js
-dist/*.map.css
-dist/*.map.js
+/dist/*
+!/dist/index.html
 src/rust/target/*
 pkg/*
 pkg

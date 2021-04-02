@@ -299,7 +299,7 @@ class Lane extends Group {
         drawBoard.size.onChange(()=>updateSize());
 
         const title = new Text({
-            x: 10, y: 0,
+            x: 10, y: 16,
             text: settings.name
         });
 
