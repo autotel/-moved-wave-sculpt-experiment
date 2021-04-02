@@ -92,7 +92,7 @@ class EnvelopeGenerator extends Module {
         this.recalculate = async (recursion = 0) => {
             const lengthSamples = settings.length * sampleRate;
             
-            this.cachedValues = new Float32Array(lengthSamples);
+            this.cachedValues = new Float64Array(lengthSamples);
 
             sortPointsByTime();
             /** @returns {EnvelopePoint|false} */

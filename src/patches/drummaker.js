@@ -18,6 +18,7 @@ export default function run(codeInterface) {
   create(possibleModules.Mixer, 'premix');
   create(possibleModules.DelayWithFilter, 'fdel');
   create(possibleModules.Mixer, 'postmix');
+  create(possibleModules.RustFreeverb, 'reverb');
 
   ghost.add(postmix,"levela",0,0.25);
   ghost.add(postmix,"levelb",0,0.25);
@@ -89,6 +90,7 @@ export default function run(codeInterface) {
   modules['premix'].connectTo(modules['postmix'].inputs.c);
   modules['fdel'].connectTo(modules['postmix'].inputs.b);
   env4.connectTo(fdel.inputs.time);
+  postmix.connectTo(reverb.inputs.main);
   modules['oscillator1'].set({
     'amplitude': 0,
     'bias': 0,
@@ -96,9 +98,6 @@ export default function run(codeInterface) {
     'frequency': 37.19489981785033,
     'phase': 0,
     'shape': 'sin',
-    'nativeProcessor': {
-      'ready': false
-    }
   });
   modules['oscillator2'].set({
     'amplitude': 0,
@@ -107,9 +106,6 @@ export default function run(codeInterface) {
     'frequency': 50.11363636363637,
     'phase': 0,
     'shape': 'sin',
-    'nativeProcessor': {
-      'ready': false
-    }
   });
   modules['oscillator3'].set({
     'amplitude': 0,
@@ -118,9 +114,6 @@ export default function run(codeInterface) {
     'frequency': 1,
     'phase': 0,
     'shape': 'noise',
-    'nativeProcessor': {
-      'ready': false
-    }
   });
   modules['env0'].set({
     'attack': 0,
@@ -163,9 +156,6 @@ export default function run(codeInterface) {
     'levelb': 0.25,
     'levelc': 0.25,
     'leveld': 0.25,
-    'nativeProcessor': {
-      'ready': false
-    }
   });
   modules['fdel'].set({
     'feedback': 0.8700000000000001,
@@ -186,9 +176,6 @@ export default function run(codeInterface) {
     'levelb': 4,
     'levelc': 0,
     'leveld': 0.2833333333333333,
-    'nativeProcessor': {
-      'ready': false
-    }
   });
 
   setTimeout(()=>{
@@ -202,6 +189,6 @@ export default function run(codeInterface) {
     modules['premix'].getInterface().autoZoom();
     modules['fdel'].getInterface().autoZoom();
     modules['postmix'].getInterface().autoZoom();
-    setInterval(randomize,1000);
+    // setInterval(randomize,1000);
   },1000);
 }

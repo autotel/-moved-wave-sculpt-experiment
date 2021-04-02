@@ -20,8 +20,8 @@ class Module extends Model{
         super(settings);
         this.unique = count ++;
         this.name = this.constructor.name + "-" + this.unique;
-        /** @type {Float32Array} */
-        this.cachedValues = new Float32Array([0]);
+        /** @type {Float64Array} */
+        this.cachedValues = new Float64Array([0]);
         /** @type {Object<string, InputNode>} */
         this.inputs = {};
         /** @type {Set<InputNode>} */
@@ -128,7 +128,7 @@ class Module extends Model{
         };
         /**
          * used to get the values from the module, or to cause the module to recalculate its values.
-         * @returns {Promise<Float32Array>} the sound array, sample by sample.
+         * @returns {Promise<Float64Array>} the sound array, sample by sample.
          * The samples will get recalculated if it's useCache flag is set to true. Otherwise, this function will return the cached samples.
          * The user can also get the cached samples by simply getting the `cachedValues` property, in which case one might get outdated samples.
          */
@@ -148,7 +148,7 @@ class Module extends Model{
                     resolve(this.cachedValues);
                 }
             });
-        },20);
+        },5);
 
         
         let measureCalculationTime = false;
@@ -160,7 +160,7 @@ class Module extends Model{
          * @returns {Promise} the recalc result 
          */
         this.recalculate = async (recursion = 0) => {
-            this.cachedValues = new Float32Array([0]);
+            this.cachedValues = new Float64Array([0]);
             this.changed({ cachedValues: this.cachedValues });
         };
 

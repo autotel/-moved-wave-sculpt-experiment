@@ -3,8 +3,6 @@ import {sampleRate} from "./vars";
 import OscillatorOperator from "./operators/OscillatorOperator";
 import voz from "../utils/valueOrZero";
 
-const workerUrl = "";
-
 /**
  * @namespace SoundModules.HarmonicsOscillator
  */
@@ -117,19 +115,17 @@ class HarmonicsOscillator extends Module{
             ]);
             
             console.log("post");
-            this.signalWorkStarted();
-
-            if(worker) {
-                worker.terminate();
-                worker=false;
-            }
-
-
-            worker = new Worker(new URL('./workers/harmonicsOscillator.js', import.meta.url));;
             
-
-
+            
             return await new Promise((resolve,reject)=>{
+                
+                this.signalWorkStarted();
+                if(worker) {
+                    worker.terminate();
+                    worker=false;
+                }
+                worker = new Worker(new URL('./workers/harmonicsOscillator.js', import.meta.url));;
+                
                 worker.onmessage = ({ data }) => {
                     console.log("received",data);
 

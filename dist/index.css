@@ -125,11 +125,14 @@ svg .control-panel .knob.active .knob-value-arc {
 svg .control-panel .knob {
   cursor: row-resize;
 }
-svg svg.lane, svg svg {
+svg svg {
   overflow: visible;
 }
 svg .lane {
-  /* overflow: hidden; */
+  overflow: hidden;
+}
+svg .lane:hover, svg .lane.active {
+  overflow: initial;
 }
 @keyframes dash-working {
   to {
@@ -138,6 +141,11 @@ svg .lane {
 }
 svg .working .wave-display {
   stroke-dasharray: 3px;
+  animation: dash-working 3s linear infinite;
+}
+svg .working .handle-rect {
+  stroke-dasharray: 3px;
+  stroke-width: 1px;
   animation: dash-working 3s linear infinite;
 }
 

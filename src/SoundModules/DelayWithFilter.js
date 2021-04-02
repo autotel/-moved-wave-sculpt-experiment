@@ -121,7 +121,7 @@ class DelayWithFilter extends Module{
             const resos = await this.inputs.reso.getValues(recursion);
             const inputValues = await this.inputs.main.getValues(recursion);
             
-            this.cachedValues = new Float32Array(inputValues.length);
+            this.cachedValues = new Float64Array(inputValues.length);
 
             filter.reset();
             

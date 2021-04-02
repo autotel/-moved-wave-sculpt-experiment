@@ -48,9 +48,9 @@ class Lane extends Group {
         super(settings);
 
 
-        this.domElement.classList.add("lane"),
+        this.domElement.classList.add("lane");
 
-            this.autoZoom = () => { }
+        // this.autoZoom = () => { }
 
         // this.settings=settings;
 
@@ -275,7 +275,12 @@ class Lane extends Group {
             translator.change({
                 width:newWidth
             });
+            this.set({width:newWidth});
+            this.contents.set({width:newWidth});
 
+            this.domElement.setAttribute("width", (newWidth+sizes.patcher.width)+"px");
+            // this.domElement.attributes["width"] = newWidth;
+            // this.domElement.style["width"] = newWidth+"px";
             this.getInputPositions();
             myInputGraphs.forEach((ig)=>ig.updatePosition());
             myOutputGraph.updatePosition();

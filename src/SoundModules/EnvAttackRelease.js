@@ -69,7 +69,7 @@ class EnvelopeAttackRelease extends Module{
             let releaseSpls = Math.floor(sampleRate * settings.release);
             let shapeFunction = shapes.exponential;
 
-            this.cachedValues = new Float32Array(envLengthSpls);
+            this.cachedValues = new Float64Array(envLengthSpls);
 
             // numberwang({
             //     envLength,
@@ -79,7 +79,6 @@ class EnvelopeAttackRelease extends Module{
             // });
 
 
-            delete settings.nativeProcessor;
             delete settings.attackCurve;
             delete settings.releaseCurve;
 

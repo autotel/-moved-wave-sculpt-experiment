@@ -3,13 +3,17 @@ import Draggable from "./DomInterfaces/components/Draggable";
 import PatchDisplay from "./DomInterfaces/PatchDisplay";
 import Canvas from "./scaffolding/Canvas";
 import TimeZoomer from "./DomInterfaces/TimeZoomer";
-import RustProcessor from "./rust";
+import SoundDownloader from "./scaffolding/SoundDownloader";
+import RustProcessor from "./rust/RustProcessor";
 
-const nativeProcessor = new RustProcessor();
+import pat1 from "./patches/drummaker";
 
-nativeProcessor.onReady((nativeProcess) => {
-    console.log("1+2=", nativeProcess.add(1, 2));
-    console.log("sine", nativeProcess.arrGenSin(0.5, 2));
+
+const rustProcessor = RustProcessor.get();
+
+rustProcessor.onReady((rustProcessor) => {
+    console.log("1+2=", rustProcessor.add(1, 2));
+    console.log("sine", rustProcessor.arrGenSin(0.5, 2));
 });
 
 const drawBoard = new Canvas();
@@ -23,8 +27,7 @@ import SoundPlayer from "./scaffolding/SoundPlayer";
 import LiveCodingInterface from "./LiveCodingInterface"
 
 const webInspectorInterface = new LiveCodingInterface({
-    drawBoard,
-    nativeProcessor
+    drawBoard
 });
 
 
@@ -48,11 +51,6 @@ drawBoard.add(patchDisplay);
 Draggable.setCanvas();
 
 //pre-run a live-coded patch
-
-import pat1 from "./patches/drummaker";
-
-import SoundDownloader from "./scaffolding/SoundDownloader";
-
 window.demos = {
     "drummaker": () => pat1(webInspectorInterface),
     "kik": () => {
@@ -68,9 +66,6 @@ window.demos = {
             'frequency': 1.7777777777777781,
             'phase': 0,
             'shape': 'sin',
-            'nativeProcessor': {
-                'ready': true
-            }
         });
         modules['env1'].set({
             'attack': 0.026961451247165532,
@@ -114,9 +109,6 @@ window.demos = {
           'interval2': randomnum(),
           'interval3': randomnum(),
           'interval4': 0,
-          'nativeProcessor': {
-            'ready': true
-          }
         });
         modules['timbrenv'].set({
           'amplitude': 1,
@@ -133,9 +125,6 @@ window.demos = {
             ]
           ],
           'loop': false,
-          'nativeProcessor': {
-            'ready': true
-          }
         });
         setTimeout(()=>{
             modules['harmosc'].getInterface().autoZoom();

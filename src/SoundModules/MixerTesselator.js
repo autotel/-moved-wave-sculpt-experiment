@@ -50,7 +50,7 @@ class MixerTesselator extends Module{
             let lengthSamples=result.length;
             let half = Math.floor(lengthSamples/2);
             
-            this.cachedValues = new Float32Array(result.map((v,i)=>{
+            this.cachedValues = new Float64Array(result.map((v,i)=>{
                 let awindow = Math.cos(2 * Math.PI * i/lengthSamples) / 2 + 0.5;
                 let window = 1 - awindow; 
                 if(i>half){

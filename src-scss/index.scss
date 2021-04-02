@@ -151,12 +151,14 @@ svg {
 			cursor: row-resize;
 		}
 	}
-	svg.lane, svg{
-		//I want to use overflow: hiden, but the layout is a bit strange, so it ends up hiding the patcher
+	svg{
 		overflow: visible;
 	}
     .lane {
-        /* overflow: hidden; */
+		overflow: hidden;
+		&:hover,&.active{
+			overflow: initial;
+		}
 	}
 	
 
@@ -167,6 +169,11 @@ svg {
 	}
 	.working .wave-display{
 		stroke-dasharray: 3px;
+		animation: dash-working 3s linear infinite;
+	}
+	.working .handle-rect{
+		stroke-dasharray: 3px;
+		stroke-width:1px;
 		animation: dash-working 3s linear infinite;
 	}
 }

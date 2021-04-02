@@ -1,7 +1,7 @@
 import Module from "./Module";
 import {sampleRate} from "./vars";
-import NativeProcess from "../scaffolding/NativeProcess";
 import requireParameter from "../utils/requireParameter";
+import RustProcessor from "../rust/RustProcessor";
 
 /**
  * @namespace SoundModules.RustComb
@@ -13,7 +13,6 @@ import requireParameter from "../utils/requireParameter";
  * @property {number} [dampening_inverse]
  * @property {number} [dampening]
  * @property {number} [feedback]
- * @property {NativeProcess} nativeProcessor
  */
 
 /** @type {RustCombSettings} */
@@ -22,7 +21,6 @@ const defaultSettings={
     dampening_inverse:0.5,
     dampening:0.5,
     feedback:0.9,
-    nativeProcessor:undefined,
 };
 
 /**
@@ -34,8 +32,7 @@ class RustComb extends Module{
      * @param {RustCombSettings} userSettings
      */
     constructor(userSettings) {
-        requireParameter(userSettings.nativeProcessor,"nativeProcessor");
-        const nativeProcessor = userSettings.nativeProcessor;
+        const rustProcessor = RustProcessor.get();
         //apply default settings for all the settings user did not provide
         const settings = {};
         Object.assign(settings, defaultSettings);
@@ -60,12 +57,7 @@ class RustComb extends Module{
    
 
         this.recalculate = async (recursion = 0) => {
-            if(!nativeProcessor.ready){
-                nativeProcessor.onReady(()=>{
-                    this.recalculate(recursion);
-                });
-                return;
-            }
+            await rustProcessor.wait(); 
 
             let {
                 frequency,
@@ -78,8 +70,8 @@ class RustComb extends Module{
 
             if (frequency == 0) frequency = 0.1/sampleRate;
 
-            this.cachedValues = new Float32Array(
-                nativeProcessor.arrCombFilter(
+            this.cachedValues = new Float64Array(
+                rustProcessor.arrCombFilter(
                     inputValues,frequency,dampening_inverse,dampening,feedback
                 )
             );

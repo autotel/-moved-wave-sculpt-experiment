@@ -44,7 +44,7 @@ class Delay extends Module{
             let feedbackLevels = this.inputs.feedback.getValues(recursion);
             let timeLevels = this.inputs.time.getValues(recursion);
 
-            this.cachedValues = new Float32Array(inputValues.length);
+            this.cachedValues = new Float64Array(inputValues.length);
             
             inputValues.forEach((value,sampleNumber)=>{
                 this.cachedValues[sampleNumber] = 0;

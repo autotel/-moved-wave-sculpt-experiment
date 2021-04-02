@@ -27,6 +27,7 @@ class Component {
                 if (attr !== appliedAttr) {
                     this.domElement.setAttribute(attrName, attr);
                     this.attributes[attrName] = attr;
+                    this.appliedAttributes[attrName] = attr;
                 }
             });
         };
@@ -132,6 +133,25 @@ class Group extends Component {
         this.remove = (elem) => {
             this.domElement.removeChild(elem.domElement);
         }
+        // const styleAttrs = ["width","height","border"];
+        // const superUpdate = this.update;
+        // this.update = () => {
+        //     if (!this.domElement)
+        //         return console.warn("this.domElement is", this.domElement);
+        //     //apply what has been modified to the dom element
+        //     //it also keeps track of modified attributes to prevent redundant changes
+        //     Object.keys(this.attributes).map((attrName) => {
+        //         const attr = this.attributes[attrName];
+        //         const appliedAttr = this.appliedAttributes[attrName];
+        //         if(styleAttrs.includes(attrName)){
+        //             this.domElement.style[attrName] = attr;
+        //             this.appliedAttributes[attrName] = attr;
+        //         }else{
+        //             superUpdate();
+        //         }
+        //     });
+        // };
+
         this.update();
     }
 }

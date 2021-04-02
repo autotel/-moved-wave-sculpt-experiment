@@ -1,6 +1,5 @@
 import Module from "./Module";
 import {sampleRate} from "./vars";
-import NativeProcess from "../scaffolding/NativeProcess";
 import requireParameter from "../utils/requireParameter";
 
 /**
@@ -13,7 +12,6 @@ import requireParameter from "../utils/requireParameter";
  * @property {number} [dampening_inverse]
  * @property {number} [dampening]
  * @property {number} [feedback]
- * @property {NativeProcess} nativeProcessor
  */
 
 /** @type {RustFreeverbSettings} */
@@ -22,7 +20,6 @@ const defaultSettings={
     dampening_inverse:0.5,
     dampening:0.5,
     feedback:0.9,
-    nativeProcessor:undefined,
 };
 /**
  * @class RustFreeverb an example that utilizes Rust to process the audio
@@ -33,14 +30,16 @@ class RustFreeverb extends Module{
      * @param {RustFreeverbSettings} userSettings
      */
     constructor(userSettings) {
-        requireParameter(userSettings.nativeProcessor,"nativeProcessor");
-        const nativeProcessor = userSettings.nativeProcessor;
         //apply default settings for all the settings user did not provide
         const settings = {};
         Object.assign(settings, defaultSettings);
         Object.assign(settings, userSettings);
         
         super(settings);
+
+        /** @type {Worker|false} */
+        let worker = false;
+
 
         this.hasInput("main");
 
@@ -60,31 +59,41 @@ class RustFreeverb extends Module{
         const actualModulo = (a,m) => ((a%m)+m)%m;       
 
         this.recalculate = async(recursion = 0) => {
-            if(!nativeProcessor.ready){
-                nativeProcessor.onReady(()=>{
-                    this.recalculate(recursion);
-                });
-                return;
-            }
-
-            let {
-                frequency,
-                dampening_inverse,
-                dampening,
-                feedback,
-            } = settings;
-
+            console.log("rust freverb start recalculation");
+            
             const inputValues = await this.inputs.main.getValues(recursion);
+            console.log("rust freverb values received");
+            
+            return await new Promise((resolve,reject)=>{
+                if(worker) {
+                    worker.terminate();
+                    worker=false;
+                }
+                
+                worker = new Worker(new URL('./workers/rustFreeverb.js', import.meta.url));;
 
-            if (frequency == 0) frequency = 0.1/sampleRate;
+                worker.onmessage = ({ data }) => {
+                    console.log("rust freeverb received",data);
 
-            this.cachedValues = new Float32Array(
-                nativeProcessor.freeverb(
-                    inputValues
-                )
-            );
-            // this.changed({ cachedValues: this.cachedValues });
-            //return this.cachedValues;
+                    if(data.audioArray){
+                        this.cachedValues=data.audioArray;
+                        this.changed({ cachedValues: this.cachedValues });
+                        this.signalWorkReady();
+                        resolve(data.audioArray);
+                        worker=false;
+                    }
+                    if(data.log){
+                        console.log(data.log);
+                    }
+                };
+
+                worker.postMessage({
+                    settings:Object.assign({},settings),
+                    sampleRate,
+                    inputValues,
+                });
+            });
+
         };
     }
 }

@@ -97,7 +97,7 @@ class SoundDownloader{
             }
             
             const wav = new Wav({sampleRate, channels: 1});
-            const buffer = new Float32Array(module.cachedValues);
+            const buffer = new Float64Array(module.cachedValues);
             wav.setBuffer(buffer);
             const link = wav.getDownload();
 

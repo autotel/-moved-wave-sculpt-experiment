@@ -67,7 +67,6 @@ registerModuleAndItsInterface(Hipparchus,HipparchusDisplay);
 
 //for typing
 import Canvas from "../scaffolding/Canvas";
-import NativeProcess from "../scaffolding/NativeProcess";
 
 function giveHelp(){
 
@@ -84,9 +83,8 @@ class LiveCodingInterface{
     /**
      * @param {Object} globals
      * @param {Canvas} globals.drawBoard
-     * @param {NativeProcess} globals.nativeProcessor
      */
-    constructor({drawBoard,nativeProcessor}){
+    constructor({drawBoard}){
         let count=0;
 
         setTimeout(giveHelp,1000);
@@ -119,7 +117,7 @@ class LiveCodingInterface{
             
             console.log(`this module will be available as "modules.${nameForAccess}"`);
             
-            const newModule=new Which({nativeProcessor});
+            const newModule=new Which();
 
             this.modules[nameForAccess]=newModule;
             if(window[intendedName]===undefined) window[intendedName]=newModule;
