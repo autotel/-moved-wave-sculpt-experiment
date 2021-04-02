@@ -31,6 +31,7 @@ function Draggable(domElement){
     domElement.addEventListener("mouseenter",(evt)=>{
         Draggable.mouse.isHovering=this;
         domElement.classList.add("active");
+        this.mouseEnterCallback(evt);
     });
     
     domElement.addEventListener("mouseleave",(evt)=>{
@@ -38,6 +39,8 @@ function Draggable(domElement){
             domElement.classList.remove("active");
         }
         Draggable.mouse.isHovering=false;
+
+        this.mouseLeaveCallback(evt);
     });
 
     /** do not override */
@@ -74,6 +77,10 @@ function Draggable(domElement){
     this.dragStartCallback=(mouse)=>{
     }
     this.dragEndCallback=(mouse)=>{
+    }
+    this.mouseEnterCallback=(mouse)=>{
+    }
+    this.mouseLeaveCallback=(mouse)=>{
     }
 
     /**

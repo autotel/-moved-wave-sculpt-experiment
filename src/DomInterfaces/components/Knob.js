@@ -2,12 +2,14 @@ import Module from "../../SoundModules/Module";
 import { Group, Text, Path } from "../../scaffolding/elements";
 import round from "../../utils/round";
 import Draggable from "./Draggable";
+import abbreviate from "../../utils/stringAbbreviator";
 
 let defaultKnobOptions = {
     x: 0, y:0,
     radius:20,
     name:"knob",
     class:"knob",
+    abbreviatedName:undefined,
     min:false, max:false,
     deltaCurve:"gain",
 }
@@ -36,6 +38,7 @@ class Knob extends Group{
         Object.assign(options,defaultKnobOptions);
         Object.assign(options,userOptions);
         super(options);
+
 
         let nameText = new Text({
             x:0,
@@ -143,6 +146,19 @@ class Knob extends Group{
             return rpv * this.value * 360;
         }
 
+        /** abbreviated name functionality */
+        
+        const abbreviateText=()=>{
+            if(!options.abbreviatedName){
+                options.abbreviatedName=abbreviate(options.name);
+            }
+            nameText.set("text",options.abbreviatedName);
+        }
+        const deAbbreviateText=()=>{
+            nameText.set("text",options.name);
+        }
+        abbreviateText();
+
         const draggable = new Draggable(knobShape.domElement);
 
         draggable.dragStartCallback=()=>{
@@ -154,6 +170,9 @@ class Knob extends Group{
         draggable.dragEndCallback=()=>{
             this.domElement.classList.remove("active");
         }
+
+        draggable.mouseEnterCallback=()=>deAbbreviateText();
+        draggable.mouseLeaveCallback=()=>abbreviateText();
 
         draggable.positionChanged=(newPosition)=>{
             //choose the lengthiest coord to define delta
@@ -184,7 +203,7 @@ class Knob extends Group{
         
         this.updateGraphic=()=>{
             knobShape.set("transform",`rotate(${getAngle()})`);
-            nameText.set("text",options.name);
+
             valueText.set("text","~"+(round(this.value,2)));
 
             if(options.min!==false&&options.max!==false){
@@ -209,6 +228,9 @@ class Knob extends Group{
             options.name=parameterName;
             this.value=propertyObject[parameterName];
 
+            options.abbreviatedName=undefined;
+            abbreviateText();
+            
             this.onChange(({value})=>{
                 propertyObject[parameterName] = value;
                 module.set(propertyObject);
