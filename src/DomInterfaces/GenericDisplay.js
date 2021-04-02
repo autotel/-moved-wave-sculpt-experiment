@@ -50,16 +50,6 @@ class GenericDisplay extends WaveLane{
         hoverable.mouseLeaveCallback=(position)=>{
             hoverText.domElement.classList.remove("active");
         }
-        model.onUpdate((changes)=>{
-            console.log(changes);
-            if(changes.isWorking!==undefined){
-                if(changes.isWorking){
-                    this.domElement.classList.add("working");
-                }else{
-                    this.domElement.classList.remove("working");
-                }
-            }
-        });
         contents.add(hoverText);
 
         model.triggerInitialState();

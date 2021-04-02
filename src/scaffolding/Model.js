@@ -8,13 +8,13 @@ class Model {
         /** @returns {Lane|undefined} */
         this.getInterface = ()=>this.interfaces.values().next().value;
         this.settings = settings;
-        //interface uses this method to conect changes in model to redrawss
+        /** interface uses this method to connect changes in model to redraws */
         this.onUpdate = (newCallback) => {
             if (typeof newCallback !== "function")
                 throw new Error(`Callback has to be function but it is ${typeof newCallback}`);
             changeListeners.push(newCallback);
         };
-        //model uses this method to notify changes to the interface
+        /** model uses this method to notify changes to the interface*/
         this.changed = (changes = {}) => {
             changeListeners.map((cb) => { cb(changes); });
         };

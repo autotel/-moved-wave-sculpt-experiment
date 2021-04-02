@@ -65,7 +65,6 @@ class Lane extends Group {
             movedCallbacks.map((cb) => cb());
         }
 
-        model.interfaces.add(this);
 
         const handleRect = new Rectangle({
             x: settings.x,
@@ -76,6 +75,19 @@ class Lane extends Group {
         });
 
         handleRect.domElement.classList.add("lane-handle");
+
+        //add a class to cause visual feedback while the module is processsing.
+        model.onUpdate((changes)=>{
+            if(changes.isWorking!==undefined){
+                if(changes.isWorking){
+                    this.domElement.classList.add("working");
+                }else{
+                    this.domElement.classList.remove("working");
+                }
+            }
+        });
+
+        model.interfaces.add(this);
 
         //position this lane at a distance from top, proportional to it's height,
         this.handyPosition = (posNumber) => {

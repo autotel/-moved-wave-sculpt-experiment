@@ -157,10 +157,16 @@ svg {
 	}
     .lane {
         /* overflow: hidden; */
-    }
-	.working{
-		stroke: red;
-		fill:red;
-		stroke-width: 1px;
+	}
+	
+
+	@keyframes dash-working {
+		to {
+			stroke-dashoffset: 6px;
+		}
+	}
+	.working .wave-display{
+		stroke-dasharray: 3px;
+		animation: dash-working 3s linear infinite;
 	}
 }

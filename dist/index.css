@@ -131,10 +131,14 @@ svg svg.lane, svg svg {
 svg .lane {
   /* overflow: hidden; */
 }
-svg .working {
-  stroke: red;
-  fill: red;
-  stroke-width: 1px;
+@keyframes dash-working {
+  to {
+    stroke-dashoffset: 6px;
+  }
+}
+svg .working .wave-display {
+  stroke-dasharray: 3px;
+  animation: dash-working 3s linear infinite;
 }
 
 /*# sourceMappingURL=index.css.map */

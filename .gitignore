@@ -7,3 +7,4 @@ dist/*.main.js
 src/rust/target/*
 pkg/*
 pkg
+dist/index.css.map
