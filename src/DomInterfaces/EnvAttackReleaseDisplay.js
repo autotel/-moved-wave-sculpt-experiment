@@ -29,7 +29,7 @@ class EnvAttackReleaseDisplay extends WaveLane{
         Object.assign(settings,options);
 
         const translator=new ValuePixelTranslator(settings);
-        super(translator,settings);
+        super(settings,translator);
 
         this.addKnob("attack").setMinMax(0,1000);
         this.addKnob("release").setMinMax(0,1000);

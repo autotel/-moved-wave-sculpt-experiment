@@ -1,6 +1,6 @@
-import GenericDisplay from "./GenericDisplay";
+import WaveLane from "./LaneTypes/WaveLane";
 
-class ReverbDisplay extends GenericDisplay{
+class ReverbDisplay extends WaveLane{
     constructor(options){
         super(options); 
 

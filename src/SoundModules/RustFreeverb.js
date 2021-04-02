@@ -8,18 +8,26 @@ import requireParameter from "../utils/requireParameter";
 
 /** 
  * @typedef {Object} RustFreeverbSettings
- * @property {number} [frequency]
- * @property {number} [dampening_inverse]
- * @property {number} [dampening]
  * @property {number} [feedback]
+ * 
+ * @property {number} [dampening]
+ * @property {boolean} [freeze]
+ * @property {number} [wet]
+ * @property {number} [width]
+ * @property {number} [dry]
+ * @property {number} [roomSize]
+ * @property {number} [LROffset]
  */
 
 /** @type {RustFreeverbSettings} */
 const defaultSettings={
-    frequency:5,
-    dampening_inverse:0.5,
-    dampening:0.5,
-    feedback:0.9,
+    dampening:1,
+    freeze:false,
+    wet:1,
+    width:1,
+    dry:1,
+    roomSize:1,
+    LROffset:1,
 };
 /**
  * @class RustFreeverb an example that utilizes Rust to process the audio
@@ -39,7 +47,6 @@ class RustFreeverb extends Module{
 
         /** @type {Worker|false} */
         let worker = false;
-
 
         this.hasInput("main");
 
@@ -79,7 +86,6 @@ class RustFreeverb extends Module{
                         console.log("rust freeverb audio",data);
                         this.cachedValues=data.audioArray;
                         this.changed({ cachedValues: this.cachedValues });
-                        this.signalWorkReady();
                         resolve(data.audioArray);
                         worker=false;
                     }

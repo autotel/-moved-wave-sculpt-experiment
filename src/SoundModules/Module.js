@@ -137,11 +137,14 @@ class Module extends Model{
                 if (recursion > maxRecursion)
                     reject (new Error("max recursion reached"));
                 if (!useCache) {
+                    this.signalWorkStarted();
                     this.recalculate(recursion + 1).then(()=>{
                         this.changed({ cachedValues: this.cachedValues });
                         this.useCache();
                         //if my cache changes, it means all my output modules need recalculation
                         this.outputs.forEach((outputModule) => outputModule.cacheObsolete());
+
+                        this.signalWorkReady();
                         resolve(this.cachedValues);
                     });
                 }else{

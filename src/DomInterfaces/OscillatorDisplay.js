@@ -34,7 +34,7 @@ class OscillatorDisplay extends WaveLane{
 
         const translator=new ValuePixelTranslator(settings);
 
-        super(translator,settings);
+        super(settings,translator);
 
         const frequencyKnob = this.addKnob("frequency");
         const phaseKnob = this.addKnob("phase").setMinMax(0,1);

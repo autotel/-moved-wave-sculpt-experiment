@@ -1,6 +1,6 @@
-import GenericDisplay from "./GenericDisplay";
+import WaveLane from "./LaneTypes/WaveLane";
 
-class ChebyshevDisplay extends GenericDisplay{
+class ChebyshevDisplay extends WaveLane{
     constructor(options){
         super(options); 
         this.addKnob("amplitude");

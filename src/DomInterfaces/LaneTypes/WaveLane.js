@@ -4,7 +4,10 @@ import typicalLaneSettings from "../../utils/const typicalLaneSettings";
 import WaveDisplay from "../components/WaveDisplay";
 import VerticalZoom from "../components/VerticalZoom";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
-
+import { Circle, Line, Path, Text } from "../../scaffolding/elements";
+import Hoverable from "../components/Hoverable";
+import round from "../../utils/round";
+import requireParameter from "../../utils/requireParameter";
 /**
  * @typedef {Object} WaveLaneOptions
  * @property {Module} model
@@ -12,12 +15,16 @@ import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
  */
 class WaveLane extends Lane{
     /**
-     * @param {ValuePixelTranslator} translator
      * @param {import("../components/Lane").LaneOptions} options
      */
-    constructor(translator,options){
+    constructor(options, valuePixelTranslator = false){
         const {model,drawBoard}=options;
+        requireParameter(model,"model");
+        requireParameter(drawBoard,"drawBoard");
         const settings=typicalLaneSettings(model,drawBoard);
+        
+        const translator = valuePixelTranslator?valuePixelTranslator:(new ValuePixelTranslator(settings));
+
         //plave for defaults
         settings.name="Wave";
         Object.assign(settings,options);
@@ -74,7 +81,7 @@ class WaveLane extends Lane{
             let maxValue = 0;
             let minValue = 0;
 
-            model.cachedValues.map((v)=>{
+            model.cachedValues.forEach((v)=>{
                 if(v>maxValue) maxValue=v;
                 if(v<minValue) minValue=v;
             });
@@ -94,6 +101,35 @@ class WaveLane extends Lane{
                 translator.coverVerticalRange(minValue,maxValue);
             }
         }
+
+        
+        const hoverText=new Text();
+        hoverText.attributes.class="hover-text";
+
+        const hoverable=new Hoverable(this.domElement);
+
+        hoverable.mouseMoveCallback=(position)=>{
+            const sampleNumberHere = translator.xToSampleNumber(
+                position.x
+            );
+            let levelHere = model.cachedValues[
+                sampleNumberHere
+            ];
+            let yhere=translator.amplitudeToY(levelHere);
+            if(isNaN(levelHere)) levelHere=translator.amplitudeToY(0);
+            hoverText.attributes.y=yhere;
+            //position.x - settings.x;
+            hoverText.attributes.x=position.x - settings.x;
+            hoverText.attributes.text=round(levelHere,2)+", "+sampleNumberHere;
+            hoverText.update();
+        }
+        hoverable.mouseEnterCallback=(position)=>{
+            hoverText.domElement.classList.add("active");
+        }
+        hoverable.mouseLeaveCallback=(position)=>{
+            hoverText.domElement.classList.remove("active");
+        }
+        contents.add(hoverText);
     }
 }
 export default WaveLane;

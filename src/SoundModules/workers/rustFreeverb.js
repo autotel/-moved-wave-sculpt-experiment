@@ -21,10 +21,34 @@ self.onmessage = ({data}) => {
             inputValues,
         } = data;
 
+        const {
+            dampening,
+            freeze,
+            wet,
+            width,
+            dry,
+            roomSize,
+            LROffset,
+        } = settings;
+        const inputs_l = new Float32Array(inputValues);
+        const inputs_r = new Float32Array(inputValues);
+
+        const outputs = rustProcessor.freeverb({
+            inputs_l,
+            inputs_r,
+
+            dampening,
+            freeze,
+            wet,
+            width,
+            dry,
+            roomSize,
+        })
+
+        //mix l and r.
+        //in the future I want to have "pan" and "time offset" settings
         const audioArray = new Float64Array(
-            rustProcessor.freeverb(
-                inputValues
-            )
+            outputs[0].map((n,i)=>(n + outputs[1][i])/2)
         );
 
         self.postMessage({

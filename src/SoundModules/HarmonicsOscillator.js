@@ -119,7 +119,6 @@ class HarmonicsOscillator extends Module{
             
             return await new Promise((resolve,reject)=>{
                 
-                this.signalWorkStarted();
                 if(worker) {
                     worker.terminate();
                     worker=false;
@@ -132,7 +131,6 @@ class HarmonicsOscillator extends Module{
                     if(data.audioArray){
                         this.cachedValues=data.audioArray;
                         this.changed({ cachedValues: this.cachedValues });
-                        this.signalWorkReady();
                         resolve(data.audioArray);
                         worker=false;
 

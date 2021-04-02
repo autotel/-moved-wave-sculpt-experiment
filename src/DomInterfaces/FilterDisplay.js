@@ -1,6 +1,6 @@
-import GenericDisplay from "./GenericDisplay";
+import WaveLane from "./LaneTypes/WaveLane";
 
-class FilterDisplay extends GenericDisplay{
+class FilterDisplay extends WaveLane{
     constructor(options){
         super(options); 
         this.addKnob("gain");

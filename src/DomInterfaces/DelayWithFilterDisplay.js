@@ -1,6 +1,6 @@
-import GenericDisplay from "./GenericDisplay";
+import WaveLane from "./LaneTypes/WaveLane";
 
-class DelayDisplay extends GenericDisplay{
+class DelayDisplay extends WaveLane{
     constructor(options){
         super(options); 
 

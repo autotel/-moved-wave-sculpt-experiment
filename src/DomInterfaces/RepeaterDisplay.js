@@ -33,7 +33,7 @@ class RepeaterDisplay extends WaveLane{
         Object.assign(settings,options);
 
         const translator=new ValuePixelTranslator(settings);
-        super(translator,settings);
+        super(settings,translator);
 
         const lengthKnob = this.addKnob("length");
         // const loopToggle = this.addToggle("loop");
