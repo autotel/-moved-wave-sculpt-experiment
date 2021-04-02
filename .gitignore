@@ -5,3 +5,5 @@ dist/main.js
 dist/*.module.wasm
 dist/*.main.js
 src/rust/target/*
+pkg/*
+pkg

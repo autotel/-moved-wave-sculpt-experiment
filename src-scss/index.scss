@@ -158,5 +158,9 @@ svg {
     .lane {
         /* overflow: hidden; */
     }
-
+	.working{
+		stroke: red;
+		fill:red;
+		stroke-width: 1px;
+	}
 }

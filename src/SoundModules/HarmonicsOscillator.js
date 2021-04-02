@@ -3,6 +3,8 @@ import {sampleRate} from "./vars";
 import OscillatorOperator from "./operators/OscillatorOperator";
 import voz from "../utils/valueOrZero";
 
+const workerUrl = "";
+
 /**
  * @namespace SoundModules.HarmonicsOscillator
  */
@@ -49,23 +51,6 @@ class HarmonicsOscillator extends Module{
         let first = true;
         super(settings);
 
-        /** this needs revision */
-        function frequencyGetter (n,order1val,order2val,order3val,order4val,baseFrequency){
-            let order1 = baseFrequency + (n * order1val);
-            let order2 = baseFrequency * (n * order2val);
-            let order3 = Math.pow(baseFrequency,(n * order3val));
-            let order4 = Math.pow((n * order4val),baseFrequency);
-            return order1+order2+order3+order4;
-        }
-
-        let operators = [
-            new OscillatorOperator(),
-            new OscillatorOperator(),
-            new OscillatorOperator(),
-            new OscillatorOperator(),
-            new OscillatorOperator(),
-        ];
-
         this.hasInput("frequency");
         this.hasInput("amplitude");
         this.hasInput("bias");
@@ -83,6 +68,7 @@ class HarmonicsOscillator extends Module{
             this.cacheObsolete();
             return this;
         };
+
         this.setAmplitude = (to) => {
             settings.amplitude = to;
             this.changed({
@@ -94,10 +80,6 @@ class HarmonicsOscillator extends Module{
         
         this.setShape = (to) => {
             try{
-                //this one is just to get the error right away.
-                //the shape is actually set in the recalculate to ensure
-                //sync
-                operators.forEach((op)=>op.setShape(to));
                 this.changed({
                     shape: to
                 });
@@ -107,21 +89,14 @@ class HarmonicsOscillator extends Module{
             }
             return this;
         };
-        
+        /** @type {Worker|false} */
+        let worker = false;
         this.setPhase = (to) => {
             return this.set({
                 phase: to
             });
         };
-        
         this.recalculate = async(recursion = 0) => {
-            const lengthSamples = settings.length * sampleRate;
-            this.cachedValues = new Float32Array(lengthSamples);
-
-            operators.forEach((op)=>op.setShape(settings.shape));
-            operators.forEach((op)=>op.setPhase(settings.phase));
-
-
             const [
                 freqInputValues,
                 ampInputValues,
@@ -141,39 +116,52 @@ class HarmonicsOscillator extends Module{
                 this.inputs.interval4.getValues(recursion),
             ]);
             
-            for (let a = 0; a < lengthSamples; a++) {
-                const freq = voz(freqInputValues[a]) + settings.frequency;
-                const amp = voz(ampInputValues[a]) + settings.amplitude;
-                const bias = voz(biasInputValues[a]) + settings.bias;
-                
-                const interval1 = voz(interval1Values[a]) + settings.interval1;
-                const interval2 = voz(interval2Values[a]) + settings.interval2;
-                const interval3 = voz(interval3Values[a]) + settings.interval3;
-                const interval4 = voz(interval4Values[a]) + settings.interval4;
+            console.log("post");
+            this.signalWorkStarted();
 
-                const frequencies = operators.map(
-                    (operator,operatorNumber)=>frequencyGetter(
-                        operatorNumber,
-                        interval1,
-                        interval2,
-                        interval3,
-                        interval4,
-                        freq
-                    )
-                );
-    
-                operators.forEach((operator,operatorNumber)=>{
-                    //sinusoidal roloff, should be somehow customizable. also it needs revision
-                    //after I can implement the workers I'd like to be able to mix each oscillator independently
-                    const ampMultiplier = (Math.sin(Math.PI * operatorNumber / operators.length)+1) / 14.3;
-                    this.cachedValues[a] += operator.calculateSample(
-                        frequencies[operatorNumber], amp * ampMultiplier, bias
-                    );
-                });
+            if(worker) {
+                worker.terminate();
+                worker=false;
             }
 
-            // this.changed({ cachedValues: this.cachedValues });
-            //return this.cachedValues;
+
+            worker = new Worker(new URL('./workers/harmonicsOscillator.js', import.meta.url));;
+            
+
+
+            return await new Promise((resolve,reject)=>{
+                worker.onmessage = ({ data }) => {
+                    console.log("received",data);
+
+                    if(data.audioArray){
+                        this.cachedValues=data.audioArray;
+                        this.changed({ cachedValues: this.cachedValues });
+                        this.signalWorkReady();
+                        resolve(data.audioArray);
+                        worker=false;
+
+                    }
+                    if(data.log){
+                        console.log(data.log);
+                    }
+                };
+
+
+                worker.postMessage({
+                    settings:Object.assign({},settings),
+                    sampleRate,
+                    freqInputValues,
+                    ampInputValues,
+                    biasInputValues,
+                    interval1Values,
+                    interval2Values,
+                    interval3Values,
+                    interval4Values,
+                });
+            });
+
+
+
         };
     }
 }

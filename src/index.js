@@ -106,7 +106,7 @@ window.demos = {
         modules['harmosc'].set({
           'amplitude': 1,
           'bias': 0,
-          'length': 2,
+          'length': 0.2,
           'frequency': 110,
           'phase': 0,
           'shape': 'sin',

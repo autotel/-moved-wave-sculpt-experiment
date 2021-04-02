@@ -1,6 +1,3 @@
-import { sampleRate } from "../vars";
-
-
 let rng=seedrandom();
 
 
@@ -12,7 +9,7 @@ class OscillatorOperator extends Operator{
 
 
 
-    constructor(){
+    constructor({sampleRate}){
         super();
 
         let phaseAccumulator = 0;

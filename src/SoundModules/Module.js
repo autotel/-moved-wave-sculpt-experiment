@@ -26,7 +26,19 @@ class Module extends Model{
         this.inputs = {};
         /** @type {Set<InputNode>} */
         this.outputs = new Set();
+        /** indicates whether a web worker is processing */
+        let isWorking = false;
 
+        this.signalWorkStarted=()=>{
+            console.log("work started");
+            isWorking=true;
+            this.changed({isWorking});
+        }
+        this.signalWorkReady=()=>{
+            console.log("work ended");
+            isWorking=false;
+            this.changed({isWorking});
+        }
         /**
          * @function hasInput defines an input for this module. This function is intended to be called only within a child's constructor. After an input has been created with this module, it will be possible for other modules to connect to this input, and for the module to get values from it.
          * @param inputName

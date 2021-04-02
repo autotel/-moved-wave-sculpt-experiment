@@ -35,7 +35,7 @@ function Canvas(){
             doSize=false;
             console.log("recalc size");
         }
-    },1000);
+    },700);
 
     const recalcSize = () => {
         doSize=true;

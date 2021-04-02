@@ -2,7 +2,7 @@ import Lane from "../DomInterfaces/components/Lane";
 
 class Model {
     constructor(settings) {
-        const redrawList = [];
+        const changeListeners = [];
         /** @type {Set<Lane>} */
         this.interfaces=new Set();
         /** @returns {Lane|undefined} */
@@ -12,11 +12,11 @@ class Model {
         this.onUpdate = (newCallback) => {
             if (typeof newCallback !== "function")
                 throw new Error(`Callback has to be function but it is ${typeof newCallback}`);
-            redrawList.push(newCallback);
+            changeListeners.push(newCallback);
         };
         //model uses this method to notify changes to the interface
         this.changed = (changes = {}) => {
-            redrawList.map((cb) => { cb(changes); });
+            changeListeners.map((cb) => { cb(changes); });
         };
 
         this.set=(changes = {})=>{

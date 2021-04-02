@@ -40,7 +40,7 @@ class Oscillator extends Module{
         let first = true;
         super(settings);
 
-        let operator = new OscillatorOperator();
+        let operator = new OscillatorOperator({sampleRate});
 
         this.hasInput("frequency");
         this.hasInput("amplitude");
