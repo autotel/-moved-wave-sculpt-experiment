@@ -1,18 +1,19 @@
 import Module from "./SoundModules/Module";
-import seedrandom from "seedrandom";
-import LpBoxcar from "./SoundModules/operators/LpBoxcar";
+var perlin = require('perlin-noise');
 
-const randomNumberGenerator=seedrandom("098789");
 //using lpf and seeded random, we can get smooth changing random number. 
 const ContinuousRandomGenerator = function(){
-    const lowPass = new LpBoxcar();
-    lowPass.setSampleRate(1);
-    lowPass.reset(randomNumberGenerator());
+    const w = 480;
+    const h = 480;
+    let currentIndex = 0;
+    let currentNoise = perlin.generatePerlinNoise(w, h);
+
+    this.reSeed=(seed)=>{
+        currentNoise = perlin.generatePerlinNoise(w, h);
+    }
     this.get=()=>{
-        return lowPass.calculateSample(
-            randomNumberGenerator(),
-            1/20,0,1,1,true
-        );
+        // return currentNoise[currentIndex++];
+        return Math.random();
     }
 }
 

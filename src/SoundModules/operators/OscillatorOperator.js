@@ -15,13 +15,13 @@ class OscillatorOperator extends Operator{
         let phaseAccumulator = 0;
         const accumulatePhase = (frequency) => {
             phaseAccumulator += frequency / sampleRate;
-            //for noise, lets us have always the same noise. Frequency will be the seed
-            rng=seedrandom(frequency);
         };
         
         /** set phase and reset the oscillator state */
         this.setPhase = (phase) => {
             phaseAccumulator = phase;
+            //for noise, lets us have always the same noise. phase will be the seed
+            rng=seedrandom(phase);
         }
 
         const shapes = {
@@ -56,11 +56,11 @@ class OscillatorOperator extends Operator{
             }, 
         };
         
-        let currentOscFunction = shapes.sin;
+        this.currentOscFunction = shapes.sin;
         
         this.setShape = (to) => {
             if(shapes[to]){
-                currentOscFunction=shapes[to];
+                this.currentOscFunction=shapes[to];
             }else{
                 throw new Error(
                     "could not set oscillator operator shape to "+to+"."
@@ -70,7 +70,9 @@ class OscillatorOperator extends Operator{
             }
         }
 
-        this.reset=()=>{}
+        this.reset=()=>{
+            this.setPhase(0);
+        }
 
         /**
          * calculate an individual sample
@@ -82,7 +84,7 @@ class OscillatorOperator extends Operator{
          * @param {number} bias
          * */
         this.calculateSample=(freq,amp,bias)=>{
-            return currentOscFunction(freq,amp,bias);
+            return this.currentOscFunction(freq,amp,bias);
         }
     }
 }

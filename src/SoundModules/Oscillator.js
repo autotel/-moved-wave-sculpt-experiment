@@ -40,7 +40,7 @@ class Oscillator extends Module{
         let first = true;
         super(settings);
 
-        let operator = new OscillatorOperator({sampleRate});
+        const operator = new OscillatorOperator({sampleRate});
 
         this.hasInput("frequency");
         this.hasInput("amplitude");
@@ -69,7 +69,7 @@ class Oscillator extends Module{
                 //the shape is actually set in the recalculate to ensure
                 //sync
                 operator.setShape(to);
-                this.changed({
+                this.set({
                     shape: to
                 });
                 this.cacheObsolete();

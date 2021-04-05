@@ -5,9 +5,19 @@ import Canvas from "./scaffolding/Canvas";
 import TimeZoomer from "./DomInterfaces/TimeZoomer";
 import SoundDownloader from "./scaffolding/SoundDownloader";
 import RustProcessor from "./rust/RustProcessor";
-
 import pat1 from "./patches/drummaker";
 
+//other interfaces
+import SoundPlayer from "./scaffolding/SoundPlayer";
+import LiveCodingInterface from "./LiveCodingInterface"
+
+//atches etc
+import drummaker2 from "./patches/drummaker2";
+import Ghost from "./Ghost";
+
+const ghost = new Ghost();
+
+window.ghost=ghost;
 
 const rustProcessor = RustProcessor.get();
 
@@ -21,10 +31,6 @@ drawBoard.element.classList.add("drawboard");
 const navBoard = new Canvas();
 navBoard.element.classList.add("nav");
 
-
-//other interfaces
-import SoundPlayer from "./scaffolding/SoundPlayer";
-import LiveCodingInterface from "./LiveCodingInterface"
 
 const webInspectorInterface = new LiveCodingInterface({
     drawBoard
@@ -53,6 +59,64 @@ Draggable.setCanvas();
 //pre-run a live-coded patch
 window.demos = {
     "drummaker": () => pat1(webInspectorInterface),
+    "drumaker2":()=> drummaker2(webInspectorInterface),
+    "wiwu":()=>{
+        create(possibleModules.HarmonicsOscillator,'harmosc');
+create(possibleModules.EnvelopeGenerator,'timbrenv');
+create(possibleModules.Oscillator,'osclltr2');
+create(possibleModules.MixerTesselator,'mxrltr3.');
+modules['harmosc'].connectTo(modules['mxrltr3.'].inputs.a);
+modules['timbrenv'].connectTo(modules['harmosc'].inputs.interval2);
+modules['osclltr2'].connectTo(modules['harmosc'].inputs.frequency);
+modules['harmosc'].set({
+  'amplitude': 1,
+  'bias': 0,
+  'length': 1,
+  'frequency': 105.55555555555564,
+  'phase': 0,
+  'shape': 'sin',
+  'interval1': 0,
+  'interval2': 1,
+  'interval3': 0,
+  'interval4': 0,
+  'interval0': 0
+});
+modules['timbrenv'].set({
+  'amplitude': 1,
+  'bias': 0,
+  'length': 1.93,
+  'points': [
+    [
+      19,
+      -11.325735319544375
+    ],
+    [
+      85,
+      9.455989716159985
+    ]
+  ],
+  'loop': true
+});
+modules['osclltr2'].set({
+  'amplitude': 34.28,
+  'bias': 0,
+  'length': 1,
+  'frequency': 1,
+  'phase': 0,
+  'shape': 'sin'
+});
+modules['mxrltr3.'].set({
+  'amplitude': 1,
+  'levela': 0.6399999999999999,
+  'levelb': 0.25,
+  'levelc': 0.5,
+  'leveld': 0.5
+});
+modules['harmosc'].getInterface().autoZoom();
+modules['timbrenv'].getInterface().autoZoom();
+modules['osclltr2'].getInterface().autoZoom();
+modules['mxrltr3.'].getInterface().autoZoom();
+    },
     "kik": () => {
         create(possibleModules.Oscillator, 'osc1');
         create(possibleModules.EnvelopeAttackRelease, 'env1');

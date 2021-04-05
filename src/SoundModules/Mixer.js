@@ -10,6 +10,7 @@ const defaultSettings={
     levelb:0.25,
     levelc:0.25,
     leveld:0.25,
+    normalize:false,
     saturate:true,
 };
 /**
@@ -37,13 +38,16 @@ class Mixer extends Module{
 
             let result=[];
             let first = true;
+
+            let max = 0;
+            let min = 0;
             
             await Promise.all(
                 this.eachInput(async(input,inputno,inputName) => {
                     const inputValues = await input.getValues(recursion);
                     inputValues.forEach((val, index) => {
                         if(!result[index]) result[index]=0;
-                        result[index] += (val) * amplitude * settings["level"+inputName];
+                        result[index] += (val) *  settings["level"+inputName];
                     });
                 })
             );
@@ -52,11 +56,27 @@ class Mixer extends Module{
                 if(n>1) return 1;
                 if(n<-1) return -1;
                 if(isNaN(n)) return 0;
+                if(n>max) max = n;
+                if(n<min) min = n;
                 return n;
             }));
-        
-            // this.changed({ cachedValues: this.cachedValues });
-            //return this.cachedValues;
+
+            if(settings.normalize && max!==0 && min!==0){
+                let mult = 1/Math.min(Math.abs(min),max);
+
+                this.cachedValues = this.cachedValues.map((n)=>{
+                    return n * mult;
+                });
+            }
+            
+            if(settings.amplitude != 1){
+                this.cachedValues = this.cachedValues.map((n)=>{
+                    return n * amplitude;
+                });
+            }
+
+            return this.cachedValues;
+            
         };
     }
 }

@@ -20,7 +20,6 @@ import Hipparchus from "../SoundModules/Hipparchus";
 
 //for interfaces
 import GenericDisplay from "../DomInterfaces/GenericDisplay";
-import MixerDisplay from "../DomInterfaces/MixerDisplay";
 import DelayDisplay from "../DomInterfaces/DelayDisplay";
 import DelayWithFilterDisplay from "../DomInterfaces/DelayWithFilterDisplay";
 import ReverbDisplay from "../DomInterfaces/ReverbDisplay";
@@ -46,7 +45,7 @@ function registerModuleAndItsInterface (ModuleProto,InterfaceProto){
 
 registerModuleAndItsInterface(Oscillator,OscillatorDisplay);
 registerModuleAndItsInterface(HarmonicsOscillator,HarmonicsOscillatorDisplay);
-registerModuleAndItsInterface(Mixer,MixerDisplay);
+registerModuleAndItsInterface(Mixer,false);
 registerModuleAndItsInterface(Delay,DelayDisplay);
 registerModuleAndItsInterface(DelayWithFilter,DelayWithFilterDisplay);
 registerModuleAndItsInterface(NaiveReverb,ReverbDisplay);
@@ -67,6 +66,7 @@ registerModuleAndItsInterface(Hipparchus,HipparchusDisplay);
 
 //for typing
 import Canvas from "../scaffolding/Canvas";
+import abbreviate from "../utils/stringAbbreviator";
 
 function giveHelp(){
 
@@ -111,7 +111,9 @@ class LiveCodingInterface{
 
             let protoname=Which.name;
             if(!intendedName) intendedName=protoname+" "+count;
-            let nameForAccess = intendedName.match(/[A-Za-z0-9]/gi).join("");
+            let nameForAccess = abbreviate(
+                intendedName,8
+            ).match(/[A-Za-z0-9]/gi).join("").toLowerCase();
 
             if(this.modules[nameForAccess]) nameForAccess = nameForAccess+count;
             
@@ -120,7 +122,7 @@ class LiveCodingInterface{
             const newModule=new Which();
 
             this.modules[nameForAccess]=newModule;
-            if(window[intendedName]===undefined) window[intendedName]=newModule;
+            if(window[nameForAccess]===undefined) window[nameForAccess]=newModule;
 
             const props = {
                 model:newModule,

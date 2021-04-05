@@ -9,7 +9,7 @@ function Canvas(){
     
     // element.setAttribute('viewBox',"0 0 1000 1000");
     element.setAttribute('width',"100%");
-    element.setAttribute('height',"1000px");
+    element.setAttribute('height',"10000px");
     
     document.body.appendChild(element);
 
