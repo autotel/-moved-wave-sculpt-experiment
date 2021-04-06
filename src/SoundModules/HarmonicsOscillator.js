@@ -59,8 +59,7 @@ class HarmonicsOscillator extends Module{
         this.hasInput("interval4");
 
         this.setFrequency = (to) => {
-            settings.frequency = to;
-            this.changed({
+            return this.set({
                 frequency: to
             });
             this.cacheObsolete();
@@ -68,24 +67,15 @@ class HarmonicsOscillator extends Module{
         };
 
         this.setAmplitude = (to) => {
-            settings.amplitude = to;
-            this.changed({
+            return this.set({
                 amplitude: to
             });
-            this.cacheObsolete();
-            return this;
         };
         
         this.setShape = (to) => {
-            try{
-                this.changed({
-                    shape: to
-                });
-                this.cacheObsolete();
-            }catch(e){
-                throw e;
-            }
-            return this;
+            return this.set({
+                shape: to
+            });
         };
         /** @type {Worker|false} */
         let worker = false;
@@ -130,7 +120,6 @@ class HarmonicsOscillator extends Module{
 
                     if(data.audioArray){
                         this.cachedValues=data.audioArray;
-                        this.changed({ cachedValues: this.cachedValues });
                         resolve(data.audioArray);
                         worker=false;
 

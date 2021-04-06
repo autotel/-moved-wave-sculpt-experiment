@@ -52,18 +52,14 @@ class Chebyshev extends Module{
         this.hasInput("main");
 
         this.setOrder = (to) => {
-            settings.order = to;
-            this.changed({
+            return this.set({
                 order: to
             });
-            this.cacheObsolete();
-            return this;
         };
 
         this.recalculate = async (recursion = 0) => {
             const inputValues = await this.inputs.main.getValues(recursion);
             this.cachedValues = inputValues.map(orders[settings.order]);
-            // this.changed({ cachedValues: this.cachedValues });
             //return this.cachedValues;
         };
     }

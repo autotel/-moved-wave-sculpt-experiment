@@ -50,13 +50,9 @@ class Repeater extends Module {
             });
         }
         this.setPoints = (pointsList) => {
-            settings.points = pointsList;
-            this.changed({
+            return this.set({
                 points: settings.points
             });
-            // console.log(pointsList);
-            this.cacheObsolete();
-            return this;
         };
 
         const sortPointsByTime = () => {
@@ -67,7 +63,7 @@ class Repeater extends Module {
         this.recalculate = async (recursion = 0) => {
 
             const lengthSamples = settings.length * sampleRate;
-            this.cachedValues = new Float64Array(lengthSamples);
+            this.cachedValues = new Float32Array(lengthSamples);
             
             sortPointsByTime();
             /** @returns {EnvelopePoint|false} */
@@ -102,7 +98,6 @@ class Repeater extends Module {
                 ] * settings.gain * currentPoint[1];
             }
 
-            // this.changed({ cachedValues: this.cachedValues });
             //return this.cachedValues;
         };
     }

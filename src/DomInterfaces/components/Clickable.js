@@ -26,13 +26,16 @@ const VectorTypedef = require("../../scaffolding/Vector2");
 function Clickable(domElement){
 
 
-    this.clickCallback=(mouse)=>{
-    }
-    this.releaseCallback=()=>{
-    }
+    this.clickCallback=(mouse)=>{}
+    this.releaseCallback=()=>{}
+    this.mouseEnterCallback=()=>{}
+    this.mouseLeaveCallback=()=>{}
 
     domElement.addEventListener('mousedown',()=>this.clickCallback());
     domElement.addEventListener('mouseup',()=>this.releaseCallback());
+
+    domElement.addEventListener('mouseenter',()=>this.mouseEnterCallback());
+    domElement.addEventListener('mouseleave',()=>this.mouseLeaveCallback());
 
     domElement.classList.add("clickable");
 }

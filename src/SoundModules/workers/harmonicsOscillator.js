@@ -57,7 +57,7 @@ self.onmessage = ({data}) => {
     ];
 
     const lengthSamples = settings.length * sampleRate;
-    const audioArray = new Float64Array(lengthSamples);
+    const audioArray = new Float32Array(lengthSamples);
 
     operators.forEach((op) => op.setShape(settings.shape));
     operators.forEach((op) => op.setPhase(settings.phase));

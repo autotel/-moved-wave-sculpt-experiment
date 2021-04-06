@@ -47,20 +47,14 @@ class Oscillator extends Module{
         this.hasInput("bias");
 
         this.setFrequency = (to) => {
-            settings.frequency = to;
-            this.changed({
+            return this.set({
                 frequency: to
             });
-            this.cacheObsolete();
-            return this;
         };
         this.setAmplitude = (to) => {
-            settings.amplitude = to;
-            this.changed({
+            return this.set({
                 amplitude: to
             });
-            this.cacheObsolete();
-            return this;
         };
         
         this.setShape = (to) => {
@@ -87,7 +81,7 @@ class Oscillator extends Module{
         
         this.recalculate = async (recursion = 0) => {
             const lengthSamples = settings.length * sampleRate;
-            this.cachedValues = new Float64Array(lengthSamples);
+            this.cachedValues = new Float32Array(lengthSamples);
 
             operator.setShape(settings.shape);
             operator.setPhase(settings.phase);
@@ -108,8 +102,6 @@ class Oscillator extends Module{
                 const bias = (biasInputValues[a] || 0) + settings.bias;
                 this.cachedValues[a] = operator.calculateSample(freq, amp, bias);
             }
-
-            // this.changed({ cachedValues: this.cachedValues });
             //return this.cachedValues;
         };
     }

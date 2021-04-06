@@ -94,7 +94,7 @@ class NaiveReverb extends Module{
             tap1.reset();
 
 
-            this.cachedValues = new Float64Array(inputValues.length);
+            this.cachedValues = new Float32Array(inputValues.length);
             
             inputValues.forEach((value,sampleNumber)=>{
                 this.cachedValues[sampleNumber]=0;
@@ -119,9 +119,6 @@ class NaiveReverb extends Module{
                     this.cachedValues[sampleNumber] += value * settings.dry;
                 }
             });
-            
-            // this.changed({ cachedValues: this.cachedValues });
-            //return this.cachedValues;
         };
     }
 }

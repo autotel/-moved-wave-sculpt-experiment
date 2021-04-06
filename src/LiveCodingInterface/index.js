@@ -17,6 +17,7 @@ import Module from "../SoundModules/Module";
 import Repeater from "../SoundModules/Repeater";
 import InputNode from "../SoundModules/InputNode";
 import Hipparchus from "../SoundModules/Hipparchus";
+import Sampler from "../SoundModules/Sampler";
 
 //for interfaces
 import GenericDisplay from "../DomInterfaces/GenericDisplay";
@@ -62,6 +63,7 @@ registerModuleAndItsInterface(Repeater,RepeaterDisplay);
 registerModuleAndItsInterface(Filter,FilterDisplay);
 registerModuleAndItsInterface(InputNode,false);
 registerModuleAndItsInterface(Hipparchus,HipparchusDisplay);
+registerModuleAndItsInterface(Sampler,false);
 
 
 //for typing

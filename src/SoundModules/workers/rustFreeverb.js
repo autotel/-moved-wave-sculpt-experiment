@@ -47,7 +47,7 @@ self.onmessage = ({data}) => {
 
         //mix l and r.
         //in the future I want to have "pan" and "time offset" settings
-        const audioArray = new Float64Array(
+        const audioArray = new Float32Array(
             outputs[0].map((n,i)=>(n + outputs[1][i])/2)
         );
 

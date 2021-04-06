@@ -8,6 +8,7 @@ import Toggle from "./Toggle";
 import Canvas from "../../scaffolding/Canvas";
 import placements from "../config/placement";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
+import SoundLoaderDecoder from "./SoundLoaderDecoder";
 
 const sizes = placements;
 
@@ -155,6 +156,15 @@ class Lane extends Group {
         /** @param {string} parameterName */
         this.addToggle = (parameterName) => {
             const newControl = new Toggle();
+            this.appendToControlPanel(newControl);
+            newControl.setToModuleParameter(model, parameterName);
+            controlPanel.add(newControl);
+            return newControl;
+        }
+
+        /** @param {string} parameterName */
+        this.addSoundDecoder = (parameterName) => {
+            const newControl = new SoundLoaderDecoder();
             this.appendToControlPanel(newControl);
             newControl.setToModuleParameter(model, parameterName);
             controlPanel.add(newControl);

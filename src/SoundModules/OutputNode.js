@@ -10,8 +10,8 @@ class OutputNode {
         this.outputs = new Set();
         this.owner = owner;
 
-        /** @type {Float64Array} */
-        this.cachedValues = new Float64Array([0]);
+        /** @type {Float32Array} */
+        this.cachedValues = new Float32Array([0]);
 
         this.getValues = owner.getValues;
         

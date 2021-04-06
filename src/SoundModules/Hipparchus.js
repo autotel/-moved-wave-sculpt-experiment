@@ -96,7 +96,7 @@ class Hipparchus extends Module {
             let yIn = await this.inputs.y.getValues(recursion);
             let rotationIn = await this.inputs.rotation.getValues(recursion);
 
-            this.cachedValues = new Float64Array(xIn.length);
+            this.cachedValues = new Float32Array(xIn.length);
 
             xIn.forEach((x,sampleNumber)=>{
                 let y = voz(yIn[sampleNumber]);
@@ -111,8 +111,6 @@ class Hipparchus extends Module {
                 this.cachedValues[sampleNumber] = result * gain;
 
             });
-
-            // this.changed({ cachedValues: this.cachedValues });
             //return this.cachedValues;
         };
     }

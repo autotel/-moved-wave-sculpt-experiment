@@ -69,7 +69,7 @@ class EnvelopeAttackRelease extends Module{
             let releaseSpls = Math.floor(sampleRate * settings.release);
             let shapeFunction = shapes.exponential;
 
-            this.cachedValues = new Float64Array(envLengthSpls);
+            this.cachedValues = new Float32Array(envLengthSpls);
 
             // numberwang({
             //     envLength,
@@ -96,7 +96,6 @@ class EnvelopeAttackRelease extends Module{
                 this.cachedValues[sampleNumber] = shapeFunction(position, settings.releaseShape) * settings.amplitude;
             }
 
-            // this.changed({ cachedValues: this.cachedValues });
             //return this.cachedValues;
         };
     }

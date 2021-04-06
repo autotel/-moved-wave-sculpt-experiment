@@ -70,13 +70,11 @@ class RustComb extends Module{
 
             if (frequency == 0) frequency = 0.1/sampleRate;
 
-            this.cachedValues = new Float64Array(
+            this.cachedValues = new Float32Array(
                 rustProcessor.arrCombFilter(
                     inputValues,frequency,dampening_inverse,dampening,feedback
                 )
             );
-            
-            // this.changed({ cachedValues: this.cachedValues });
             //return this.cachedValues;
         };
     }

@@ -28,6 +28,8 @@ class GenericDisplay extends WaveLane{
                 this.addKnob(settingName);
             }else if(settingType === "boolean"){
                 this.addToggle(settingName);
+            }else if(settingValue.constructor && settingValue.constructor.name === "Float32Array"){
+                this.addSoundDecoder(settingName);
             }
         });
         model.triggerInitialState();

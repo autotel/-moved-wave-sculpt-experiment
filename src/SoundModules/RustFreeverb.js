@@ -85,7 +85,6 @@ class RustFreeverb extends Module{
 
                         console.log("rust freeverb audio",data);
                         this.cachedValues=data.audioArray;
-                        this.changed({ cachedValues: this.cachedValues });
                         resolve(data.audioArray);
                         worker=false;
                     }

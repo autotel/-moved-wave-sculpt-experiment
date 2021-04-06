@@ -76,8 +76,6 @@ class WaveFolder extends Module{
                 ) / currentFold;
                 return result * amplitude;
             });
-            // this.changed({ cachedValues: this.cachedValues });
-            //return this.cachedValues;
         };
     }
 }

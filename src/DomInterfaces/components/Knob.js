@@ -199,7 +199,7 @@ class Knob extends Group{
             changeCallbacks.push(cb);
         }
 
-        const handleChanged=(changes)=> changeCallbacks.map((cb)=>cb(changes));
+        const handleChanged=(changes)=> changeCallbacks.forEach((cb)=>cb(changes));
         
         this.updateGraphic=()=>{
             knobShape.set("transform",`rotate(${getAngle()})`);
@@ -224,7 +224,7 @@ class Knob extends Group{
         this.setToModuleParameter=(module,parameterName)=>{
             
             let propertyObject = {};
-            propertyObject=module.settings;
+            
             options.name=parameterName;
             this.value=propertyObject[parameterName];
 
@@ -238,6 +238,7 @@ class Knob extends Group{
 
             module.onUpdate((changes)=>{
                 if(changes[parameterName]){
+                    console.log("module changed",parameterName);
                     this.value=changes[parameterName];
                     this.updateGraphic();
                 }
@@ -247,6 +248,10 @@ class Knob extends Group{
                     this.setDeltaCurve("frequency");
                     this.setMinMax(0,22000);
                 break;
+                case "levela":
+                case "levelb":
+                case "levelc":
+                case "leveld":
                 case "order":
                     this.setDeltaCurve("integer");
                     this.setMinMax(0,10);

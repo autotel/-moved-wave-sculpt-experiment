@@ -3,6 +3,7 @@ import Model from "../scaffolding/Model";
 import InputNode from "./InputNode";
 import measureExec from "../utils/measureExec";
 import promiseDebounce from "../utils/promiseDebounceFunction";
+import Lane from "../DomInterfaces/components/Lane";
 
 let count = 0;
 
@@ -20,22 +21,25 @@ class Module extends Model{
         super(settings);
         this.unique = count ++;
         this.name = this.constructor.name + "-" + this.unique;
-        /** @type {Float64Array} */
-        this.cachedValues = new Float64Array([0]);
+        /** @type {Float32Array} */
+        this.cachedValues = new Float32Array([0]);
         /** @type {Object<string, InputNode>} */
         this.inputs = {};
         /** @type {Set<InputNode>} */
         this.outputs = new Set();
         /** indicates whether a web worker is processing */
         let isWorking = false;
-
+        
+        /** @type {Set<Lane>} */
+        this.interfaces=new Set();
+        /** @returns {Lane|undefined} */
+        this.getInterface = ()=>this.interfaces.values().next().value;
+        
         this.signalWorkStarted=()=>{
-            console.log("work started");
             isWorking=true;
             this.changed({isWorking});
         }
         this.signalWorkReady=()=>{
-            console.log("work ended");
             isWorking=false;
             this.changed({isWorking});
         }
@@ -99,9 +103,9 @@ class Module extends Model{
             }
         };
         
+        const modelSetFunction = this.set;
         this.set=(changes = {})=>{
-            Object.assign(this.settings,changes);
-            this.changed(changes);
+            modelSetFunction(changes);
             this.cacheObsolete();
             return this;
         }
@@ -128,7 +132,7 @@ class Module extends Model{
         };
         /**
          * used to get the values from the module, or to cause the module to recalculate its values.
-         * @returns {Promise<Float64Array>} the sound array, sample by sample.
+         * @returns {Promise<Float32Array>} the sound array, sample by sample.
          * The samples will get recalculated if it's useCache flag is set to true. Otherwise, this function will return the cached samples.
          * The user can also get the cached samples by simply getting the `cachedValues` property, in which case one might get outdated samples.
          */
@@ -163,7 +167,7 @@ class Module extends Model{
          * @returns {Promise} the recalc result 
          */
         this.recalculate = async (recursion = 0) => {
-            this.cachedValues = new Float64Array([0]);
+            this.cachedValues = new Float32Array([0]);
             this.changed({ cachedValues: this.cachedValues });
         };
 

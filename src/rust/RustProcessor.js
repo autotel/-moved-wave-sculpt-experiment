@@ -42,12 +42,12 @@ class RustProcessor {
             this.add=(a,b)=>lib.add(a,b);
             /**
              * @param {number} values
-             * @returns {Float64Array} result
+             * @returns {Float32Array} result
              **/
             this.arrGenSin = (duration,frequency)=>lib.array_sine(sampleRate,duration,frequency);
             /**
              * @param {Array<number>} values
-             * @returns {Float64Array} result
+             * @returns {Float32Array} result
              **/
             this.arrCombFilter = (samplesArray,
                 frequency,dampening_inverse,dampening,feedback) => lib.array_filter_comb(

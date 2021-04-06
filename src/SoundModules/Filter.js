@@ -88,20 +88,14 @@ class Filter extends Module{
         this.hasInput("reso");
 
         this.setOrder = (to) => {
-            settings.order = to;
-            this.changed({
+            return this.set({
                 order: to
             });
-            this.cacheObsolete();
-            return this;
         };
         this.setFrequency = (to) => {
-            settings.frequency = to;
-            this.changed({
+            return this.set({
                 frequency: to
             });
-            this.cacheObsolete();
-            return this;
         };
         /** @param {filterType} to */
         this.setType = (to) => {
@@ -109,12 +103,9 @@ class Filter extends Module{
                 return Object.keys(filterProtos);
             }
 
-            settings.type = to;
-            this.changed({
+            return this.set({
                 type: to
             });
-            this.cacheObsolete();
-            return this;
         };
 
         this.recalculate = async (recursion = 0) => {
@@ -127,7 +118,7 @@ class Filter extends Module{
             const resos = await this.inputs.reso.getValues(recursion);
             const inputValues=await this.inputs.main.getValues(recursion);
             
-            this.cachedValues = new Float64Array(inputValues.length);
+            this.cachedValues = new Float32Array(inputValues.length);
 
             filter.reset();
 
@@ -138,8 +129,7 @@ class Filter extends Module{
                 voz(gains[sampleNumber]) + settings.gain,
                 order,settings.saturate
             ));
-        
-            // this.changed({ cachedValues: this.cachedValues });
+
             //return this.cachedValues;
         };
     }

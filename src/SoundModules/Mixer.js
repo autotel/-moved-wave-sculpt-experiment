@@ -52,7 +52,7 @@ class Mixer extends Module{
                 })
             );
 
-            this.cachedValues = new Float64Array(result.map((n)=>{
+            this.cachedValues = new Float32Array(result.map((n)=>{
                 if(n>1) return 1;
                 if(n<-1) return -1;
                 if(isNaN(n)) return 0;
