@@ -314,6 +314,7 @@ class Lane extends Group {
         });
 
         this.contents.add(title);
+        model.triggerInitialState();
     }
 };
 

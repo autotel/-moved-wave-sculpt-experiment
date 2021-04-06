@@ -25,7 +25,6 @@ import DelayDisplay from "../DomInterfaces/DelayDisplay";
 import DelayWithFilterDisplay from "../DomInterfaces/DelayWithFilterDisplay";
 import ReverbDisplay from "../DomInterfaces/ReverbDisplay";
 import EnvelopeGeneratorDisplay from "../DomInterfaces/EnvelopeGeneratorDisplay";
-import OscillatorDisplay from "../DomInterfaces/OscillatorDisplay";
 import HarmonicsOscillatorDisplay from "../DomInterfaces/HarmonicsOscillatorDisplay";
 import EnvAttackReleaseDisplay from "../DomInterfaces/EnvAttackReleaseDisplay";
 import ChebyshevDisplay from "../DomInterfaces/ChebyshevDisplay";
@@ -44,7 +43,7 @@ function registerModuleAndItsInterface (ModuleProto,InterfaceProto){
     ];
 };
 
-registerModuleAndItsInterface(Oscillator,OscillatorDisplay);
+registerModuleAndItsInterface(Oscillator,false);
 registerModuleAndItsInterface(HarmonicsOscillator,HarmonicsOscillatorDisplay);
 registerModuleAndItsInterface(Mixer,false);
 registerModuleAndItsInterface(Delay,DelayDisplay);

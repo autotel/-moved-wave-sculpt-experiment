@@ -238,11 +238,11 @@ class Knob extends Group{
 
             module.onUpdate((changes)=>{
                 if(changes[parameterName]){
-                    console.log("module changed",parameterName);
                     this.value=changes[parameterName];
                     this.updateGraphic();
                 }
             });
+
             switch (parameterName){
                 case "frequency":
                     this.setDeltaCurve("frequency");

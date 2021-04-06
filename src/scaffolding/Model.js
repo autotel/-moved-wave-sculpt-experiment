@@ -23,12 +23,13 @@ class Model {
         /** 
          * this is used to tie parameters together, for example if one setting is 
          * always 2 times other setting.
-         * @param {ChangesListener} newCallback
+         * @param {BeforeChangesListener} newCallback
          **/
         this.beforeUpdate = (newCallback) => {
             if (typeof newCallback !== "function")
                 throw new Error(`Callback has to be function but it is ${typeof newCallback}`);
             beforeChangeListeners.push(newCallback);
+            newCallback(this.settings,this.settings);
         };
         /**
          * interface uses this method to connect changes in model to redraws
@@ -38,6 +39,7 @@ class Model {
             if (typeof newCallback !== "function")
                 throw new Error(`Callback has to be function but it is ${typeof newCallback}`);
             changeListeners.push(newCallback);
+            newCallback(this.settings);
         };
 
         /**
@@ -61,7 +63,9 @@ class Model {
         }
 
         //get the initial state of the model
-        this.triggerInitialState = () => { };
+        this.triggerInitialState = () => {
+            this.set(settings);
+        };
     }
 }
 export default Model;

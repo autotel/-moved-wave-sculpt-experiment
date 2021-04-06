@@ -30,7 +30,7 @@ class SoundLoaderDecoder extends Group{
         fileSelector.addEventListener('change', (event) => {
             console.log("file changed");
             let file = fileSelector.files[0];
-            
+            //TODO: resample when source sample rate is different than context samplerate
             if(file){
                 const reader = new FileReader();
                 reader.onload = function (e) {
@@ -41,6 +41,7 @@ class SoundLoaderDecoder extends Group{
                             const numberOfChannels = audioBuffer.numberOfChannels;
                             //TODO: not just discarding other channels
                             const channelData = audioBuffer.getChannelData(0);
+                            
                             filePath=file.name;
                             handleChanged({
                                 sampleArray:channelData,
