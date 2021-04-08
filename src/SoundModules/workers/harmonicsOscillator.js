@@ -28,24 +28,27 @@ function frequencyGetter(n, order1val, order2val, order3val, order4val, baseFreq
 self.onmessage = ({data}) => {
 
 
-    self.postMessage({
-        log: "start harmonicsOscillator thread",
-    });
+    // self.postMessage({
+    //     log: "start harmonicsOscillator thread",
+    // });
     const {
         settings,
         sampleRate,
+
         freqInputValues,
         ampInputValues,
         biasInputValues,
+        mixCurveInputValues,
+
         interval1Values,
         interval2Values,
         interval3Values,
         interval4Values,
     } = data;
 
-    self.postMessage({
-        log: data,
-    });
+    // self.postMessage({
+    //     log: data,
+    // });
 
 
     let operators = [
@@ -66,6 +69,7 @@ self.onmessage = ({data}) => {
         const freq = voz(freqInputValues[a]) + settings.frequency;
         const amp = voz(ampInputValues[a]) + settings.amplitude;
         const bias = voz(biasInputValues[a]) + settings.bias;
+        const mixCurve = voz(mixCurveInputValues[a]) + settings.mixCurve;
 
         const interval1 = voz(interval1Values[a]) + settings.interval1;
         const interval2 = voz(interval2Values[a]) + settings.interval2;
@@ -84,9 +88,7 @@ self.onmessage = ({data}) => {
         );
 
         operators.forEach((operator, operatorNumber) => {
-            //sinusoidal roloff, should be somehow customizable. also it needs revision
-            //after I can implement the workers I'd like to be able to mix each oscillator independently
-            const ampMultiplier = (Math.sin(Math.PI * operatorNumber / operators.length) + 1) / 14.3;
+            const ampMultiplier = (Math.sin(mixCurve * Math.PI * operatorNumber / operators.length) + 1) / 14.3;
             audioArray[a] += operator.calculateSample(
                 frequencies[operatorNumber], amp * ampMultiplier, bias
             );

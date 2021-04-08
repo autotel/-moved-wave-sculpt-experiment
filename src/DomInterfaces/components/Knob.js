@@ -248,15 +248,15 @@ class Knob extends Group{
                     this.setDeltaCurve("frequency");
                     this.setMinMax(0,22000);
                 break;
-                case "levela":
-                case "levelb":
-                case "levelc":
-                case "leveld":
                 case "order":
                     this.setDeltaCurve("integer");
                     this.setMinMax(0,10);
                 break;
 
+                case "levela":
+                case "levelb":
+                case "levelc":
+                case "leveld":
                 case "time":
                 case "length":
                     this.setMinMax(0,5);

@@ -14,6 +14,7 @@ const defaultSettings={
     frequency:2,
     phase:0,
     shape:"sin",
+    mixCurve:1,
     interval1:0,
     interval2:0,
     interval3:0,
@@ -27,6 +28,7 @@ const defaultSettings={
  * @property {number} [length]
  * @property {number} [frequency]
  * @property {number} [phase]
+ * @property {number} [mixCurve]
  * @property {number} [interval1]
  * @property {number} [interval2]
  * @property {number} [interval3]
@@ -52,6 +54,7 @@ class HarmonicsOscillator extends Module{
         this.hasInput("frequency");
         this.hasInput("amplitude");
         this.hasInput("bias");
+        this.hasInput("mixCurve");
 
         this.hasInput("interval1");
         this.hasInput("interval2");
@@ -89,6 +92,8 @@ class HarmonicsOscillator extends Module{
                 freqInputValues,
                 ampInputValues,
                 biasInputValues,
+                mixCurveInputValues,
+
                 interval1Values,
                 interval2Values,
                 interval3Values,
@@ -97,15 +102,14 @@ class HarmonicsOscillator extends Module{
                 this.inputs.frequency.getValues(recursion),
                 this.inputs.amplitude.getValues(recursion),
                 this.inputs.bias.getValues(recursion),
+                this.inputs.mixCurve.getValues(recursion),
 
                 this.inputs.interval1.getValues(recursion),
                 this.inputs.interval2.getValues(recursion),
                 this.inputs.interval3.getValues(recursion),
                 this.inputs.interval4.getValues(recursion),
             ]);
-            
-            console.log("post");
-            
+                        
             
             return await new Promise((resolve,reject)=>{
                 
@@ -116,7 +120,6 @@ class HarmonicsOscillator extends Module{
                 worker = new Worker(new URL('./workers/harmonicsOscillator.js', import.meta.url));;
                 
                 worker.onmessage = ({ data }) => {
-                    console.log("received",data);
 
                     if(data.audioArray){
                         this.cachedValues=data.audioArray;
@@ -133,9 +136,12 @@ class HarmonicsOscillator extends Module{
                 worker.postMessage({
                     settings:Object.assign({},settings),
                     sampleRate,
+                    
                     freqInputValues,
                     ampInputValues,
                     biasInputValues,
+                    mixCurveInputValues,
+
                     interval1Values,
                     interval2Values,
                     interval3Values,

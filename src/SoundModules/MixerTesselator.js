@@ -7,6 +7,8 @@ import voz from "../utils/valueOrZero";
 
 const defaultSettings={
     amplitude:1,
+    window:true,
+    normalize:false,
     levela:0.5,
     levelb:0.5,
     levelc:0.5,
@@ -36,7 +38,6 @@ class MixerTesselator extends Module{
 
         this.recalculate = async (recursion = 0) => {
             let result=[];
-            let first = true;
             await Promise.all(
                 this.eachInput(async (input,inputno,inputName) => {
                     const inputValues = await input.getValues(recursion);
@@ -49,10 +50,22 @@ class MixerTesselator extends Module{
                 
             let lengthSamples=result.length;
             let half = Math.floor(lengthSamples/2);
-            
+            let max=0;
+            let min=0;
             this.cachedValues = new Float32Array(result.map((v,i)=>{
-                let awindow = Math.cos(2 * Math.PI * i/lengthSamples) / 2 + 0.5;
-                let window = 1 - awindow; 
+                let awindow,window;
+                if(settings.window){
+                    awindow = Math.cos(2 * Math.PI * i/lengthSamples) / 2 + 0.5;
+                    window = 1 - awindow;
+                }else{
+                    awindow = 0.5;
+                    window=0.5;
+                }
+
+
+                if(v>max) max = v;
+                if(v<min) min = v;
+
                 if(i>half){
                     return v * window + result[i - half] * awindow
                 }else if(i<half){
@@ -61,7 +74,16 @@ class MixerTesselator extends Module{
                     return v;
                 }
             }));
-            //return this.cachedValues;
+
+
+            if(settings.normalize && max!==0 && min!==0){
+                let mult = 1/Math.min(Math.abs(min),max);
+
+                this.cachedValues = this.cachedValues.map((n)=>{
+                    return n * mult;
+                });
+            }
+            
         };
     }
 }

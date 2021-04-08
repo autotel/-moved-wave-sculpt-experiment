@@ -6,6 +6,9 @@ import TimeZoomer from "./DomInterfaces/TimeZoomer";
 import SoundDownloader from "./scaffolding/SoundDownloader";
 import RustProcessor from "./rust/RustProcessor";
 import pat1 from "./patches/drummaker";
+import harmoscPatch from "./patches/harmoscPatch";
+import harmoscPatch2 from "./patches/harmoscPatch2";
+import harmoscPatch3 from "./patches/harmoscPatch3";
 
 //other interfaces
 import SoundPlayer from "./scaffolding/SoundPlayer";
@@ -60,6 +63,9 @@ Draggable.setCanvas();
 window.demos = {
     "drummaker": () => pat1(webInspectorInterface),
     "drumaker2":()=> drummaker2(webInspectorInterface),
+    "harmosc":()=> harmoscPatch(),
+    "harmosc2":()=> harmoscPatch2(),
+    "harmosc3":()=> harmoscPatch3(),
     "wiwu":()=>{
         create(possibleModules.HarmonicsOscillator,'harmosc');
 create(possibleModules.EnvelopeGenerator,'timbrenv');

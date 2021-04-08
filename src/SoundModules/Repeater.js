@@ -13,7 +13,6 @@ import { sampleRate } from "./vars";
  * @typedef {Object} RepeaterOptions
  * @property {number} [length]
  * @property {Array<EnvelopePoint>} [points]
- * @property {boolean} [loop]
  * @property {boolean} [monophonic]
  * @property {number} [gain]
  */
@@ -22,7 +21,7 @@ import { sampleRate } from "./vars";
 const defaultSettings = {
     length: 1,
     points: [],
-    loop: false,
+    monophonic:false,
     gain:1,
 };
 
@@ -54,6 +53,11 @@ class Repeater extends Module {
                 points: settings.points
             });
         };
+        this.addPoint = (point=[0,0]) => {
+            return this.set({
+                points: settings.points.concat([point])
+            });
+        }
 
         const sortPointsByTime = () => {
             settings.points.sort((a, b) => a[0] - b[0]);
@@ -66,39 +70,26 @@ class Repeater extends Module {
             this.cachedValues = new Float32Array(lengthSamples);
             
             sortPointsByTime();
-            /** @returns {EnvelopePoint|false} */
-            const getNextPoint = (spl) => {
-
-                /** @type {EnvelopePoint|false} */
-                let selected = false;
-                for (let pnum = 0; pnum < settings.points.length; pnum++) {
-                    const point = settings.points[pnum];
-                    selected = point;
-                    if (point[0] > spl) return selected;
-                };
-                return false;
-            }
-
 
             let inputSamples = await this.inputs.main.getValues(recursion);
-
-            let nextPoint = getNextPoint(0);
-            let currentPoint = [0, 0];
+            let currentPoint=false;
 
             for (let splN = 0; splN < lengthSamples; splN++) {
-                if (nextPoint) {
-                    if (splN >= nextPoint[0]) {
-                        currentPoint = nextPoint;
-                        nextPoint = getNextPoint(splN);
+                settings.points.forEach((runningPoint)=>{
+                    let localSample = splN - runningPoint[0];
+                    if(localSample>-1 && localSample < inputSamples.length){
+                        if(settings.monophonic){ 
+                            currentPoint=runningPoint;
+                            localSample = splN - currentPoint[0];
+                            this.cachedValues[splN] = inputSamples[localSample] * currentPoint[1];
+                        
+                        }else{
+                            this.cachedValues[splN] += inputSamples[localSample] * runningPoint[1];
+                        }
                     }
-                }
-
-                this.cachedValues[splN] = inputSamples[
-                    splN - currentPoint[0]
-                ] * settings.gain * currentPoint[1];
+                });
+                this.cachedValues[splN] *= settings.gain;
             }
-
-            //return this.cachedValues;
         };
     }
 }

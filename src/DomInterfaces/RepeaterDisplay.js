@@ -36,7 +36,7 @@ class RepeaterDisplay extends WaveLane{
         super(settings,translator);
 
         const lengthKnob = this.addKnob("length");
-        // const loopToggle = this.addToggle("loop");
+        const monophonicToggle = this.addToggle("monophonic");
         this.addKnob("gain");
 
         //lane has a contents sprite.

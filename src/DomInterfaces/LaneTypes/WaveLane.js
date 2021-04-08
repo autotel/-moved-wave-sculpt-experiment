@@ -16,6 +16,7 @@ import requireParameter from "../../utils/requireParameter";
 class WaveLane extends Lane{
     /**
      * @param {import("../components/Lane").LaneOptions} options
+     * @param {ValuePixelTranslator|false} valuePixelTranslator
      */
     constructor(options, valuePixelTranslator = false){
         const {model,drawBoard}=options;
