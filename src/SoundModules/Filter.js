@@ -133,8 +133,6 @@ class Filter extends Module{
                 voz(gains[sampleNumber]) + settings.gain,
                 order,settings.saturate
             ));
-
-            //return output.cachedValues;
         };
     }
 }

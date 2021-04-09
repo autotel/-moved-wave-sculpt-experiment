@@ -111,8 +111,8 @@ class LiveCodingInterface{
 
             let protoname=Which.name;
             if(!intendedName) intendedName=protoname+" "+count;
-            let nameForAccess = abbreviate(
-                intendedName,8
+            let nameForAccess = (
+                intendedName
             ).match(/[A-Za-z0-9]/gi).join("").toLowerCase();
 
             if(this.modules[nameForAccess]) nameForAccess = nameForAccess+count;
@@ -205,8 +205,6 @@ class LiveCodingInterface{
                 });
                 //"deep copy" settings 
                 const setts = JSON.parse(JSON.stringify(module.settings));
-                //remove non-user settings
-                if(setts.isWorking) delete setts.isWorking;
 
                 settingStrings.push(''+name+'.set('+JSON.stringify(setts,null, 2)+');');
                 autozoomStrings.push(''+name+'.getInterface().autoZoom();');

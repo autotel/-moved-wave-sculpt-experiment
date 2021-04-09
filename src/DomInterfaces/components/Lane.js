@@ -80,12 +80,11 @@ class Lane extends Group {
 
         //add a class to cause visual feedback while the module is processsing.
         module.onUpdate((changes)=>{
-            if(changes.cacheStillValid!==undefined){
-                if(changes.cacheStillValid){
-                    this.domElement.classList.remove("working");
-                }else{
-                    this.domElement.classList.add("working");
-                }
+            if(changes.cacheStillValid === true){
+                this.domElement.classList.remove("working");
+            }
+            if(changes.cacheStillValid === false){
+                this.domElement.classList.add("working");
             }
         });
 
@@ -230,7 +229,8 @@ class Lane extends Group {
                 };
                 newInputPosition.absolute.x = newInputPosition.x + settings.x;
                 newInputPosition.absolute.y = newInputPosition.y + settings.y;
-                inputPositions.push(newInputPosition);
+                if(! inputPositions[index]) inputPositions[index] = {};
+                Object.assign(inputPositions[index],newInputPosition);
             });
             return inputPositions;
         }
@@ -251,61 +251,62 @@ class Lane extends Group {
                 };
                 newInputPosition.absolute.x = newInputPosition.x + settings.x;
                 newInputPosition.absolute.y = newInputPosition.y + settings.y;
-                outputPositions.push(newInputPosition);
+                if(! outputPositions[index]) outputPositions[index] = {};
+                Object.assign(outputPositions[index],newInputPosition);
             });
             return outputPositions;
         }
-
-        const InputGraph = function (inputPositions, name, container) {
-            const inputPosition = inputPositions[name];
-            const optxt = new Text({
-                x: inputPosition.x + 10, y: inputPosition.y + 5,
-                text: name,
-            });
+        /** @param {NodePosition} pos */
+        const InputGraph = function (pos, name, container) {
+            const optxt = new Text();
             container.add(optxt);
-            const rect = new Rectangle({
-                x: inputPosition.x - 5,
-                y: inputPosition.y - 5,
-                width: 10,
-                height: 10,
-            });
+            const rect = new Rectangle();
             container.add(rect);
             this.updatePosition = () =>{
-
-                optxt.set("x",inputPositions[name].x + 10);
-                rect.set("x",inputPositions[name].x - 5);
+                Object.assign(rect.attributes,{
+                    x: pos.x - 15,
+                    y: pos.y - 5,
+                    width: 10,
+                    height: 10,
+                });
+                rect.update();
+                Object.assign(optxt.attributes,{
+                    x: pos.x + 10, y: pos.y + 5,
+                    text: pos.name,
+                });              
+                optxt.update();  
             }
         }
-
-        const OutputGraph = function (outputPositions, name, container) {
-            const outputPosition = outputPositions[name];
-            const optxt = new Text({
-                x: outputPosition.x + 10, y: outputPosition.y + 5,
-                text: name,
-            });
+        /** @param {NodePosition} pos */
+        const OutputGraph = function (pos, name, container) {
+            const optxt = new Text();
             container.add(optxt);
-            const rect = new Rectangle({
-                x: outputPosition.x - 5,
-                y: outputPosition.y - 5,
-                width: 10,
-                height: 10,
-            });
+            const rect = new Rectangle();
             container.add(rect);
             this.updatePosition = () =>{
-
-                optxt.set("x",outputPositions[name].x + 10);
-                rect.set("x",outputPositions[name].x - 5);
+                Object.assign(rect.attributes,{
+                    x: pos.x - 5,
+                    y: pos.y - 5,
+                    width: 10,
+                    height: 10,
+                });
+                rect.update();
+                Object.assign(optxt.attributes,{
+                    x: pos.x + 10, y: pos.y + 5,
+                    text: pos.name,
+                });              
+                optxt.update();  
             }
         }
 
         this.getInputPositions();
-        const myInputGraphs = Object.keys(inputPositions).map((name)=>{
-            return new InputGraph(inputPositions, name, this.contents)
+        const myInputGraphs = inputPositions.map((position)=>{
+            return new InputGraph(position, name, this.contents)
         });
 
         this.getOutputPositions();
-        const myOutputGraphs = Object.keys(outputPositions).map((name)=>{
-            return new OutputGraph(outputPositions, name, this.contents)
+        const myOutputGraphs = outputPositions.map((position)=>{
+            return new OutputGraph(position, name, this.contents)
         });
 
 
@@ -337,6 +338,7 @@ class Lane extends Group {
         });
 
         drawBoard.size.onChange(()=>updateSize());
+        setTimeout(updateSize,1);
 
         const title = new Text({
             x: 10, y: 16,

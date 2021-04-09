@@ -19,26 +19,19 @@ class Input {
          * input from which I get sound
          * @type {false|Output} 
          */
-        let myOutput = false;
+        this.myConnectedOutput = false;
 
         /** @returns {Promise<Float32Array>} */
         this.getValues = async (recursion) => {
-            if (myOutput)
-                return await myOutput.getValues(recursion);
+            if (this.myConnectedOutput)
+                return await this.myConnectedOutput.getValues(recursion);
             return new Float32Array(0);
         };
 
         this.getOwner=()=>ownerModule;
         
-        /** @param {Output|false} ifMatches */
-        this.disconnect=(ifMatches=false)=>{
-            if(ifMatches){
-                if(myOutput!==ifMatches) return;
-            }
-            myOutput=false;
-        }
 
-        this.cacheObsolete = ownerModule.cacheObsolete;
+        // this.cacheObsolete = ownerModule.cacheObsolete;
     }
 }
 export default Input;

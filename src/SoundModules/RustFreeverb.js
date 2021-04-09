@@ -4,7 +4,6 @@ import requireParameter from "../utils/requireParameter";
 
 import Output from "./io/Output";
 import Input from "./io/Input";
-import createWorker from "../utils/createWorker";
 /**
  * @namespace SoundModules.RustFreeverb
  */
@@ -82,7 +81,7 @@ class RustFreeverb extends Module{
                     worker=false;
                 }
                 
-                worker = createWorker('./workers/rustFreeverb.js');
+                worker = new Worker(new URL('./workers/rustFreeverb.js', import.meta.url));
 
                 worker.onmessage = ({ data }) => {
 

@@ -29,7 +29,6 @@ class WaveLane extends Lane{
         const translator = valuePixelTranslator?valuePixelTranslator:(new ValuePixelTranslator(settings));
 
         //defaults
-        name="Wave";
         Object.assign(settings,options);
         super(translator,options);
         
@@ -58,15 +57,18 @@ class WaveLane extends Lane{
         new Array().map
 
         translator.onChange((changes)=>{
-            //TODO: display every wave, and not just the wave of the default output.
+            //TODO: multichannel display
             waveDisplay.set("wave",
                 defaultModuleOutput.cachedValues
             );
         });
 
-        defaultModuleOutput.onUpdate((changes)=>{
-            if(changes.cachedValues){
-                waveDisplay.set("wave",changes.cachedValues);
+        module.onUpdate((changes)=>{
+            if(changes.cacheStillValid == true){
+                //TODO: multichannel display
+                waveDisplay.set("wave",
+                    defaultModuleOutput.cachedValues
+                );
             }
         });
 
@@ -122,7 +124,7 @@ class WaveLane extends Lane{
             if(isNaN(levelHere)) levelHere=translator.amplitudeToY(0);
             hoverText.attributes.y=yhere;
             //position.x - x;
-            hoverText.attributes.x=position.x - x;
+            hoverText.attributes.x=position.x;// - x;
             hoverText.attributes.text=round(levelHere,2)+", "+sampleNumberHere;
             hoverText.update();
         }

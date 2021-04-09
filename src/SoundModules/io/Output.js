@@ -1,5 +1,5 @@
 
-import { sampleRate } from "../common/vars";
+import { sampleRate, maxRecursion } from "../common/vars";
 import Input from "./Input";
 import Module from "../common/Module";
 import Model from "../../scaffolding/Model";
@@ -43,6 +43,7 @@ class Output extends Model{
         this.connectTo=(to)=>{
             if(to instanceof Input){
                 myInputs.add(to);
+                to.myConnectedOutput=this;
                 return;
             }else if(to.inputs && to.inputs.main instanceof Input){
                 this.connectTo(to.inputs.main);
@@ -67,9 +68,7 @@ class Output extends Model{
          */
         this.disconnect = (input = false) => {
             if(input){
-                if (input.disconnect) {
-                    input.disconnect();
-                }
+                input.myConnectedOutput=false;
                 myInputs.delete(input);
                 this.changed({
                     connections:myInputs,
@@ -87,18 +86,22 @@ class Output extends Model{
 
         /** @returns {Promise<Float32Array>} */
         this.getValues = async (recursion) => {
-            return new Promise((resolve,reject)=>{
-                if (recursion > maxRecursion)
-                    reject (new Error("max recursion reached"));
-                if (ownerModule.cacheStillValid) {
-                    resolve(this.cachedValues);
-                }else{
-                    ownerModule.requestRecalculation(recursion);
-                }
-            });
+            if (recursion > maxRecursion)
+                throw (new Error("max recursion reached"));
+            if (ownerModule.cacheStillValid) {
+                return (this.cachedValues);
+            }else{
+                await ownerModule.requestRecalculation(recursion);
+                return this.cachedValues;
+            }
         };
 
-        this.cacheObsolete = ownerModule.cacheObsolete;
+        this.propagateCacheChanged = () => {
+            this.forEachConnectedInput((input)=>{
+                input.owner.cacheObsolete();
+            });
+        }
+
     }
 }
 export default Output;

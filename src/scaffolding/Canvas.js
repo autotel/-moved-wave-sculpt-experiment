@@ -25,20 +25,12 @@ function Canvas(){
         onChange:(callback)=>sizeChangeCallbacks.push(callback)
     }
 
-    //something is causing an infinite call cycle, this is a hacky patch for that.
-    let doSize=false;
-    setInterval(()=>{
-        if(doSize){
-            this.size.width=window.innerWidth;
-            this.size.height=window.innerHeight;
-            sizeChangeCallbacks.forEach((callback)=>callback());
-            doSize=false;
-            console.log("recalc size");
-        }
-    },700);
 
     const recalcSize = () => {
-        doSize=true;
+        this.size.width=window.innerWidth;
+        this.size.height=window.innerHeight;
+        sizeChangeCallbacks.forEach((callback)=>callback());
+        console.log("recalc size");
     }
     
     const scrollChangeCallbacks = [];

@@ -111,11 +111,13 @@ class Module extends Model{
                 cacheStillValid:this.cacheStillValid
             });
         }
-        this.cacheObsolete=(recalculate = true)=>{
+
+        this.cacheObsolete=()=>{
             this.cacheStillValid=false;
             this.changed({
                 cacheStillValid:this.cacheStillValid
             });
+            
             this.requestRecalculation();
         }
 
@@ -137,10 +139,11 @@ class Module extends Model{
          *  get outdated samples.
          */
         this.requestRecalculation = promiseDebounce(async(recursion = 0)=>{
-            await this.recalculate(recursion + 1)
+            // console.log("RR",this.name,recursion);
+            await this.recalculate(recursion + 1);
             this.cacheIsValid();
             //if my cache changes, it means all my output modules need recalculation
-            this.eachOutput((output) => output.cacheObsolete());
+            this.eachOutput((output) => output.propagateCacheChanged());
         },2);
 
         

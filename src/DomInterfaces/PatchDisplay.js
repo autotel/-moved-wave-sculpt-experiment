@@ -1,8 +1,9 @@
 import Module from "../SoundModules/common/Module";
-import { Line, Path, Group } from "../scaffolding/elements";
+import { Line, Path, Group, Component } from "../scaffolding/elements";
 import Canvas from "../scaffolding/Canvas";
 import Output from "../SoundModules/io/Output";
 import Input from "../SoundModules/io/Input";
+import Lane from "./components/Lane";
 const pathTypes = require("../scaffolding/elements");
 
 /** @typedef {pathTypes.PathOptions} PathOptions */
@@ -15,9 +16,61 @@ const pathTypes = require("../scaffolding/elements");
  * TODO: interfaces should also extend model, so that changes to interface can be tracked better.
  */
 
+const VectorTypedef = require("../scaffolding/Vector2");
+
 /**
- * @typedef {{x:number,y:number}} MiniVector
+ * @typedef {VectorTypedef.MiniVector} MiniVector
  */
+
+/**
+ * @typedef {Object} NodePosition
+ * @property {string} name
+ * @property {number} x
+ * @property {number} y
+ * @property {MiniVector} absolute
+ * //either:
+ * @property {Input} [input]
+ * @property {Output} [output]
+ **/
+
+/**
+ * @param {Output} fromOutput
+ * @param {Input} toInput 
+ */
+class PatchCord{
+    /** @param {Group} parentEl*/
+    constructor (parentEl){
+        const myPath = new Path();
+        parentEl.add(myPath);
+
+        myPath.domElement.classList.toggle("patchcord");
+
+        myPath.domElement.addEventListener(
+            'click',
+            (evt)=>myPath.domElement.classList.toggle("highlight")
+        );
+
+        let displaying = true;
+        this.show=()=>{
+            if(displaying) return;
+            myPath.domElement.classList.remove("hidden");
+        }
+        this.hide=()=>{
+            if(!displaying) return;
+            myPath.domElement.classList.add("hidden");
+        }
+        this.set=(startPos,endPos)=>{
+            this.show();
+            let bez=Math.abs(startPos.y-endPos.y) / 5;
+            myPath.set('d',
+                `M ${endPos.x}, ${startPos.y}
+                 C ${endPos.x + bez}, ${startPos.y}
+                    ${endPos.x + bez}, ${endPos.y}
+                    ${endPos.x}, ${endPos.y}`
+            );
+        }
+    }
+}
 
 /** 
  * @class PatchDisplay
@@ -31,21 +84,90 @@ class PatchDisplay extends Group{
 
     constructor(drawBoard){
         super();
-        /** @type {Path[]} */
-        const lines=[];
+
+        this.domElement.classList.add("patch-board");
         
         /** @type {Set<Module>}  */
         const myAppendedModules=new Set();
 
+        /** @type {Set<Lane>}  */
+        const myAppendedInterfaces=new Set();
 
+        const patchCords = [];
+
+        const drawPatchCord=(startPos,endPos,number)=>{
+            if(!patchCords[number]) patchCords[number]=new PatchCord(this);
+            patchCords[number].set(startPos,endPos);
+        }
+
+        const hidePatchCordsFrom=(from)=>{
+            for(let index=from; index<patchCords.length; index++){
+                patchCords[index].hide();
+            }
+        }
+
+        const getListOfConnectionCoordinates = () => {
+            const coords = [{
+                startPos:{x:0,y:0},
+                endPos:{x:0,y:0},
+            }];
+
+            /** @type {Array<NodePosition>} */
+            const outputPositions = [];
+
+            /** @type {Array<NodePosition>} */
+            const inputPositions = [];
+            
+            myAppendedInterfaces.forEach((lane)=>{
+                outputPositions.push(... lane.getOutputPositions());
+                inputPositions.push(... lane.getInputPositions());
+            });
+
+            /** @param {Input} input */
+            const getPositionOfInput = (input)=> {
+                return inputPositions.filter((position)=>{
+                    return position.input==input;
+                })[0];
+            }
+            outputPositions.forEach((outputPosition)=>{
+                const outputNode = outputPosition.output;
+                outputNode.forEachConnectedInput((input)=>{
+                    const inputPos = getPositionOfInput(input);
+                    if(inputPos){
+                        const startPos=outputPosition.absolute;
+                        const endPos=inputPos.absolute;
+                        coords.push({
+                            startPos,
+                            endPos
+                        });
+                    }else{
+                        console.error("input position found to draw patch cable");
+                    }
+                });
+            });
+            return coords;
+
+        }
+
+        const updatePatchLines=()=>{
+            let coordinates = getListOfConnectionCoordinates();
+
+            hidePatchCordsFrom(coordinates.length);
+
+            coordinates.forEach(({startPos,endPos},index)=>{
+                drawPatchCord(startPos,endPos,index);
+            });
+        }
+
+        // client functions
         this.appendModules=(...modules)=>{
             modules.map(this.appendModule);
         }
+        
         /** @param {Module} module */
         this.appendModule=(module)=>{
-            
             myAppendedModules.add(module);
-
+            
             module.onUpdate((changes)=>{
                 if(changes.outputs){
                     updatePatchLines();
@@ -53,92 +175,19 @@ class PatchDisplay extends Group{
             });
 
             const modInterface=module.getInterface();
-            if(modInterface) modInterface.onMoved(updatePatchLines);
+
+            if(modInterface){
+                modInterface.onMoved(updatePatchLines);
+                myAppendedInterfaces.add(modInterface);
+            }
 
             updatePatchLines();
         }
+        //event callbacks
 
-        const updatePatchLines=()=>{
-            /** @type {Array<PathOptions>} */
-            const coords = [];
-
-            /**
-             * @param {Output} fromOutput
-             * @param {Input} toInput 
-             */
-            const appendCoord=(fromOutput,toInput)=>{
-
-                const modulesInterface=fromOutput.owner.getInterface();
-                const otherModulesInterface=toInput.owner.getInterface();
-
-                if(!modulesInterface) return;
-                if(!otherModulesInterface) return;
-
-                const othersModuleInputCoordinates = otherModulesInterface.getInputPositions();
-                const othersModuleOutputCoordinates = otherModulesInterface.getOutputPositions();
-
-
-                let filteredInputCoordinates=[];
-                othersModuleInputCoordinates.forEach((outputCoordinates)=>{
-                    if(outputCoordinates.input===toInput){
-                        filteredInputCoordinates.push(outputCoordinates);
-                    }
-                })
-
-                let filteredOutputCoordinates=[];
-                othersModuleOutputCoordinates.forEach((outputCoordinates)=>{
-                    if(outputCoordinates.output===fromOutput){
-                        filteredOutputCoordinates.push(outputCoordinates);
-                    }
-                })
-
-                filteredInputCoordinates.forEach((startPos)=>{
-                    filteredOutputCoordinates.forEach((endPos)=>{         
-                        let bez=Math.abs(startPos.y-endPos.y) / 5;
-                        coords.push({
-                            d:`M ${endPos.x}, ${startPos.y}
-                                C ${endPos.x + bez}, ${startPos.y}
-                                    ${endPos.x + bez}, ${endPos.y}
-                                    ${endPos.x}, ${endPos.y}
-                                `
-                        });
-                    });
-                });
-            }
-
-            myAppendedModules.forEach((module)=>{
-                module.eachOutput((output,index,name)=>{
-                    module.eachInput((input,index,name)=>{
-                        appendCoord(output,input);
-                    });
-                });
-            });
-
-            lines.forEach((line)=>{
-                Object.assign(line.attributes,{d:""});
-            });
-
-            coords.forEach((coord,i)=>{
-                if(!lines[i]){
-                    lines[i]=new Path();
-                    lines[i].domElement.addEventListener('click',(evt)=>lines[i].domElement.classList.toggle("highlight"));
-                    this.add(lines[i]);
-                }
-                Object.assign(lines[i].attributes,coord);
-                lines[i].attributes.class="patchcord";
-            });
-
-            lines.forEach((line)=>{
-                line.update();
-            });
-
-            drawBoard.size.onChange(()=>{
-                updatePatchLines();
-            });
-
-
-        }
-
+        drawBoard.size.onChange(()=>{
+            updatePatchLines();
+        });
 
 
     }

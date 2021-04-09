@@ -5,7 +5,6 @@ import {sampleRate} from "./common/vars";
 import OscillatorOperator from "./operators/OscillatorOperator";
 import voz from "../utils/valueOrZero";
 import Input from "./io/Input";
-import createWorker from "../utils/createWorker";
 
 /**
  * @namespace SoundModules.HarmonicsOscillator
@@ -126,12 +125,12 @@ class HarmonicsOscillator extends Module{
                     worker=false;
                 }
 
-                worker = createWorker('./workers/harmonicsOscillator.js');
+                worker = new Worker(new URL('./workers/harmonicsOscillator.js', import.meta.url));
                 
                 worker.onmessage = ({ data }) => {
 
                     if(data.audioArray){
-                        this.cachedValues=data.audioArray;
+                        output.cachedValues=data.audioArray;
                         resolve(data.audioArray);
                         worker=false;
 
