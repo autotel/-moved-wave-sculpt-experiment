@@ -221,15 +221,17 @@ class Lane extends Group {
         
         this.getInputPositions = () => {
             module.eachInput((input, index) => {
+                let col = index % 6;
+                let row = Math.floor(index / 6)
                 const newInputPosition = {
-                    x: settings.width + 10,
-                    y: settings.height - index * 20 - 10,
+                    x: settings.width + (col * 20) + 30,
+                    y: row * 20 + 15,
                     absolute: {},
                     input,name:input.name,
                 };
                 newInputPosition.absolute.x = newInputPosition.x + settings.x;
                 newInputPosition.absolute.y = newInputPosition.y + settings.y;
-                if(! inputPositions[index]) inputPositions[index] = {};
+                if(! inputPositions[index]) inputPositions[index] = newInputPosition;
                 Object.assign(inputPositions[index],newInputPosition);
             });
             return inputPositions;
@@ -243,21 +245,23 @@ class Lane extends Group {
         
         this.getOutputPositions = () => {
             module.eachOutput((output, index) => {
+                let col = index % 6;
+                let row = Math.floor(index / 6)
                 const newInputPosition = {
-                    x: settings.width + 0,
-                    y: settings.height - index * 20 - 10,
+                    x: settings.width + (col * 20) + 30,
+                    y: settings.height - row * 20 - 10,
                     absolute: {},
                     output,name:output.name,
                 };
                 newInputPosition.absolute.x = newInputPosition.x + settings.x;
                 newInputPosition.absolute.y = newInputPosition.y + settings.y;
-                if(! outputPositions[index]) outputPositions[index] = {};
+                if(! outputPositions[index]) outputPositions[index] = newInputPosition;
                 Object.assign(outputPositions[index],newInputPosition);
             });
             return outputPositions;
         }
         /** @param {NodePosition} pos */
-        const InputGraph = function (pos, name, container) {
+        const ConnectorGraph = function (pos, name, container) {
             const optxt = new Text();
             container.add(optxt);
             const rect = new Rectangle();
@@ -277,36 +281,15 @@ class Lane extends Group {
                 optxt.update();  
             }
         }
-        /** @param {NodePosition} pos */
-        const OutputGraph = function (pos, name, container) {
-            const optxt = new Text();
-            container.add(optxt);
-            const rect = new Rectangle();
-            container.add(rect);
-            this.updatePosition = () =>{
-                Object.assign(rect.attributes,{
-                    x: pos.x - 5,
-                    y: pos.y - 5,
-                    width: 10,
-                    height: 10,
-                });
-                rect.update();
-                Object.assign(optxt.attributes,{
-                    x: pos.x + 10, y: pos.y + 5,
-                    text: pos.name,
-                });              
-                optxt.update();  
-            }
-        }
 
         this.getInputPositions();
         const myInputGraphs = inputPositions.map((position)=>{
-            return new InputGraph(position, name, this.contents)
+            return new ConnectorGraph(position, name, this.contents)
         });
 
         this.getOutputPositions();
         const myOutputGraphs = outputPositions.map((position)=>{
-            return new OutputGraph(position, name, this.contents)
+            return new ConnectorGraph(position, name, this.contents)
         });
 
 
