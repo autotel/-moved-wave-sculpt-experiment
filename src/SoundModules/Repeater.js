@@ -1,5 +1,8 @@
-import Module from "./Module";
-import { sampleRate } from "./vars";
+
+import Output from "./io/Output";
+import Module from "./common/Module";
+import { sampleRate } from "./common/vars";
+import Input from "./io/Input";
 
 /**
  * @namespace SoundModules.Repeater
@@ -41,8 +44,10 @@ class Repeater extends Module {
         
         super(settings);
         
-        this.hasInput("main");
+        this.inputs.main = new Input(this);
 
+        const output = this.outputs.main = new Output(this);
+        
         this.setLength = (to) => {
             return this.set({
                 length: to
@@ -67,7 +72,7 @@ class Repeater extends Module {
         this.recalculate = async (recursion = 0) => {
 
             const lengthSamples = settings.length * sampleRate;
-            this.cachedValues = new Float32Array(lengthSamples);
+            output.cachedValues = new Float32Array(lengthSamples);
             
             sortPointsByTime();
 
@@ -81,14 +86,14 @@ class Repeater extends Module {
                         if(settings.monophonic){ 
                             currentPoint=runningPoint;
                             localSample = splN - currentPoint[0];
-                            this.cachedValues[splN] = inputSamples[localSample] * currentPoint[1];
+                            output.cachedValues[splN] = inputSamples[localSample] * currentPoint[1];
                         
                         }else{
-                            this.cachedValues[splN] += inputSamples[localSample] * runningPoint[1];
+                            output.cachedValues[splN] += inputSamples[localSample] * runningPoint[1];
                         }
                     }
                 });
-                this.cachedValues[splN] *= settings.gain;
+                output.cachedValues[splN] *= settings.gain;
             }
         };
     }

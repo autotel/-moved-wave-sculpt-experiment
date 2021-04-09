@@ -1,5 +1,7 @@
-import Module from "./Module";
-import {sampleRate} from "./vars";
+import Module from "./common/Module";
+import {sampleRate} from "./common/vars";
+import Output from "./io/Output";
+import Input from "./io/Input";
 
 /**
  * @namespace SoundModules.WaveFolder
@@ -35,9 +37,11 @@ class WaveFolder extends Module{
         
         super(settings);
 
-        this.hasInput("main");
-        this.hasInput("fold");
+        this.inputs.main = new Input(this);
+        this.inputs.fold = new Input(this);
 
+        const output = this.outputs.main = new Output(this);
+        
         this.setPreamp = (to) => {
             return this.set({amplitude:to});
         };
@@ -62,7 +66,7 @@ class WaveFolder extends Module{
             
             let currentFoldEnvelope = 0;
 
-            this.cachedValues = inputValues.map((val,sampleNumber)=>{
+            output.cachedValues = inputValues.map((val,sampleNumber)=>{
                 if(foldValues[sampleNumber] !== undefined) currentFoldEnvelope = foldValues[sampleNumber];
                 
                 const currentFold = fold + currentFoldEnvelope;

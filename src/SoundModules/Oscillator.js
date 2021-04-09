@@ -1,6 +1,9 @@
-import Module from "./Module";
-import {sampleRate} from "./vars";
+
+import Output from "./io/Output";
+import Module from "./common/Module";
+import {sampleRate} from "./common/vars";
 import OscillatorOperator from "./operators/OscillatorOperator";
+import Input from "./io/Input";
 
 /**
  * @namespace SoundModules.Oscillator
@@ -42,10 +45,12 @@ class Oscillator extends Module{
 
         const operator = new OscillatorOperator({sampleRate});
 
-        this.hasInput("frequency");
-        this.hasInput("amplitude");
-        this.hasInput("bias");
+        this.inputs.frequency = new Input(this);
+        this.inputs.amplitude = new Input(this);
+        this.inputs.bias = new Input(this);
 
+        const output = this.outputs.main = new Output(this);
+        
         this.setFrequency = (to) => {
             return this.set({
                 frequency: to
@@ -81,7 +86,7 @@ class Oscillator extends Module{
         
         this.recalculate = async (recursion = 0) => {
             const lengthSamples = settings.length * sampleRate;
-            this.cachedValues = new Float32Array(lengthSamples);
+            output.cachedValues = new Float32Array(lengthSamples);
 
             operator.setShape(settings.shape);
             operator.setPhase(settings.phase);
@@ -100,9 +105,9 @@ class Oscillator extends Module{
                 const freq = (freqInputValues[a] || 0) + settings.frequency;
                 const amp = (ampInputValues[a] || 0) + settings.amplitude;
                 const bias = (biasInputValues[a] || 0) + settings.bias;
-                this.cachedValues[a] = operator.calculateSample(freq, amp, bias);
+                output.cachedValues[a] = operator.calculateSample(freq, amp, bias);
             }
-            //return this.cachedValues;
+            //return output.cachedValues;
         };
     }
 }

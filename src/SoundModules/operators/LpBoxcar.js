@@ -1,6 +1,6 @@
 import Operator from "./Operator";
 import saturate1 from "../../utils/saturate1";
-import { sampleRate } from "../vars";
+import { sampleRate } from "../common/vars";
 
 //just average, only takes sample into account
 class LpBoxcar extends Operator{

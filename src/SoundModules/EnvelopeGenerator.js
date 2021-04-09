@@ -1,5 +1,6 @@
-import Module from "./Module";
-import { sampleRate } from "./vars";
+import Module from "./common/Module";
+import { sampleRate } from "./common/vars";
+import Output from "./io/Output";
 
 /**
  * @namespace SoundModules.EnvelopeGenerator
@@ -86,10 +87,14 @@ class EnvelopeGenerator extends Module {
             // return pointa[1]+pointb[1] * position / 44100;
             return ret;
         }
+
+
+        const output = this.outputs.main = new Output(this);
+
         this.recalculate = async (recursion = 0) => {
             const lengthSamples = settings.length * sampleRate;
             
-            this.cachedValues = new Float32Array(lengthSamples);
+            output.cachedValues = new Float32Array(lengthSamples);
 
             sortPointsByTime();
             /** @returns {EnvelopePoint|false} */
@@ -111,7 +116,7 @@ class EnvelopeGenerator extends Module {
 
             for (let splN = 0; splN < lengthSamples; splN++) {
                 if (nextPoint) {
-                    this.cachedValues[splN] = getInterpolation(splN, currentPoint, nextPoint);
+                    output.cachedValues[splN] = getInterpolation(splN, currentPoint, nextPoint);
                     if (splN >= nextPoint[0]) {
                         currentPoint = nextPoint;
                         nextPoint = getNextPoint(splN);
@@ -119,15 +124,15 @@ class EnvelopeGenerator extends Module {
                 } else {
                     if(settings.loop){
                         //currentPoint is now last point, and indicates length of the loop
-                        this.cachedValues[splN] = this.cachedValues[splN % currentPoint[0]];
+                        output.cachedValues[splN] = output.cachedValues[splN % currentPoint[0]];
                     }else{
-                        this.cachedValues[splN] = currentPoint[1]; //this.cachedValues[splN % currentPoint[0]];
+                        output.cachedValues[splN] = currentPoint[1]; //output.cachedValues[splN % currentPoint[0]];
                     }
 
                 }
             }
 
-            //return this.cachedValues;
+            //return output.cachedValues;
         };
     }
 }

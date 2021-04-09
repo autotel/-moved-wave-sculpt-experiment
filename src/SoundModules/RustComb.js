@@ -1,7 +1,9 @@
-import Module from "./Module";
-import {sampleRate} from "./vars";
+
+import Output from "./io/Output";import Module from "./common/Module";
+import {sampleRate} from "./common/vars";
 import requireParameter from "../utils/requireParameter";
 import RustProcessor from "../rust/RustProcessor";
+import Input from "./io/Input";
 
 /**
  * @namespace SoundModules.RustComb
@@ -40,8 +42,10 @@ class RustComb extends Module{
         
         super(settings);
 
-        this.hasInput("main");
+        this.inputs.main = new Input(this);
 
+        const output = this.outputs.main = new Output(this);
+        
         this.setFrequency = (to) => {
             return this.set({frequency:to});
         };
@@ -70,12 +74,12 @@ class RustComb extends Module{
 
             if (frequency == 0) frequency = 0.1/sampleRate;
 
-            this.cachedValues = new Float32Array(
+            output.cachedValues = new Float32Array(
                 rustProcessor.arrCombFilter(
                     inputValues,frequency,dampening_inverse,dampening,feedback
                 )
             );
-            //return this.cachedValues;
+            //return output.cachedValues;
         };
     }
 }

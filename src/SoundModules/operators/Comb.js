@@ -1,6 +1,6 @@
 import Operator from "./Operator";
-import { sampleRate } from "../vars";
 import saturate1 from "../../utils/saturate1";
+import { sampleRate } from "../common/vars";
 //I havent checked that this is actually a comb filter
 class Comb extends Operator{
     constructor(){

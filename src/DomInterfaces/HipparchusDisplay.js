@@ -22,12 +22,12 @@ import Canvas from "../scaffolding/Canvas";
 class HipparchusDisplay extends WaveLane{
     /**
      * @param {object} options
-     * @param {Hipparchus} options.model
+     * @param {Hipparchus} options.module
      * @param {Canvas} options.drawBoard
      **/
     constructor (options){
-        const {model,drawBoard} = options;
-        const settings=typicalLaneSettings(model,drawBoard);
+        const {module,drawBoard} = options;
+        const settings=typicalLaneSettings(module,drawBoard);
         //plave for defaults
         settings.name="Hipparchus";
         Object.assign(settings,options);

@@ -1,7 +1,8 @@
-import Module from "../SoundModules/Module";
+import Module from "../SoundModules/common/Module";
 import { Line, Path, Group } from "../scaffolding/elements";
-import InputNode from "../SoundModules/InputNode";
 import Canvas from "../scaffolding/Canvas";
+import Output from "../SoundModules/io/Output";
+import Input from "../SoundModules/io/Input";
 const pathTypes = require("../scaffolding/elements");
 
 /** @typedef {pathTypes.PathOptions} PathOptions */
@@ -62,53 +63,61 @@ class PatchDisplay extends Group{
             const coords = [];
 
             /**
-             * @param {Module} fromModule
-             * @param {InputNode} toInput 
+             * @param {Output} fromOutput
+             * @param {Input} toInput 
              */
-            const appendCoord=(fromModule,toInput)=>{
-                const modulesInterface=fromModule.getInterface();
+            const appendCoord=(fromOutput,toInput)=>{
+
+                const modulesInterface=fromOutput.owner.getInterface();
                 const otherModulesInterface=toInput.owner.getInterface();
+
                 if(!modulesInterface) return;
                 if(!otherModulesInterface) return;
 
                 const othersModuleInputCoordinates = otherModulesInterface.getInputPositions();
-                let filteredCoordinates=[];
-                Object.keys(othersModuleInputCoordinates).map((opname)=>{
-                    const outputCoordinates=othersModuleInputCoordinates[opname];
+                const othersModuleOutputCoordinates = otherModulesInterface.getOutputPositions();
+
+
+                let filteredInputCoordinates=[];
+                othersModuleInputCoordinates.forEach((outputCoordinates)=>{
                     if(outputCoordinates.input===toInput){
-                        filteredCoordinates.push(outputCoordinates);
+                        filteredInputCoordinates.push(outputCoordinates);
                     }
                 })
-                filteredCoordinates.map((filteredCoord)=>{
-                    const startPos = modulesInterface.getOutputPosition().absolute;
-                    const endPos = filteredCoord.absolute;
-                    
-                    let bez=Math.abs(startPos.y-endPos.y) / 5;
 
-                    coords.push({
-                        d:`M ${endPos.x}, ${startPos.y}
-                            C ${endPos.x + bez}, ${startPos.y}
-                              ${endPos.x + bez}, ${endPos.y}
-                              ${endPos.x}, ${endPos.y}
-                            `
+                let filteredOutputCoordinates=[];
+                othersModuleOutputCoordinates.forEach((outputCoordinates)=>{
+                    if(outputCoordinates.output===fromOutput){
+                        filteredOutputCoordinates.push(outputCoordinates);
+                    }
+                })
+
+                filteredInputCoordinates.forEach((startPos)=>{
+                    filteredOutputCoordinates.forEach((endPos)=>{         
+                        let bez=Math.abs(startPos.y-endPos.y) / 5;
+                        coords.push({
+                            d:`M ${endPos.x}, ${startPos.y}
+                                C ${endPos.x + bez}, ${startPos.y}
+                                    ${endPos.x + bez}, ${endPos.y}
+                                    ${endPos.x}, ${endPos.y}
+                                `
+                        });
                     });
                 });
             }
 
-            //for each of my modules
             myAppendedModules.forEach((module)=>{
-                //for each input of that module
-                
-                module.eachInput((input,index,name)=>{
-                    const otherModule = input.input;
-                    // console.log("m["+module.unique+"]->m["+otherModule.unique+"]."+name);
-                    appendCoord(otherModule,input);
+                module.eachOutput((output,index,name)=>{
+                    module.eachInput((input,index,name)=>{
+                        appendCoord(output,input);
+                    });
                 });
             });
 
             lines.forEach((line)=>{
                 Object.assign(line.attributes,{d:""});
             });
+
             coords.forEach((coord,i)=>{
                 if(!lines[i]){
                     lines[i]=new Path();

@@ -1,5 +1,8 @@
-import Module from "./Module";
-import { sampleRate } from "./vars";
+
+import Output from "./io/Output";
+import Module from "./common/Module";
+import { sampleRate } from "./common/vars";
+import Input from "./io/Input";
 
 /**
  * @namespace SoundModules.Hipparchus
@@ -73,9 +76,11 @@ class Hipparchus extends Module {
         
         super(settings);
         
-        this.hasInput("x");
-        this.hasInput("y");
-        this.hasInput("rotation");
+        this.inputs.x = new Input(this);
+        this.inputs.y = new Input(this);
+        this.inputs.rotation = new Input(this);
+
+        const output = this.outputs.main = new Output(this);
 
         this.setAngle = (to) => {
             return this.set({
@@ -96,7 +101,7 @@ class Hipparchus extends Module {
             let yIn = await this.inputs.y.getValues(recursion);
             let rotationIn = await this.inputs.rotation.getValues(recursion);
 
-            this.cachedValues = new Float32Array(xIn.length);
+            output.cachedValues = new Float32Array(xIn.length);
 
             xIn.forEach((x,sampleNumber)=>{
                 let y = voz(yIn[sampleNumber]);
@@ -108,10 +113,10 @@ class Hipparchus extends Module {
                 polar.th += polarRotation;
                 const result = polarToCartesianAndSquashX(polar).y;
 
-                this.cachedValues[sampleNumber] = result * gain;
+                output.cachedValues[sampleNumber] = result * gain;
 
             });
-            //return this.cachedValues;
+            //return output.cachedValues;
         };
     }
 }

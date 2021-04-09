@@ -1,6 +1,7 @@
-import Module from "./Module";
-import {sampleRate} from "./vars";
+import Module from "./common/Module";
+import {sampleRate} from "./common/vars";
 import voz from "../utils/valueOrZero";
+import Input from "./io/Input";
 /**
  * @namespace SoundModules.Sampler
  */
@@ -39,8 +40,8 @@ class Sampler extends Module{
         let first = true;
         super(settings);
 
-        this.hasInput("frequency");
-        this.hasInput("amplitude");
+        this.inputs.frequency = new Input(this);
+        this.inputs.amplitude = new Input(this);
 
 
         /** @param {number} to */

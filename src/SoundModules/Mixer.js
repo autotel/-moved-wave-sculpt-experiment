@@ -1,4 +1,7 @@
-import Module from "./Module";
+
+import Output from "./io/Output";
+import Module from "./common/Module";
+import Input from "./io/Input";
 
 /**
  * @namespace SoundModules.Mixer
@@ -28,11 +31,13 @@ class Mixer extends Module{
         
         super(settings);
 
-        this.hasInput("a");
-        this.hasInput("b");
-        this.hasInput("c");
-        this.hasInput("d");
+        this.inputs.a = new Input(this);
+        this.inputs.b = new Input(this);
+        this.inputs.c = new Input(this);
+        this.inputs.d = new Input(this);
 
+        const output = this.outputs.main = new Output(this);
+        
         this.recalculate = async (recursion = 0) => {
             
 
@@ -52,7 +57,7 @@ class Mixer extends Module{
                 })
             );
 
-            this.cachedValues = new Float32Array(result.map((n)=>{
+            output.cachedValues = new Float32Array(result.map((n)=>{
                 if(n>1) return 1;
                 if(n<-1) return -1;
                 if(isNaN(n)) return 0;
@@ -64,18 +69,18 @@ class Mixer extends Module{
             if(settings.normalize && max!==0 && min!==0){
                 let mult = 1/Math.min(Math.abs(min),max);
 
-                this.cachedValues = this.cachedValues.map((n)=>{
+                output.cachedValues = output.cachedValues.map((n)=>{
                     return n * mult;
                 });
             }
             
             if(settings.amplitude != 1){
-                this.cachedValues = this.cachedValues.map((n)=>{
+                output.cachedValues = output.cachedValues.map((n)=>{
                     return n * amplitude;
                 });
             }
 
-            return this.cachedValues;
+            return output.cachedValues;
             
         };
     }

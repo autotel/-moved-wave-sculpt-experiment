@@ -84,9 +84,11 @@ function Draggable(domElement){
     }
 
     /**
-     * @typedef {MiniVector} DragPosition
-     * @property {MiniVector} start
-     * @property {MiniVector} delta
+     * @typedef {Object} DragPosition
+     * @property {number} x
+     * @property {number} y
+     * @property {MiniVector} DragPosition.start
+     * @property {MiniVector} DragPosition.delta
      **/
     
     /** @param {DragPosition} newPosition */

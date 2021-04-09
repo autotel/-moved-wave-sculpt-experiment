@@ -1,7 +1,8 @@
-import Module from "../SoundModules/Module";
-import { sampleRate, audioContext } from "../SoundModules/vars";
+import Module from "../SoundModules/common/Module";
+import { sampleRate, audioContext } from "../SoundModules/common/vars";
 import Lane from "../DomInterfaces/components/Lane";
 import { Rectangle, Path, Group } from "./elements";
+import Output from "../SoundModules/io/Output";
 
 
 class SoundPlayer{
@@ -12,8 +13,8 @@ class SoundPlayer{
         myGain.gain.value=1;
         myGain.connect(audioContext.destination);
         
-        /** @type {Module|false} */
-        let myModule = false;
+        /** @type {Output|false} */
+        let myOutput = false;
         let playing = false;
 
         var magicPlayer = (function() {
@@ -28,13 +29,13 @@ class SoundPlayer{
             //makes a slice from the module's buffer in a circular way
             const getCircularSlice=(start,length)=>{
                 let returnBuffer = [];
-                if(myModule){
-                    start %= myModule.cachedValues.length;
+                if(myOutput){
+                    start %= myOutput.cachedValues.length;
                     let sliceStart = start;
-                    let sliceEnd = (start+length) % myModule.cachedValues.length
+                    let sliceEnd = (start+length) % myOutput.cachedValues.length
     
                     returnBuffer = Array.from(
-                        myModule.cachedValues
+                        myOutput.cachedValues
                     ).slice(
                         start,
                         start+length
@@ -43,7 +44,7 @@ class SoundPlayer{
                     //if the current period will reach beyond the length of audio loop
                     if(sliceEnd<sliceStart){
                         let append = Array.from(
-                            myModule.cachedValues
+                            myOutput.cachedValues
                         ).slice(
                             0,
                             sliceStart-sliceEnd
@@ -71,7 +72,7 @@ class SoundPlayer{
 
                 for (var i = 0; i < bufferSize; i++) {
                     
-                    if(playing && myModule){
+                    if(playing && myOutput){
                         let nowWeight = fadeCurveFunction(i/interpolationSpls);
                         if(nowWeight>1) nowWeight=1;
                         let nextWeight = 1-nowWeight;
@@ -87,7 +88,7 @@ class SoundPlayer{
                     }
                 }
                 sourcePlayhead += bufferSize;
-                if(myModule) sourcePlayhead %= myModule.cachedValues.length;
+                if(myOutput) sourcePlayhead %= myOutput.cachedValues.length;
 
                 //peek into next period, so that in next lap we interpolate
                 peekedPeriod = getCircularSlice(sourcePlayhead,bufferSize);
@@ -182,13 +183,13 @@ class SoundPlayer{
 
         /** @param {Module} module */
         this.setModule = (module,start=false)=>{
-            myModule=module;
+            myOutput=module.getDefaultOutput();
             if(start) playing=true;
         }
 
         // this.updateBuffer = ()=>{
         //     if(!buffer) return;
-        //     if(!myModule) return;
+        //     if(!myOutput) return;
         //     //not possible for now
         // }
 

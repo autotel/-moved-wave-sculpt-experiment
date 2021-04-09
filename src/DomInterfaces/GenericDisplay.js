@@ -15,14 +15,14 @@ class GenericDisplay extends WaveLane{
 
     /** @param {import("./components/Lane").LaneOptions} options */
     constructor(options){
-        const {model,drawBoard} = options;
-        const settings=typicalLaneSettings(model,drawBoard);
+        const {module,drawBoard} = options;
+        const settings=typicalLaneSettings(module,drawBoard);
         Object.assign(settings,options);
         super(settings);
         
 
-        Object.keys(model.settings).forEach((settingName,settingNumber)=>{
-            const settingValue = model.settings[settingName];
+        Object.keys(module.settings).forEach((settingName,settingNumber)=>{
+            const settingValue = module.settings[settingName];
             const settingType = typeof settingValue;
             if(settingType === "number"){
                 this.addKnob(settingName);
@@ -32,7 +32,7 @@ class GenericDisplay extends WaveLane{
                 this.addSoundDecoder(settingName);
             }
         });
-        model.triggerInitialState();
+        module.triggerInitialState();
     }
 };
 

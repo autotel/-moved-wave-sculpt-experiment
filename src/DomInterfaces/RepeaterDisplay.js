@@ -8,7 +8,6 @@ import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
 import Model from "../scaffolding/Model";
 import Repeater from "../SoundModules/Repeater";
-import { sampleRate } from "../SoundModules/vars";
 import Canvas from "../scaffolding/Canvas";
 const vectorTypes = require("../scaffolding/Vector2");
 /** @typedef {vectorTypes.MiniVector} MiniVector
@@ -22,12 +21,12 @@ const vectorTypes = require("../scaffolding/Vector2");
 class RepeaterDisplay extends WaveLane{
     /**
      * @param {object} options
-     * @param {Repeater} options.model
+     * @param {Repeater} options.module
      * @param {Canvas} options.drawBoard
      **/
     constructor (options){
-        const {model,drawBoard} = options;
-        const settings=typicalLaneSettings(model,drawBoard);
+        const {module,drawBoard} = options;
+        const settings=typicalLaneSettings(module,drawBoard);
         //plave for defaults
         settings.name="Repeater";
         Object.assign(settings,options);
@@ -65,7 +64,7 @@ class RepeaterDisplay extends WaveLane{
                 let activated=false;
                 
                 /**
-                 * change handle position visually and propagate the result to the model. 
+                 * change handle position visually and propagate the result to the module. 
                  * @param {MiniVector} pos
                  **/
                 this.handleGuiChangedPoint = (pos) =>{
@@ -75,13 +74,13 @@ class RepeaterDisplay extends WaveLane{
                     this.attributes.cy=pos.y;
                     this.update();
 
-                    //update the point belonging to the model
+                    //update the point belonging to the module
                     this.point[0]=translator.xToSampleNumber(pos.x);
                     this.point[1]=translator.yToAmplitude(pos.y);
 
-                    //let the model know of the change
+                    //let the module know of the change
                     let newPoints=handles.map((h)=>h.point);//.sort();
-                    // model.setPoints(model.settings.points);
+                    // module.setPoints(module.settings.points);
 
                     changes.points=newPoints;
 
@@ -92,10 +91,10 @@ class RepeaterDisplay extends WaveLane{
                     }); 
 
                     //to use last point as length selector
-                    // if(!model.settings.loop)
+                    // if(!module.settings.loop)
                     //     changes.length=(latestSpl / sampleRate);
 
-                    model.set(changes);
+                    module.set(changes);
                 }
                 /**
                  * update the handle's point coordinates and cause
@@ -152,22 +151,22 @@ class RepeaterDisplay extends WaveLane{
 
         //helps moving points according to zoom level
         translator.onChange((changes)=>{
-            updatePointsPositions(model.settings.points);
+            updatePointsPositions(module.settings.points);
         });
         
         //let us represent changes in the module graphically
-        model.onUpdate((changes)=>{
+        module.onUpdate((changes)=>{
             if(
                 changes.frequency!==undefined ||
                 changes.amplitude!==undefined
             ){
                 readoutText.set("text",
                     `${
-                        round(model.settings.frequency,4)
+                        round(module.settings.frequency,4)
                     }Hz; ${
-                        round(model.settings.amplitude,4)
+                        round(module.settings.amplitude,4)
                     }U ${
-                        model.settings.frequency>(settings.rangeSamples/10)?"(ALIASED)":""
+                        module.settings.frequency>(settings.rangeSamples/10)?"(ALIASED)":""
                     }`);
             }
             if(changes.points){
@@ -175,7 +174,7 @@ class RepeaterDisplay extends WaveLane{
             }
         });
 
-        model.triggerInitialState();
+        module.triggerInitialState();
     }
 };
 

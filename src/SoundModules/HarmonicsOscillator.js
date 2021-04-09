@@ -1,7 +1,11 @@
-import Module from "./Module";
-import {sampleRate} from "./vars";
+
+import Output from "./io/Output";
+import Module from "./common/Module";
+import {sampleRate} from "./common/vars";
 import OscillatorOperator from "./operators/OscillatorOperator";
 import voz from "../utils/valueOrZero";
+import Input from "./io/Input";
+import createWorker from "../utils/createWorker";
 
 /**
  * @namespace SoundModules.HarmonicsOscillator
@@ -51,15 +55,19 @@ class HarmonicsOscillator extends Module{
         let first = true;
         super(settings);
 
-        this.hasInput("frequency");
-        this.hasInput("amplitude");
-        this.hasInput("bias");
-        this.hasInput("mixCurve");
+        this.inputs.frequency = new Input(this);
+        this.inputs.amplitude = new Input(this);
+        this.inputs.bias = new Input(this);
+        this.inputs.mixCurve = new Input(this);
 
-        this.hasInput("interval1");
-        this.hasInput("interval2");
-        this.hasInput("interval3");
-        this.hasInput("interval4");
+        this.inputs.interval1 = new Input(this);
+        this.inputs.interval2 = new Input(this);
+        this.inputs.interval3 = new Input(this);
+        this.inputs.interval4 = new Input(this);
+
+
+        const output = this.outputs.main = new Output(this);
+
 
         this.setFrequency = (to) => {
             return this.set({
@@ -117,7 +125,8 @@ class HarmonicsOscillator extends Module{
                     worker.terminate();
                     worker=false;
                 }
-                worker = new Worker(new URL('./workers/harmonicsOscillator.js', import.meta.url));;
+
+                worker = createWorker('./workers/harmonicsOscillator.js');
                 
                 worker.onmessage = ({ data }) => {
 

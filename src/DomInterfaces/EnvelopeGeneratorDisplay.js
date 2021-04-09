@@ -1,14 +1,9 @@
 
-import { Circle, Text } from "../scaffolding/elements";
+import { Circle } from "../scaffolding/elements";
 import Draggable from "./components/Draggable";
-import Vector2 from "../scaffolding/Vector2";
-import round from "../utils/round";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
-import Model from "../scaffolding/Model";
-import EnvelopeGenerator from "../SoundModules/EnvelopeGenerator";
-import { sampleRate } from "../SoundModules/vars";
 const vectorTypes = require("../scaffolding/Vector2");
 /** @typedef {vectorTypes.MiniVector} MiniVector
 /**
@@ -22,8 +17,8 @@ class EnvelopeGeneratorDisplay extends WaveLane{
     /** @param {import("./components/Lane").LaneOptions} options */
     constructor (options){
 
-        const {model,drawBoard} = options;
-        const settings=typicalLaneSettings(model,drawBoard);
+        const {module,drawBoard} = options;
+        const settings=typicalLaneSettings(module,drawBoard);
         //plave for defaults
         settings.name="Envelope";
         Object.assign(settings,options);
@@ -32,8 +27,6 @@ class EnvelopeGeneratorDisplay extends WaveLane{
         super(settings,translator);
 
 
-        const lengthKnob = this.addKnob("length");
-        const loopToggle = this.addToggle("loop");
 
 
         //lane has a contents sprite.
@@ -55,7 +48,7 @@ class EnvelopeGeneratorDisplay extends WaveLane{
                 let activated=false;
                 
                 /**
-                 * change handle position visually and propagate the result to the model. 
+                 * change handle position visually and propagate the result to the module. 
                  * @param {MiniVector} pos
                  **/
                 this.handleGuiChangedPoint = (pos) =>{
@@ -65,13 +58,13 @@ class EnvelopeGeneratorDisplay extends WaveLane{
                     this.attributes.cy=pos.y;
                     this.update();
 
-                    //update the point belonging to the model
+                    //update the point belonging to the module
                     this.point[0]=translator.xToSampleNumber(pos.x);
                     this.point[1]=translator.yToAmplitude(pos.y);
 
-                    //let the model know of the change
+                    //let the module know of the change
                     let newPoints=handles.map((h)=>h.point);//.sort();
-                    // model.setPoints(model.settings.points);
+                    // module.setPoints(module.settings.points);
 
                     changes.points=newPoints;
 
@@ -82,10 +75,10 @@ class EnvelopeGeneratorDisplay extends WaveLane{
                     }); 
 
                     //to use last point as length selector
-                    // if(!model.settings.loop)
+                    // if(!module.settings.loop)
                     //     changes.length=(latestSpl / sampleRate);
 
-                    model.set(changes);
+                    module.set(changes);
                 }
                 /**
                  * update the handle's point coordinates and cause
@@ -136,23 +129,22 @@ class EnvelopeGeneratorDisplay extends WaveLane{
 
         
         handles.map((handle)=>{
-            const frequencyDraggable=handle.draggable;
             handle.activate();
         });
 
         //helps moving points according to zoom level
-        translator.onChange((changes)=>{
-            updatePointsPositions(model.settings.points);
+        translator.onChange(()=>{
+            updatePointsPositions(module.settings.points);
         });
         
         //let us represent changes in the module graphically
-        model.onUpdate((changes)=>{
+        module.onUpdate((changes)=>{
             if(changes.points){
                 updatePointsPositions(changes.points);
             }
         });
 
-        model.triggerInitialState();
+        module.triggerInitialState();
     }
 };
 

@@ -1,5 +1,5 @@
 import Operator from "./Operator"
-import { sampleRate } from "../vars";
+import { sampleRate } from "../common/vars";
 import saturate1 from "../../utils/saturate1";
 //https://noisehack.com/custom-audio-effects-javascript-web-audio-api/
 //https://www.musicdsp.org/en/latest/Filters/26-LpMoog-vcf-variation-2.html#id2

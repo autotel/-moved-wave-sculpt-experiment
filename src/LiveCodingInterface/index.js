@@ -13,9 +13,8 @@ import RustComb from "../SoundModules/RustComb";
 import RustFreeverb from "../SoundModules/RustFreeverb";
 import Filter from "../SoundModules/Filter";
 import MixerTesselator from "../SoundModules/MixerTesselator";
-import Module from "../SoundModules/Module";
+import Module from "../SoundModules/common/Module";
 import Repeater from "../SoundModules/Repeater";
-import InputNode from "../SoundModules/InputNode";
 import Hipparchus from "../SoundModules/Hipparchus";
 import Sampler from "../SoundModules/Sampler";
 
@@ -59,7 +58,6 @@ registerModuleAndItsInterface(MixerTesselator,);
 registerModuleAndItsInterface(Module,false);
 registerModuleAndItsInterface(Repeater,RepeaterDisplay);
 registerModuleAndItsInterface(Filter,FilterDisplay);
-registerModuleAndItsInterface(InputNode,false);
 registerModuleAndItsInterface(Hipparchus,HipparchusDisplay);
 registerModuleAndItsInterface(Sampler,false);
 
@@ -67,6 +65,8 @@ registerModuleAndItsInterface(Sampler,false);
 //for typing
 import Canvas from "../scaffolding/Canvas";
 import abbreviate from "../utils/stringAbbreviator";
+import getMyNameInObject from "../utils/getMyNameInObject";
+import exportToBrowserGlobal from "../utils/exportToBrowserGlobal";
 
 function giveHelp(){
 
@@ -125,7 +125,7 @@ class LiveCodingInterface{
             if(window[nameForAccess]===undefined) window[nameForAccess]=newModule;
 
             const props = {
-                model:newModule,
+                module:newModule,
                 name:nameForAccess, drawBoard
             }
 
@@ -170,32 +170,46 @@ class LiveCodingInterface{
                 return a.getInterface().attributes.y - b.getInterface().attributes.y;
             });
 
-            const findModulesName = (module)=>{
-                let keys = Object.keys(this.modules)
-                return keys.find((keyName)=>this.modules[keyName]===module);
+            const getAccessNameOfModule=(module)=>{
+
+                let name = getMyNameInObject(module,window);
+                if(!name){
+                    name = `modules["${getMyNameInObject(module,modulesList)}"]`;
+                }
+                return name;
             }
-            
             modulesList.map((module)=>{
                 //make creation string
                 let constructorName = module.constructor.name;
-                let name = findModulesName(module);
-                instanceStrings.push(`create(possibleModules.${constructorName},"${name}");`);
-                /** @type {Set<InputNode>} */
-                let outputs=module.outputs;
-                outputs.forEach((inputNode)=>{
-                    /** @type {Module} */
-                    let inputNodeOwner = inputNode.owner;
+                if(!constructorName){
+                    constructorName = `possibleModules["${getMyNameInObject(module,this.possibleModules)}"]`;
+                }
+                let name = getAccessNameOfModule(module);
 
-                    let inputNodeOwnerName=findModulesName(inputNodeOwner);
-                    /* the key under which this inputNode is kept in owner module */
-                    let inputNodeNameInOwner = Object.keys(inputNodeOwner.inputs)
-                        .find((inputName)=>inputNodeOwner.inputs[inputName]===inputNode);
-                    
-                    connectionStrings.push(`modules["${name}"].connectTo(modules["${inputNodeOwnerName}"].inputs.${inputNodeNameInOwner});`);
+                instanceStrings.push(`let ${name} = create(possibleModules.${constructorName},"${name}");`);
+                
+                module.eachOutput((output)=>{
+                    output.forEachConnectedInput((connectedInput)=>{    
+
+                        let connectedInputOwner = connectedInput.getOwner();
+                        let connectedInputOwnerAccessName = getAccessNameOfModule(connectedInputOwner);
+
+                        connectionStrings.push(
+                            `${ 
+                                name }.outputs.${
+                                output.name }.connectTo(${
+                                connectedInputOwnerAccessName }.inputs.${
+                                connectedInput.name });`
+                        );
+                    });
                 });
-                const setts = JSON.stringify(module.settings,null, 2);
-                settingStrings.push('modules["'+name+'"].set('+setts+');');
-                autozoomStrings.push('modules["'+name+'"].getInterface().autoZoom();');
+                //"deep copy" settings 
+                const setts = JSON.parse(JSON.stringify(module.settings));
+                //remove non-user settings
+                if(setts.isWorking) delete setts.isWorking;
+
+                settingStrings.push(''+name+'.set('+JSON.stringify(setts,null, 2)+');');
+                autozoomStrings.push(''+name+'.getInterface().autoZoom();');
 
             });
             return [instanceStrings,connectionStrings,settingStrings,autozoomStrings].flat().join("\n").replace(/\"/g,"'");
@@ -210,22 +224,25 @@ class LiveCodingInterface{
             this.possibleModules[modName] = modulesAndTheirInterfaces[modName][0];
         });
         
-        window.possibleModules=this.possibleModules;
+        exportToBrowserGlobal(this.possibleModules,"possibleModules");
 
         Object.keys(this.possibleModules).map((mname)=>{
             if(window[mname]===undefined) window[mname]=this.possibleModules[mname];
         });
         
-        window.create=(module,name)=>{
+        exportToBrowserGlobal((module,name)=>{
             if(!module){
                 console.error("create: provided module is",module);
                 return Object.keys(this.possibleModules);
             }
             return this.create(module,name)
-        };
-        window.modules=this.modules;
-        window.dumpPatch=()=>{return dumpPatch()};
-        window.connect=(from,to)=>{
+        },"create");
+
+        exportToBrowserGlobal(this.modules,"modules");
+        exportToBrowserGlobal(()=>{return dumpPatch()},"dumpPatch");
+
+        //connect a list of inputs to a list of outputs
+        exportToBrowserGlobal((from,to)=>{
             from=([from]).flat();
             to=([to]).flat();
             from.map((source)=>{
@@ -233,7 +250,19 @@ class LiveCodingInterface{
                     source.connectTo(destination);
                 })
             });
-        }
+        },"connect");
+
+        //connect the modules in a chain
+        exportToBrowserGlobal((...modules)=>{
+            /** @type {Module|false} */
+            let prevModule = false;
+            modules.flat().forEach((module)=>{
+                if(prevModule){
+                    prevModule.connectTo(module);
+                }
+                prevModule=module;
+            });
+        },"chain");
 
     }
 }

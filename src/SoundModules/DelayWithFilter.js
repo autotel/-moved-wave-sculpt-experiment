@@ -1,5 +1,5 @@
-import Module from "./Module";
-import { sampleRate } from "./vars";
+import Module from "./common/Module";
+import { sampleRate } from "./common/vars";
 import BasicDelay from "./operators/BasicDelay";
 import voz from "../utils/valueOrZero";
 
@@ -12,6 +12,8 @@ import LpMoog from "./operators/LpMoog"
 import Operator from "./operators/Operator"
 import Pinking from "./operators/Pinking"
 import saturate1 from "../utils/saturate1";
+import Input from "./io/Input";
+import Output from "./io/Output";
 
 /**
  * @namespace SoundModules.DelayWithFilter
@@ -82,12 +84,14 @@ class DelayWithFilter extends Module{
 
         super(settings);
 
-        this.hasInput("main");
-        this.hasInput("feedback");
-        this.hasInput("time");
-        this.hasInput("frequency");
-        this.hasInput("gain");
-        this.hasInput("reso");
+        this.inputs.main = new Input(this);
+        this.inputs.feedback = new Input(this);
+        this.inputs.time = new Input(this);
+        this.inputs.frequency = new Input(this);
+        this.inputs.gain = new Input(this);
+        this.inputs.reso = new Input(this);
+
+        const output = this.outputs.main = new Output(this);
 
 
         this.setOrder = (to) => {

@@ -1,14 +1,15 @@
 import { Line, Rectangle, Path, Group, Text, Component } from "../../scaffolding/elements";
 import Draggable from "./Draggable";
 import typicalLaneSettings from "../../utils/const typicalLaneSettings";
-import Module from "../../SoundModules/Module";
-import InputNode from "../../SoundModules/InputNode";
+import Module from "../../SoundModules/common/Module";
 import Knob from "./Knob";
 import Toggle from "./Toggle";
 import Canvas from "../../scaffolding/Canvas";
 import placements from "../config/placement";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
 import SoundLoaderDecoder from "./SoundLoaderDecoder";
+import Input from "../../SoundModules/io/Input";
+import Output from "../../SoundModules/io/Output";
 
 const sizes = placements;
 
@@ -24,7 +25,7 @@ const VectorTypedef = require("../../scaffolding/Vector2");
  * @property {number} [y] 
  * @property {number} [width]
  * @property {number} [height]
- * @property {Module} model
+ * @property {Module} module
  * @property {string} [name]
  * @property {Canvas} drawBoard
  * @exports LaneOptions
@@ -42,8 +43,8 @@ class Lane extends Group {
      */
     constructor(translator,options) {
 
-        const { model, drawBoard } = options;
-        const settings = typicalLaneSettings(model,drawBoard);
+        const { module, drawBoard } = options;
+        const settings = typicalLaneSettings(module,drawBoard);
         Object.assign(settings, options);
 
         super(settings);
@@ -78,17 +79,17 @@ class Lane extends Group {
         handleRect.domElement.classList.add("lane-handle");
 
         //add a class to cause visual feedback while the module is processsing.
-        model.onUpdate((changes)=>{
-            if(changes.isWorking!==undefined){
-                if(changes.isWorking){
-                    this.domElement.classList.add("working");
-                }else{
+        module.onUpdate((changes)=>{
+            if(changes.cacheStillValid!==undefined){
+                if(changes.cacheStillValid){
                     this.domElement.classList.remove("working");
+                }else{
+                    this.domElement.classList.add("working");
                 }
             }
         });
 
-        model.interfaces.add(this);
+        module.interfaces.add(this);
 
         //position this lane at a distance from top, proportional to it's height,
         this.handyPosition = (posNumber) => {
@@ -149,7 +150,7 @@ class Lane extends Group {
         this.addKnob = (parameterName) => {
             const newControl = new Knob();
             this.appendToControlPanel(newControl);
-            newControl.setToModuleParameter(model, parameterName);
+            newControl.setToModuleParameter(module, parameterName);
             controlPanel.add(newControl);
             return newControl;
         }
@@ -157,7 +158,7 @@ class Lane extends Group {
         this.addToggle = (parameterName) => {
             const newControl = new Toggle();
             this.appendToControlPanel(newControl);
-            newControl.setToModuleParameter(model, parameterName);
+            newControl.setToModuleParameter(module, parameterName);
             controlPanel.add(newControl);
             return newControl;
         }
@@ -166,7 +167,7 @@ class Lane extends Group {
         this.addSoundDecoder = (parameterName) => {
             const newControl = new SoundLoaderDecoder();
             this.appendToControlPanel(newControl);
-            newControl.setToModuleParameter(model, parameterName);
+            newControl.setToModuleParameter(module, parameterName);
             controlPanel.add(newControl);
             return newControl;
         }
@@ -201,39 +202,59 @@ class Lane extends Group {
         //add graphs to input and output
         //TODO: encapsulate
         this.add(this.contents);
-        /** @typedef {{x:number,y:number,input:InputNode,absolute:MiniVector}} inputPosition */
-        /** @type {Object<String,inputPosition>|undefined} */
-        const inputPositions={};
-        /** @returns {Object<String,inputPosition>} */
+
+        /**
+         * @typedef {Object} NodePosition
+         * @property {string} NodePosition.name
+         * @property {number} NodePosition.x
+         * @property {number} NodePosition.y
+         * @property {MiniVector} NodePosition.absolute
+         * //either:
+         * @property {Input} [NodePosition.input]
+         * @property {Output} [NodePosition.output]
+         **/
+        
+        /** @type {Array<NodePosition>|undefined} */
+
+        const inputPositions=[];
+        
+        /** @returns {Array<NodePosition>} */
+        
         this.getInputPositions = () => {
-            Object.keys(model.inputs).map((inputName, index) => {
+            module.eachInput((input, index) => {
                 const newInputPosition = {
                     x: settings.width + 10,
                     y: settings.height - index * 20 - 10,
                     absolute: {},
-                    input: model.inputs[inputName],
+                    input,name:input.name,
                 };
                 newInputPosition.absolute.x = newInputPosition.x + settings.x;
                 newInputPosition.absolute.y = newInputPosition.y + settings.y;
-                if(inputPositions[inputName]) delete inputPositions[inputName];
-                inputPositions[inputName] = newInputPosition;
+                inputPositions.push(newInputPosition);
             });
-            // }
             return inputPositions;
         }
 
-        this.getOutputPosition = () => {
-            let ret = {
-                x: settings.width + 10,
-                y: 0,
-            }
-            ret.absolute = {
-                x: ret.x + settings.x,
-                y: ret.y + settings.y + 5,
-            };
-            return ret;
-        };
+        /** @type {Array<NodePosition>|undefined} */
 
+        const outputPositions=[];
+        
+        /** @returns {Array<NodePosition>} */
+        
+        this.getOutputPositions = () => {
+            module.eachOutput((output, index) => {
+                const newInputPosition = {
+                    x: settings.width + 0,
+                    y: settings.height - index * 20 - 10,
+                    absolute: {},
+                    output,name:output.name,
+                };
+                newInputPosition.absolute.x = newInputPosition.x + settings.x;
+                newInputPosition.absolute.y = newInputPosition.y + settings.y;
+                outputPositions.push(newInputPosition);
+            });
+            return outputPositions;
+        }
 
         const InputGraph = function (inputPositions, name, container) {
             const inputPosition = inputPositions[name];
@@ -256,19 +277,24 @@ class Lane extends Group {
             }
         }
 
-        const OutputGraph = function (parent,container) {
-            let position=parent.getOutputPosition();
+        const OutputGraph = function (outputPositions, name, container) {
+            const outputPosition = outputPositions[name];
+            const optxt = new Text({
+                x: outputPosition.x + 10, y: outputPosition.y + 5,
+                text: name,
+            });
+            container.add(optxt);
             const rect = new Rectangle({
-                x: position.x,
-                y: position.y,
-                width: 80,
+                x: outputPosition.x - 5,
+                y: outputPosition.y - 5,
+                width: 10,
                 height: 10,
             });
-
             container.add(rect);
-            this.updatePosition=()=>{
-                position=parent.getOutputPosition();
-                rect.set("x",position.x);
+            this.updatePosition = () =>{
+
+                optxt.set("x",outputPositions[name].x + 10);
+                rect.set("x",outputPositions[name].x - 5);
             }
         }
 
@@ -276,7 +302,11 @@ class Lane extends Group {
         const myInputGraphs = Object.keys(inputPositions).map((name)=>{
             return new InputGraph(inputPositions, name, this.contents)
         });
-        const myOutputGraph = new OutputGraph(this,this.contents);
+
+        this.getOutputPositions();
+        const myOutputGraphs = Object.keys(outputPositions).map((name)=>{
+            return new OutputGraph(outputPositions, name, this.contents)
+        });
 
 
         const updateSize = () => {
@@ -293,7 +323,7 @@ class Lane extends Group {
             // this.domElement.style["width"] = newWidth+"px";
             this.getInputPositions();
             myInputGraphs.forEach((ig)=>ig.updatePosition());
-            myOutputGraph.updatePosition();
+            myOutputGraphs.forEach((ig)=>ig.updatePosition());
         }
 
         translator.onChange(()=>{
@@ -314,7 +344,7 @@ class Lane extends Group {
         });
 
         this.contents.add(title);
-        model.triggerInitialState();
+        module.triggerInitialState();
     }
 };
 

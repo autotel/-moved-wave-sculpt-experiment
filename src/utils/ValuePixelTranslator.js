@@ -1,5 +1,5 @@
 import Model from "../scaffolding/Model";
-import { sampleRate } from "../SoundModules/vars";
+import { sampleRate } from "../SoundModules/common/vars";
 
 /**
  * @export @typedef {{
@@ -9,7 +9,7 @@ import { sampleRate } from "../SoundModules/vars";
 *  firstSample:number,
 *  width:number,
 *  height:number,
-*  model:Model,
+*  module:Model,
 * }} ValuePixelTranslatorParams
 */
 /**
@@ -18,7 +18,7 @@ import { sampleRate } from "../SoundModules/vars";
  * @param {number} [centerAmplitude]
  * @param {number} [width]
  * @param {number} [height]
- * @param {Model} [model]
+ * @param {Model} [module]
  * }} 
 */
     
@@ -29,8 +29,8 @@ class ValuePixelTranslator {
      * @param {ValuePixelTranslatorParams} settings
     */
     constructor(settings) {
-        const model = settings.model;
-        const modelSettings = model.settings;
+        const module = settings.module;
+        const moduleSettings = module.settings;
         this.settings=settings;
         
         let changedListeners = [];

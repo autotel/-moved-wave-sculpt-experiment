@@ -1,5 +1,6 @@
-import Module from "./Module";
 
+import Output from "./io/Output";
+import Module from "./common/Module";
 import Comb from "./operators/Comb"
 import HpBoxcar from "./operators/HpBoxcar"
 import HpNBoxcar from "./operators/HpNBoxcar"
@@ -9,6 +10,7 @@ import LpMoog from "./operators/LpMoog"
 import Operator from "./operators/Operator"
 import Pinking from "./operators/Pinking"
 import voz from "../utils/valueOrZero";
+import Input from "./io/Input";
 
 //todo: find more interesting filters. Eg. https://www.musicdsp.org/en/latest/Filters/index.html
 /**
@@ -82,11 +84,13 @@ class Filter extends Module{
         
         super(settings);
 
-        this.hasInput("main");
-        this.hasInput("frequency");
-        this.hasInput("gain");
-        this.hasInput("reso");
+        this.inputs.main = new Input(this);
+        this.inputs.frequency = new Input(this);
+        this.inputs.gain = new Input(this);
+        this.inputs.reso = new Input(this);
 
+        const output = this.outputs.main = new Output(this);
+        
         this.setOrder = (to) => {
             return this.set({
                 order: to
@@ -118,11 +122,11 @@ class Filter extends Module{
             const resos = await this.inputs.reso.getValues(recursion);
             const inputValues=await this.inputs.main.getValues(recursion);
             
-            this.cachedValues = new Float32Array(inputValues.length);
+            output.cachedValues = new Float32Array(inputValues.length);
 
             filter.reset();
 
-            this.cachedValues = inputValues.map((inputValue,sampleNumber)=>filter.calculateSample(
+            output.cachedValues = inputValues.map((inputValue,sampleNumber)=>filter.calculateSample(
                 inputValue,
                 voz(frequencies[sampleNumber]) + settings.frequency,
                 voz(resos[sampleNumber]) + settings.reso,
@@ -130,7 +134,7 @@ class Filter extends Module{
                 order,settings.saturate
             ));
 
-            //return this.cachedValues;
+            //return output.cachedValues;
         };
     }
 }

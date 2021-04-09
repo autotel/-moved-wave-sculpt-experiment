@@ -1,7 +1,10 @@
-import Module from "./Module";
-import {sampleRate} from "./vars";
+import Module from "./common/Module";
+import {sampleRate} from "./common/vars";
 import requireParameter from "../utils/requireParameter";
 
+import Output from "./io/Output";
+import Input from "./io/Input";
+import createWorker from "../utils/createWorker";
 /**
  * @namespace SoundModules.RustFreeverb
  */
@@ -48,8 +51,10 @@ class RustFreeverb extends Module{
         /** @type {Worker|false} */
         let worker = false;
 
-        this.hasInput("main");
+        this.inputs.main = new Input(this);
 
+        const output = this.outputs.main = new Output(this);
+        
         this.setFrequency = (to) => {
             return this.set({frequency:to});
         };
@@ -77,14 +82,14 @@ class RustFreeverb extends Module{
                     worker=false;
                 }
                 
-                worker = new Worker(new URL('./workers/rustFreeverb.js', import.meta.url));;
+                worker = createWorker('./workers/rustFreeverb.js');
 
                 worker.onmessage = ({ data }) => {
 
                     if(data.audioArray){
 
                         console.log("rust freeverb audio",data);
-                        this.cachedValues=data.audioArray;
+                        output.cachedValues=data.audioArray;
                         resolve(data.audioArray);
                         worker=false;
                     }

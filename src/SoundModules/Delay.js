@@ -1,7 +1,9 @@
-import Module from "./Module";
-import { sampleRate } from "./vars";
+import Module from "./common/Module";
+import { sampleRate } from "./common/vars";
 import BasicDelay from "./operators/BasicDelay";
 import voz from "../utils/valueOrZero";
+import Input from "./io/Input";
+import Output from "./io/Output";
 
 /**
  * @namespace SoundModules.Module
@@ -28,9 +30,11 @@ class Delay extends Module{
         const { amplitude } = settings;
         super(settings);
 
-        this.hasInput("main");
-        this.hasInput("feedback");
-        this.hasInput("time");
+        this.inputs.main = new Input(this);
+        this.inputs.feedback = new Input(this);
+        this.inputs.time = new Input(this);
+
+        const output = this.outputs.main = new Output(this);
 
         let operator = new BasicDelay();
         
@@ -44,31 +48,29 @@ class Delay extends Module{
             let feedbackLevels = this.inputs.feedback.getValues(recursion);
             let timeLevels = this.inputs.time.getValues(recursion);
 
-            this.cachedValues = new Float32Array(inputValues.length);
+            output.cachedValues = new Float32Array(inputValues.length);
             
             inputValues.forEach((value,sampleNumber)=>{
-                this.cachedValues[sampleNumber] = 0;
+                output.cachedValues[sampleNumber] = 0;
                 
                 let currentTimeLevel = voz(timeLevels[sampleNumber]) + delayInSamples;
                 
                 if(sampleNumber>currentTimeLevel){
                     let timeAgo=sampleNumber - currentTimeLevel;
-                    value += (this.cachedValues[timeAgo] + inputValues[timeAgo])
+                    value += (output.cachedValues[timeAgo] + inputValues[timeAgo])
                         * (settings.feedback + voz(feedbackLevels[sampleNumber]));
                 }
 
-                this.cachedValues[sampleNumber]+=operator.calculateSample(value,currentTimeLevel);
+                output.cachedValues[sampleNumber]+=operator.calculateSample(value,currentTimeLevel);
             });
 
             //mix dry and wet
-            this.cachedValues.forEach((val,sampleNumber)=>{
+            output.cachedValues.forEach((val,sampleNumber)=>{
 
-                this.cachedValues[sampleNumber] = this.cachedValues[sampleNumber] * settings.wet 
+                output.cachedValues[sampleNumber] = output.cachedValues[sampleNumber] * settings.wet 
                     + inputValues[sampleNumber] * settings.dry;
                 
             });
-
-            //return this.cachedValues;
         };
     }
 }

@@ -1,4 +1,4 @@
-import Module from "./SoundModules/Module";
+import Module from "./SoundModules/common/Module";
 var perlin = require('perlin-noise');
 
 //using lpf and seeded random, we can get smooth changing random number. 

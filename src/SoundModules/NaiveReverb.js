@@ -1,6 +1,9 @@
-import Module from "./Module";
-import { sampleRate } from "./vars";
+
+import Output from "./io/Output";
+import Module from "./common/Module";
+import { sampleRate } from "./common/vars";
 import voz from "../utils/valueOrZero";
+import Input from "./io/Input";
 
 /**
  * @namespace SoundModules.Module
@@ -73,10 +76,12 @@ class NaiveReverb extends Module{
         const { amplitude } = settings;
         super(settings);
 
-        this.hasInput("main");
-        this.hasInput("feedback");
-        this.hasInput("time");
+        this.inputs.main = new Input(this);
+        this.inputs.feedback = new Input(this);
+        this.inputs.time = new Input(this);
 
+        const output = this.outputs.main = new Output(this);
+        
         const tap1 = new ReverbTap();
         
         this.recalculate = async (recursion = 0) => {
@@ -94,29 +99,29 @@ class NaiveReverb extends Module{
             tap1.reset();
 
 
-            this.cachedValues = new Float32Array(inputValues.length);
+            output.cachedValues = new Float32Array(inputValues.length);
             
             inputValues.forEach((value,sampleNumber)=>{
-                this.cachedValues[sampleNumber]=0;
+                output.cachedValues[sampleNumber]=0;
                 
                 if(isNaN(value)) value = 0;
                 delayCache.push(value);
 
                 
                 if(settings.wet>0){
-                    this.cachedValues[sampleNumber] += tap1.calculateSample(
+                    output.cachedValues[sampleNumber] += tap1.calculateSample(
                         settings.feedback + voz(feedbackLevels[sampleNumber]),
                         delayCache
                     ) * settings.wet;
                 }
                 
                 if(settings.feedback>0){
-                    delayCache[delayCache.length-1] += this.cachedValues[sampleNumber] * settings.feedback;
+                    delayCache[delayCache.length-1] += output.cachedValues[sampleNumber] * settings.feedback;
                 }
 
 
                 if(settings.dry>0){
-                    this.cachedValues[sampleNumber] += value * settings.dry;
+                    output.cachedValues[sampleNumber] += value * settings.dry;
                 }
             });
         };

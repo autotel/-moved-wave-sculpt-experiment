@@ -1,5 +1,5 @@
-import Module from "../SoundModules/Module";
-import { sampleRate, audioContext } from "../SoundModules/vars";
+import Module from "../SoundModules/common/Module";
+import { sampleRate, audioContext } from "../SoundModules/common/vars";
 import Lane from "../DomInterfaces/components/Lane";
 import { Rectangle, Path, Group } from "./elements";
 import Wav from "../utils/asanoboy-makewav";
@@ -10,6 +10,7 @@ class SoundDownloader{
         
         /** @type {Module|false} */
         let myModule = false;
+        let defaultModuleOutput;
 
         let position={
             x:0,
@@ -24,6 +25,8 @@ class SoundDownloader{
         this.appendModule = (module)=>{
             console.log("module appended to downloader");
 
+            defaultModuleOutput = module.getDefaultOutput();
+        
             let topLine = position.y - position.height / 2;
             let bottomLine = position.y + position.height / 2;
             let leftLine = position.x - position.width / 2;
@@ -67,12 +70,6 @@ class SoundDownloader{
                 downloadButton, position.width +10
             );
             
-            module.onUpdate((changes)=>{
-                if(changes.cachedValues){
-                    // this.updateBuffer();
-                }
-            });
-            
             downloadButton.domElement.addEventListener('mousedown',(evt)=>{
                 downloadButton.domElement.classList.add("active");
                 this.download(module);
@@ -83,7 +80,7 @@ class SoundDownloader{
             });
             
         }
-        let downloadno = 0;
+        let downloadNo = 0;
         /** @param {Module} module */
         this.download=(module)=>{
             
@@ -97,7 +94,7 @@ class SoundDownloader{
             }
             
             const wav = new Wav({sampleRate, channels: 1});
-            const buffer = new Float32Array(module.cachedValues);
+            const buffer = new Float32Array(defaultModuleOutput.cachedValues);
             wav.setBuffer(buffer);
             const link = wav.getDownload();
 
@@ -105,19 +102,9 @@ class SoundDownloader{
                 "soundsculpt-"
                 + module.name
                 + "-"
-                + (downloadno++)
+                + (downloadNo++)
             );
         }
-
-        // this.updateBuffer = ()=>{
-        //     if(!buffer) return;
-        //     if(!myModule) return;
-        //     //not possible for now
-        // }
-
-        // /** @type {AudioBuffer|false} */
-        // let buffer=false;
-
     }
 }
 export default SoundDownloader;

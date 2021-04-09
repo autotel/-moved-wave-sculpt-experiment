@@ -1,9 +1,9 @@
-import Module from "../../SoundModules/Module";
+import Module from "../../SoundModules/common/Module";
 import { Group, Text, Path } from "../../scaffolding/elements";
 import round from "../../utils/round";
 import Draggable from "./Draggable";
 import abbreviate from "../../utils/stringAbbreviator";
-import { audioContext } from "../../SoundModules/vars";
+import { audioContext } from "../../SoundModules/common/vars";
 import Clickable from "./Clickable";
 
 let defaultSoundLoaderDecoderOptions = {
@@ -153,6 +153,7 @@ class SoundLoaderDecoder extends Group{
         const deAbbreviateText=()=>{
             nameText.set("text",`[${options.name}]`);
         }
+        
         abbreviateText();
 
         this.value=0;

@@ -1,5 +1,8 @@
-import Module from "./Module";
+
+import Output from "./io/Output";
+import Module from "./common/Module";
 import voz from "../utils/valueOrZero";
+import Input from "./io/Input";
 
 /**
  * @namespace SoundModules.MixerTesselator
@@ -31,10 +34,12 @@ class MixerTesselator extends Module{
         
         super(settings);
 
-        this.hasInput("a");
-        this.hasInput("b");
-        this.hasInput("c");
-        this.hasInput("d");
+        this.inputs.a = new Input(this);
+        this.inputs.b = new Input(this);
+        this.inputs.c = new Input(this);
+        this.inputs.d = new Input(this);
+
+        const output = this.outputs.main = new Output(this);
 
         this.recalculate = async (recursion = 0) => {
             let result=[];
@@ -52,7 +57,7 @@ class MixerTesselator extends Module{
             let half = Math.floor(lengthSamples/2);
             let max=0;
             let min=0;
-            this.cachedValues = new Float32Array(result.map((v,i)=>{
+            output.cachedValues = new Float32Array(result.map((v,i)=>{
                 let awindow,window;
                 if(settings.window){
                     awindow = Math.cos(2 * Math.PI * i/lengthSamples) / 2 + 0.5;
@@ -79,7 +84,7 @@ class MixerTesselator extends Module{
             if(settings.normalize && max!==0 && min!==0){
                 let mult = 1/Math.min(Math.abs(min),max);
 
-                this.cachedValues = this.cachedValues.map((n)=>{
+                output.cachedValues = output.cachedValues.map((n)=>{
                     return n * mult;
                 });
             }

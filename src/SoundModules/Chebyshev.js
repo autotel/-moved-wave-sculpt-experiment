@@ -1,5 +1,6 @@
-import Module from "./Module";
-import {sampleRate} from "./vars";
+import Module from "./common/Module";
+import Input from "./io/Input";
+import Output from "./io/Output";
 
 /**
  * @namespace SoundModules.Chebyshev
@@ -35,8 +36,6 @@ class Chebyshev extends Module{
         Object.assign(settings, defaultSettings);
         Object.assign(settings, userSettings);
         
-        let phaseAccumulator = 0;
-
         //todo: lookup table
         //todo: auto nth order
         const orders=[
@@ -49,7 +48,9 @@ class Chebyshev extends Module{
 
         super(settings);
 
-        this.hasInput("main");
+        this.inputs.main = new Input(this);
+        
+        const output = this.outputs.main = new Output(this);
 
         this.setOrder = (to) => {
             return this.set({
@@ -59,8 +60,7 @@ class Chebyshev extends Module{
 
         this.recalculate = async (recursion = 0) => {
             const inputValues = await this.inputs.main.getValues(recursion);
-            this.cachedValues = inputValues.map(orders[settings.order]);
-            //return this.cachedValues;
+            output.cachedValues = inputValues.map(orders[settings.order]);
         };
     }
 }

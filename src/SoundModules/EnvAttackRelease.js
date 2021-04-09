@@ -1,5 +1,7 @@
-import Module from "./Module";
-import { sampleRate } from "./vars";
+
+import Output from "./io/Output";
+import Module from "./common/Module";
+import { sampleRate } from "./common/vars";
 const shapes = {};
 
 shapes.exponential = (position,shape) => Math.pow(position,shape);
@@ -55,11 +57,7 @@ class EnvelopeAttackRelease extends Module{
             });
         }
 
-        function numberwang (nos) {
-            Object.keys(nos).forEach((noname)=>{
-                if(isNaN(nos[noname])) throw new Error(noname + " is numberwang!");
-            });
-        }
+        const output = this.outputs.main = new Output(this);
         
         this.recalculate = async(recursion = 0) => {
             
@@ -69,34 +67,22 @@ class EnvelopeAttackRelease extends Module{
             let releaseSpls = Math.floor(sampleRate * settings.release);
             let shapeFunction = shapes.exponential;
 
-            this.cachedValues = new Float32Array(envLengthSpls);
-
-            // numberwang({
-            //     envLength,
-            //     envLengthSpls,
-            //     attackSpls,
-            //     releaseSpls,
-            // });
-
+            output.cachedValues = new Float32Array(envLengthSpls);
 
             delete settings.attackCurve;
             delete settings.releaseCurve;
-
-            // numberwang(settings);
             
             //attack phase
             for(let sampleNumber = 0; sampleNumber < attackSpls; sampleNumber++){
                 let position = sampleNumber / attackSpls;
-                this.cachedValues[sampleNumber] = shapeFunction(position, settings.attackShape) * settings.amplitude;
+                output.cachedValues[sampleNumber] = shapeFunction(position, settings.attackShape) * settings.amplitude;
             }
             //release phase
             for(let stageSampleNumber = 0; stageSampleNumber < releaseSpls; stageSampleNumber++){
                 let position = 1 - stageSampleNumber / releaseSpls;
                 let sampleNumber = stageSampleNumber + attackSpls;
-                this.cachedValues[sampleNumber] = shapeFunction(position, settings.releaseShape) * settings.amplitude;
+                output.cachedValues[sampleNumber] = shapeFunction(position, settings.releaseShape) * settings.amplitude;
             }
-
-            //return this.cachedValues;
         };
     }
 }

@@ -1,5 +1,5 @@
 import Lane from "../components/Lane";
-import Module from "../../SoundModules/Module";
+import Module from "../../SoundModules/common/Module";
 import typicalLaneSettings from "../../utils/const typicalLaneSettings";
 import WaveDisplay from "../components/WaveDisplay";
 import VerticalZoom from "../components/VerticalZoom";
@@ -10,7 +10,7 @@ import round from "../../utils/round";
 import requireParameter from "../../utils/requireParameter";
 /**
  * @typedef {Object} WaveLaneOptions
- * @property {Module} model
+ * @property {Module} module
  * @property {string} [name]
  */
 class WaveLane extends Lane{
@@ -19,15 +19,17 @@ class WaveLane extends Lane{
      * @param {ValuePixelTranslator|false} valuePixelTranslator
      */
     constructor(options, valuePixelTranslator = false){
-        const {model,drawBoard}=options;
-        requireParameter(model,"model");
+        const {module,drawBoard}=options;
+        requireParameter(module,"module");
         requireParameter(drawBoard,"drawBoard");
-        const settings=typicalLaneSettings(model,drawBoard);
+        const settings=typicalLaneSettings(module,drawBoard);
+
+        const defaultModuleOutput = module.getDefaultOutput();
         
         const translator = valuePixelTranslator?valuePixelTranslator:(new ValuePixelTranslator(settings));
 
-        //plave for defaults
-        settings.name="Wave";
+        //defaults
+        name="Wave";
         Object.assign(settings,options);
         super(translator,options);
         
@@ -56,13 +58,13 @@ class WaveLane extends Lane{
         new Array().map
 
         translator.onChange((changes)=>{
-            waveDisplay.set("wave",model.cachedValues);
+            //TODO: display every wave, and not just the wave of the default output.
+            waveDisplay.set("wave",
+                defaultModuleOutput.cachedValues
+            );
         });
 
-        // zoom.changeCallback=()=>{
-        // }
-
-        model.onUpdate((changes)=>{
+        defaultModuleOutput.onUpdate((changes)=>{
             if(changes.cachedValues){
                 waveDisplay.set("wave",changes.cachedValues);
             }
@@ -82,7 +84,7 @@ class WaveLane extends Lane{
             let maxValue = 0;
             let minValue = 0;
 
-            model.cachedValues.forEach((v)=>{
+            defaultModuleOutput.cachedValues.forEach((v)=>{
                 if(v>maxValue) maxValue=v;
                 if(v<minValue) minValue=v;
             });
@@ -113,14 +115,14 @@ class WaveLane extends Lane{
             const sampleNumberHere = translator.xToSampleNumber(
                 position.x
             );
-            let levelHere = model.cachedValues[
+            let levelHere = defaultModuleOutput.cachedValues[
                 sampleNumberHere
             ];
             let yhere=translator.amplitudeToY(levelHere);
             if(isNaN(levelHere)) levelHere=translator.amplitudeToY(0);
             hoverText.attributes.y=yhere;
-            //position.x - settings.x;
-            hoverText.attributes.x=position.x - settings.x;
+            //position.x - x;
+            hoverText.attributes.x=position.x - x;
             hoverText.attributes.text=round(levelHere,2)+", "+sampleNumberHere;
             hoverText.update();
         }

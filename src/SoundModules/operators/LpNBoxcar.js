@@ -1,6 +1,7 @@
 import Operator from "./Operator";
 import saturate1 from "../../utils/saturate1";
-import { sampleRate } from "../vars";
+import { sampleRate } from "../common/vars";
+
 /**
  * boxcar, but utilizing any amount of steps in series. 
  * note the sample weighting function, which I decided arbitrarily. It could have been linear ramp.

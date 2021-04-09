@@ -8,7 +8,6 @@ import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
 import Model from "../scaffolding/Model";
 import EnvAttackRelease from "../SoundModules/EnvAttackRelease";
-import { sampleRate } from "../SoundModules/vars";
 const vectorTypes = require("../scaffolding/Vector2");
 /** @typedef {vectorTypes.MiniVector} MiniVector
 /**
@@ -22,8 +21,8 @@ class EnvAttackReleaseDisplay extends WaveLane{
     /** @param {import("./components/Lane").LaneOptions} options */
     constructor (options){
 
-        const {model,drawBoard} = options;
-        const settings=typicalLaneSettings(model,drawBoard);
+        const {module,drawBoard} = options;
+        const settings=typicalLaneSettings(module,drawBoard);
         //plave for defaults
         settings.name="Envelope";
         Object.assign(settings,options);
@@ -58,7 +57,7 @@ class EnvAttackReleaseDisplay extends WaveLane{
                 let activated=false;
                 
                 /**
-                 * change handle position visually and propagate the result to the model. 
+                 * change handle position visually and propagate the result to the module. 
                  * @param {MiniVector} pos
                  **/
                 this.handleGuiChangedPoint = (pos) =>{
@@ -89,22 +88,22 @@ class EnvAttackReleaseDisplay extends WaveLane{
         ];
 
         handles[0].handleGuiChangedPoint = function(pos){
-            model.set({
+            module.set({
                 attack: translator.xToSeconds(pos.x),
                 amplitude: translator.yToAmplitude(pos.y),
             });
             
         }
         handles[1].handleGuiChangedPoint = function(pos){
-            model.set({
-                release: translator.xToSeconds(pos.x) - model.settings.attack,
+            module.set({
+                release: translator.xToSeconds(pos.x) - module.settings.attack,
             });
         }
 
         handles[0].handleModelChangedPoint = function(){
             let pos = {
-                x:translator.secondsToX(model.settings.attack),
-                y:translator.amplitudeToY(model.settings.amplitude),
+                x:translator.secondsToX(module.settings.attack),
+                y:translator.amplitudeToY(module.settings.amplitude),
             }
             this.draggable.setPosition(pos,false);
             this.attributes.cx=pos.x;
@@ -114,7 +113,7 @@ class EnvAttackReleaseDisplay extends WaveLane{
 
         handles[1].handleModelChangedPoint = function(){
             let pos = {
-                x:translator.secondsToX(model.settings.release + model.settings.attack),
+                x:translator.secondsToX(module.settings.release + module.settings.attack),
                 y:translator.amplitudeToY(0),
             }
             this.draggable.setPosition(pos,false);
@@ -146,16 +145,16 @@ class EnvAttackReleaseDisplay extends WaveLane{
 
         //helps moving points according to zoom level
         translator.onChange((changes)=>{
-            updatePointsPositions(model.settings);
+            updatePointsPositions(module.settings);
             handles.forEach((handle)=>handle.handleModelChangedPoint());
         });
         
         //let us represent changes in the module graphically
-        model.onUpdate((changes)=>{
+        module.onUpdate((changes)=>{
             updatePointsPositions(changes);
         });
 
-        model.triggerInitialState();
+        module.triggerInitialState();
     }
 };
 

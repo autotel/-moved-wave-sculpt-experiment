@@ -1,4 +1,4 @@
-import Module from "../SoundModules/Module";
+import Module from "../SoundModules/common/Module";
 import Canvas from "../scaffolding/Canvas";
 import Model from "../scaffolding/Model";
 
@@ -16,24 +16,24 @@ import Model from "../scaffolding/Model";
  * @property {number} rangeSamples zoom horizontal
  * @property {number} width size horizontal
  * @property {number} height size vertical
- * @property {Module} model 
+ * @property {Module} module 
  * @property {Canvas} drawBoard 
  * 
  * @typedef {Object<String,number|string|Module|Model|Canvas>} ExtraLaneOptions
  */
 
 /**
- * @param {Module} model
+ * @param {Module} module
  * @param {Canvas} drawBoard
  * @returns {TypicalLaneSettingsReturn}
  * */
-const typicalLaneSettings=(model,drawBoard)=>({
+const typicalLaneSettings=(module,drawBoard)=>({
     name:"Lane",
     x:0,y:0,
     centerAmplitude:0,rangeAmplitude:2,
     firstSample:0, rangeSamples:44100,
     width:800, height:120,
-    model, drawBoard,
+    module, drawBoard,
 })
 
 export default typicalLaneSettings;

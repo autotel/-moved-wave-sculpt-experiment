@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * @returns {AudioContext} the new or existing context
@@ -21,7 +22,6 @@ function getAudioContext(){
 }
 
 const audioContext=getAudioContext();
-
 
 const maxRecursion = 20;
 const sampleRate = audioContext.sampleRate;

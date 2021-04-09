@@ -1,4 +1,4 @@
-import Module from "../../SoundModules/Module";
+import Module from "../../SoundModules/common/Module";
 import { Group, Text, Path, Rectangle } from "../../scaffolding/elements";
 import round from "../../utils/round";
 import Draggable from "./Draggable";
