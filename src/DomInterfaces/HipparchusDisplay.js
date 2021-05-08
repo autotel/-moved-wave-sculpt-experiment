@@ -1,5 +1,5 @@
 import Sprite from "../scaffolding/Sprite";
-import { Circle, Line, Path, Text } from "../scaffolding/elements";
+import { Circle, Line, Path, Text } from "../scaffolding/GraphicElements";
 import Lane from "./components/Lane";
 import Draggable from "./components/Draggable";
 import Vector2 from "../scaffolding/Vector2";
@@ -32,11 +32,10 @@ class HipparchusDisplay extends WaveLane{
         settings.name="Hipparchus";
         Object.assign(settings,options);
 
-        const translator=new ValuePixelTranslator(settings);
-
-        super(translator,options);
+        super(options);
 
         this.addKnob("rotation").setMinMax(0,2);
+        this.addKnob("rightOffset").setMinMax(-1,1);
         this.addKnob("gain").setMinMax(0,2);
         
 

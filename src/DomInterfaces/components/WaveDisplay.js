@@ -1,4 +1,4 @@
-import { Path } from "../../scaffolding/elements";
+import { Path } from "../../scaffolding/GraphicElements";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
 
 

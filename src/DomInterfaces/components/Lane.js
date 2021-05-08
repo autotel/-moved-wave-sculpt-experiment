@@ -1,4 +1,4 @@
-import { Line, Rectangle, Path, Group, Text, Component } from "../../scaffolding/elements";
+import { Line, Rectangle, Path, SVGGroup, Text, Component } from "../../scaffolding/GraphicElements";
 import Draggable from "./Draggable";
 import typicalLaneSettings from "../../utils/const typicalLaneSettings";
 import Module from "../../SoundModules/common/Module";
@@ -34,9 +34,9 @@ const VectorTypedef = require("../../scaffolding/Vector2");
 
 /**
  * @class Lane
- * @extends Group
+ * @extends SVGGroup
  * */
-class Lane extends Group {
+class Lane extends SVGGroup {
     /**
      * @param {ValuePixelTranslator} translator
      * @param {LaneOptions} options
@@ -107,7 +107,7 @@ class Lane extends Group {
         const controlPanelHeight = 70;
         const controlsCenterTop = 26;
         const controlPanelBackground = new Rectangle();
-        const controlPanel = new Group();
+        const controlPanel = new SVGGroup();
 
         let controlPanelAppended = false;
         const updateControlsBg = () => {
@@ -192,7 +192,7 @@ class Lane extends Group {
 
         this.add(handleRect);
 
-        this.contents = new Group({
+        this.contents = new SVGGroup({
             x: settings.x, y: settings.y,
             width: settings.width, height: settings.height,
             name: "contents"

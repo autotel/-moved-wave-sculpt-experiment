@@ -34,7 +34,7 @@
     </style>
 </head>
 <body>
-    <div id="notes">
+    <div id="notes" onclick="javascript:hidenotes()">
         <h1>Autotel's sound sculpt experiment</h1>
         <p>For your own hearing safety, <b>don't use headphones here!</b></p>
         <p>This is an unfinished piece, so some things are unreasonably complicated to do. The time zooming has one bug. There is no deleting modules either. Also be careful of not doing feedback loops!</p>
@@ -51,4 +51,12 @@
     </div>
 </body>
 <script src="main.js"></script>
+<script>
+    function hidenotes(){
+        let no = document.getElementById("notes");
+        if(no) {
+            no.classList.add("hide");
+        }
+    }
+</script>
 </html>

@@ -1,5 +1,5 @@
 import Module from "../../SoundModules/common/Module";
-import { Group, Text, Path } from "../../scaffolding/elements";
+import { SVGGroup, Text, Path } from "../../scaffolding/GraphicElements";
 import round from "../../utils/round";
 import Draggable from "./Draggable";
 import abbreviate from "../../utils/stringAbbreviator";
@@ -14,7 +14,7 @@ let defaultSoundLoaderDecoderOptions = {
     abbreviatedName:undefined,
 }
 
-class SoundLoaderDecoder extends Group{
+class SoundLoaderDecoder extends SVGGroup{
     constructor(userOptions){
         const options = {};
         Object.assign(options,defaultSoundLoaderDecoderOptions);

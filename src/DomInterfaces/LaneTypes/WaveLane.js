@@ -4,7 +4,7 @@ import typicalLaneSettings from "../../utils/const typicalLaneSettings";
 import WaveDisplay from "../components/WaveDisplay";
 import VerticalZoom from "../components/VerticalZoom";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
-import { Circle, Line, Path, Text } from "../../scaffolding/elements";
+import { Circle, Line, Path, Text } from "../../scaffolding/GraphicElements";
 import Hoverable from "../components/Hoverable";
 import round from "../../utils/round";
 import requireParameter from "../../utils/requireParameter";
@@ -24,8 +24,6 @@ class WaveLane extends Lane{
         requireParameter(drawBoard,"drawBoard");
         const settings=typicalLaneSettings(module,drawBoard);
 
-        const defaultModuleOutput = module.getDefaultOutput();
-        
         const translator = valuePixelTranslator?valuePixelTranslator:(new ValuePixelTranslator(settings));
 
         //defaults
@@ -33,12 +31,18 @@ class WaveLane extends Lane{
         super(translator,options);
         
 
+        const outputs = Object.keys(module.outputs).map((opname)=>module.outputs[opname]);        
+
         const contents=this.contents;
 
-        const waveDisplay=this.waveDisplay = new WaveDisplay(translator);
-        waveDisplay.domElement.classList.add("wave-display");
-        waveDisplay.domElement.classList.add("no-mouse");
-        contents.add(waveDisplay);
+        
+        const waveDisplays=outputs.map((output)=>{
+            let waveDisplay=new WaveDisplay(translator);
+            waveDisplay.domElement.classList.add("wave-display");
+            waveDisplay.domElement.classList.add("no-mouse");
+            contents.add(waveDisplay);
+            return waveDisplay;
+        });
         
 
         const zoom = new VerticalZoom(translator);
@@ -57,18 +61,20 @@ class WaveLane extends Lane{
         new Array().map
 
         translator.onChange((changes)=>{
-            //TODO: multichannel display
-            waveDisplay.set("wave",
-                defaultModuleOutput.cachedValues
-            );
+            waveDisplays.forEach((waveDisplay,index)=>{
+                waveDisplay.set("wave",
+                    outputs[index].cachedValues
+                );
+            });
         });
 
         module.onUpdate((changes)=>{
             if(changes.cacheStillValid == true){
-                //TODO: multichannel display
-                waveDisplay.set("wave",
-                    defaultModuleOutput.cachedValues
-                );
+                waveDisplays.forEach((waveDisplay,index)=>{
+                    waveDisplay.set("wave",
+                        outputs[index].cachedValues
+                    );
+                });
             }
         });
 
@@ -86,7 +92,7 @@ class WaveLane extends Lane{
             let maxValue = 0;
             let minValue = 0;
 
-            defaultModuleOutput.cachedValues.forEach((v)=>{
+            outputs[0].cachedValues.forEach((v)=>{
                 if(v>maxValue) maxValue=v;
                 if(v<minValue) minValue=v;
             });
@@ -117,7 +123,7 @@ class WaveLane extends Lane{
             const sampleNumberHere = translator.xToSampleNumber(
                 position.x
             );
-            let levelHere = defaultModuleOutput.cachedValues[
+            let levelHere = outputs[0].cachedValues[
                 sampleNumberHere
             ];
             let yhere=translator.amplitudeToY(levelHere);

@@ -1,5 +1,5 @@
 import Module from "../../SoundModules/common/Module";
-import { Group, Text, Path } from "../../scaffolding/elements";
+import { SVGGroup, Text, Path } from "../../scaffolding/GraphicElements";
 import round from "../../utils/round";
 import Draggable from "./Draggable";
 import abbreviate from "../../utils/stringAbbreviator";
@@ -32,7 +32,7 @@ const deltaCurves = {
     channelvol:(deltaval)=>deltaval*5,
 }
 
-class Knob extends Group{
+class Knob extends SVGGroup{
     constructor(userOptions){
         const options = {};
         Object.assign(options,defaultKnobOptions);
@@ -260,6 +260,8 @@ class Knob extends Group{
                 case "time":
                 case "length":
                     this.setMinMax(0,5);
+                default:
+                    this.setDeltaCurve("gain");
                 break;
             }
 

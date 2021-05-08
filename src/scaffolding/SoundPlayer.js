@@ -1,8 +1,98 @@
+//TODO: exact coordination between the channels 
 import Module from "../SoundModules/common/Module";
 import { sampleRate, audioContext } from "../SoundModules/common/vars";
 import Lane from "../DomInterfaces/components/Lane";
-import { Rectangle, Path, Group } from "./elements";
+import { Rectangle, Path, SVGGroup } from "./GraphicElements";
 import Output from "../SoundModules/io/Output";
+
+const MagicPlayer = function(myOutput) {
+    //playing position in the original module, from where we source sound
+    let sourcePlayhead=0;
+    //how long each period
+    var bufferSize = 2048;
+
+    let playing = false;
+
+    this.play=()=>playing=true;
+    this.stop=()=>playing=false;
+
+    //get a curve to fade in/out old and new "peeked" buffer (click prevention)
+    const fadeCurveFunction = (v) => {
+        return (1-Math.cos(Math.PI * v))/2;
+    }
+    this.setOutput=(newOutput)=>{
+        myOutput=newOutput;
+    }
+    //makes a slice from the module's buffer in a circular way
+    const getCircularSlice=(start,length)=>{
+        let returnBuffer = [];
+        if(myOutput){
+            start %= myOutput.cachedValues.length;
+            let sliceStart = start;
+            let sliceEnd = (start+length) % myOutput.cachedValues.length
+
+            returnBuffer = Array.from(
+                myOutput.cachedValues
+            ).slice(
+                start,
+                start+length
+            );
+
+            //if the current period will reach beyond the length of audio loop
+            if(sliceEnd<sliceStart){
+                let append = Array.from(
+                    myOutput.cachedValues
+                ).slice(
+                    0,
+                    sliceStart-sliceEnd
+                );
+                returnBuffer = returnBuffer.concat(append);
+            }
+        }
+        return returnBuffer;
+    }
+    //the foreseen period, in the state it was on the last period
+    /** @type {false|Array<number>} */
+    let peekedPeriod = false;
+    let interpolationSpls = bufferSize;
+
+    var node = audioContext.createScriptProcessor(bufferSize, 1, 1);
+    node.channelInterpretation
+    node.onaudioprocess = function(e) {
+        
+        //make a copy of the buffer for this period. This will let us interpolate,
+        //preventing the clicks caused by buffer changes while playing.
+        //note that the frequency response of the interpolation changes 
+        //in function of the bufferSize selection.
+        let currentBuffer = getCircularSlice(sourcePlayhead,bufferSize);
+        // var input = e.inputBuffer.getChannelData(0);
+        var output = e.outputBuffer.getChannelData(0);
+
+        for (var i = 0; i < bufferSize; i++) {
+            
+            if(playing && myOutput){
+                let nowWeight = fadeCurveFunction(i/interpolationSpls);
+                if(nowWeight>1) nowWeight=1;
+                let nextWeight = 1-nowWeight;
+                //current sonic contents fading in...
+                output[i] = currentBuffer[i] * nowWeight;
+                if(peekedPeriod){
+                    //and the previously expected sonic contents fading out.
+                    //clipped, for security.
+                    output[i] += Math.min(1,peekedPeriod[i] * nextWeight);
+                }
+            }else{
+                output[i]=0;
+            }
+        }
+        sourcePlayhead += bufferSize;
+        if(myOutput) sourcePlayhead %= myOutput.cachedValues.length;
+
+        //peek into next period, so that in next lap we interpolate
+        peekedPeriod = getCircularSlice(sourcePlayhead,bufferSize);
+    }
+    this.node=node;
+};
 
 
 class SoundPlayer{
@@ -12,91 +102,21 @@ class SoundPlayer{
         const myGain = audioContext.createGain();
         myGain.gain.value=1;
         myGain.connect(audioContext.destination);
-        
-        /** @type {Output|false} */
-        let myOutput = false;
-        let playing = false;
 
-        var magicPlayer = (function() {
-            //playing position in the original module, from where we source sound
-            let sourcePlayhead=0;
-            //how long each period
-            var bufferSize = 2048;
-            //get a curve to fade in/out old and new "peeked" buffer (click prevention)
-            const fadeCurveFunction = (v) => {
-                return (1-Math.cos(Math.PI * v))/2;
-            }
-            //makes a slice from the module's buffer in a circular way
-            const getCircularSlice=(start,length)=>{
-                let returnBuffer = [];
-                if(myOutput){
-                    start %= myOutput.cachedValues.length;
-                    let sliceStart = start;
-                    let sliceEnd = (start+length) % myOutput.cachedValues.length
-    
-                    returnBuffer = Array.from(
-                        myOutput.cachedValues
-                    ).slice(
-                        start,
-                        start+length
-                    );
-    
-                    //if the current period will reach beyond the length of audio loop
-                    if(sliceEnd<sliceStart){
-                        let append = Array.from(
-                            myOutput.cachedValues
-                        ).slice(
-                            0,
-                            sliceStart-sliceEnd
-                        );
-                        returnBuffer = returnBuffer.concat(append);
-                    }
-                }
-                return returnBuffer;
-            }
-            //the foreseen period, in the state it was on the last period
-            /** @type {false|Array<number>} */
-            let peekedPeriod = false;
-            let interpolationSpls = bufferSize;
+        const pannerLeft = audioContext.createStereoPanner();
+        const pannerRight = audioContext.createStereoPanner();
 
-            var node = audioContext.createScriptProcessor(bufferSize, 1, 1);
-            node.onaudioprocess = function(e) {
-                
-                //make a copy of the buffer for this period. This will let us interpolate,
-                //preventing the clicks caused by buffer changes while playing.
-                //note that the frequency response of the interpolation changes 
-                //in function of the bufferSize selection.
-                let currentBuffer = getCircularSlice(sourcePlayhead,bufferSize);
-                // var input = e.inputBuffer.getChannelData(0);
-                var output = e.outputBuffer.getChannelData(0);
+        pannerLeft.pan.value=-1;
+        pannerRight.pan.value=1;
 
-                for (var i = 0; i < bufferSize; i++) {
-                    
-                    if(playing && myOutput){
-                        let nowWeight = fadeCurveFunction(i/interpolationSpls);
-                        if(nowWeight>1) nowWeight=1;
-                        let nextWeight = 1-nowWeight;
-                        //current sonic contents fading in...
-                        output[i] = currentBuffer[i] * nowWeight;
-                        if(peekedPeriod){
-                            //and the previously expected sonic contents fading out.
-                            //clipped, for security.
-                            output[i] += Math.min(1,peekedPeriod[i] * nextWeight);
-                        }
-                    }else{
-                        output[i]=0;
-                    }
-                }
-                sourcePlayhead += bufferSize;
-                if(myOutput) sourcePlayhead %= myOutput.cachedValues.length;
+        pannerLeft.connect(myGain);
+        pannerRight.connect(myGain);
 
-                //peek into next period, so that in next lap we interpolate
-                peekedPeriod = getCircularSlice(sourcePlayhead,bufferSize);
-            }
-            return node;
-        })();
+        const magicPlayerLeft = new MagicPlayer(false);
+        const magicPlayerRight = new MagicPlayer(false);
 
-        magicPlayer.connect(myGain);
+        magicPlayerLeft.node.connect(pannerLeft);
+        magicPlayerRight.node.connect(pannerRight);
 
         let position={
             x:-15,
@@ -109,8 +129,6 @@ class SoundPlayer{
         const everyPlayButton=[];
         /** @param {Module} module */
         this.appendModule = (module)=>{
-
-
             console.log("module appended to player");
             //rect
             let c1=`${position.x}, ${position.y}`;
@@ -126,7 +144,7 @@ class SoundPlayer{
             let c6=`${triStartX + triW}, ${triStartY + triH / 2}`;
             let c7=`${triStartX}, ${triStartY + triH}`;
 
-            const playButton = new Group();
+            const playButton = new SVGGroup();
 
             let path = new Path({
                 d: `M ${c1}
@@ -145,6 +163,7 @@ class SoundPlayer{
 
             playButton.domElement.setAttribute("class","button play");
             everyPlayButton.push(playButton);
+
             module.getInterface().appendToControlPanel(
                 playButton,
                 position.width + 10
@@ -183,8 +202,18 @@ class SoundPlayer{
 
         /** @param {Module} module */
         this.setModule = (module,start=false)=>{
-            myOutput=module.getDefaultOutput();
-            if(start) playing=true;
+            if(module.outputs.l && module.outputs.r){
+                magicPlayerLeft.setOutput(module.outputs.l);
+                magicPlayerRight.setOutput(module.outputs.r);
+            }else{
+                let defo=module.getDefaultOutput();
+                magicPlayerLeft.setOutput(defo);
+                magicPlayerRight.setOutput(defo);
+            }
+            if(start){
+                magicPlayerLeft.play();
+                magicPlayerRight.play();
+            }
         }
 
         // this.updateBuffer = ()=>{
@@ -197,7 +226,8 @@ class SoundPlayer{
         // let buffer=false;
 
         this.stop = ()=>{
-            playing=false;
+            magicPlayerLeft.stop();
+            magicPlayerRight.stop();
         }
     }
 }

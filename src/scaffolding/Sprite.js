@@ -1,4 +1,4 @@
-import { Component } from "./elements";
+import { Component } from "./GraphicElements";
 
 class Sprite {
     constructor(name = "sprite") {

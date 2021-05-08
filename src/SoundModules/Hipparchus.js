@@ -15,12 +15,14 @@ import Input from "./io/Input";
 /** 
  * @typedef {Object} HipparchusOptions
  * @property {number} [gain]
- * @property {number} [rotation] rotation in ratio, zero equals 0 degrees and 1 equals 360 degrees
+ * @property {number} [rotation] rotation in ratio, zero equals 0 degrees and 1 equals 180 degrees
+ * @property {number} [rightOffset] how much more rotation to give to the right channel
  */
 
 /** @type {HipparchusOptions} */
 const defaultSettings = {
     rotation: 0,
+    rightOffset: 0.5,
     gain:1,
 };
 
@@ -80,7 +82,8 @@ class Hipparchus extends Module {
         this.inputs.y = new Input(this);
         this.inputs.rotation = new Input(this);
 
-        const output = this.outputs.main = new Output(this);
+        const left = this.outputs.l = new Output(this);
+        const right = this.outputs.r = new Output(this);
 
         this.setAngle = (to) => {
             return this.set({
@@ -101,19 +104,31 @@ class Hipparchus extends Module {
             let yIn = await this.inputs.y.getValues(recursion);
             let rotationIn = await this.inputs.rotation.getValues(recursion);
 
-            output.cachedValues = new Float32Array(xIn.length);
+            left.cachedValues = new Float32Array(xIn.length);
+            right.cachedValues = new Float32Array(xIn.length);
 
             xIn.forEach((x,sampleNumber)=>{
                 let y = voz(yIn[sampleNumber]);
                 let rotationSample = voz(rotationIn[sampleNumber]);
 
-                let polarRotation = (rotationSample + settings.rotation)  * Math.PI;
+                let polarRotationLeft = (
+                        rotationSample + settings.rotation
+                    )  * Math.PI;
                 
-                const polar = cartesianToPolar({x,y},0);
-                polar.th += polarRotation;
-                const result = polarToCartesianAndSquashX(polar).y;
+                let polarRotationRight = (
+                        rotationSample + settings.rotation + settings.rightOffset
+                    )  * Math.PI;
+                    
+                const polarLeft = cartesianToPolar({x,y},0);
+                polarLeft.th += polarRotationLeft;
+                const resultLeft = polarToCartesianAndSquashX(polarLeft).y;
 
-                output.cachedValues[sampleNumber] = result * gain;
+                const polarRight = cartesianToPolar({x,y},0);
+                polarRight.th += polarRotationRight;
+                const resultRight = polarToCartesianAndSquashX(polarRight).y;
+
+                left.cachedValues[sampleNumber] = resultLeft * gain;
+                right.cachedValues[sampleNumber] = resultRight * gain;
 
             });
             //return output.cachedValues;

@@ -1,8 +1,8 @@
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
-import { Rectangle, Group } from "../scaffolding/elements";
+import { Rectangle, SVGGroup } from "../scaffolding/GraphicElements";
 import Draggable from "./components/Draggable";
 
-class TimeZoomer extends Group {
+class TimeZoomer extends SVGGroup {
     constructor() {
         super();
         const maxSample = 44100 * 4;

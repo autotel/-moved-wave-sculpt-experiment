@@ -1,7 +1,7 @@
 import Module from "../SoundModules/common/Module";
 import { sampleRate, audioContext } from "../SoundModules/common/vars";
 import Lane from "../DomInterfaces/components/Lane";
-import { Rectangle, Path, Group } from "./elements";
+import { Rectangle, Path, SVGGroup } from "./GraphicElements";
 import Wav from "../utils/asanoboy-makewav";
 
 
@@ -48,7 +48,7 @@ class SoundDownloader{
             let c7=`${innerLeftLine}, ${arrowMiddleLine}`;
             let c8=`${innerLeftLine}, ${topLine}`;
 
-            const downloadButton = new Group();
+            const downloadButton = new SVGGroup();
 
             let path = new Path({
                 d: `M ${c1}
@@ -80,6 +80,23 @@ class SoundDownloader{
             });
             
         }
+        /** 
+         * @param {Array<Float32Array>} buffers
+         * @returns {Float32Array}
+         **/
+        const interleave = (buffers) => {
+            let length = 0;
+            buffers.forEach((buff)=>length+=buff.length);
+            const newBuffer = new Float32Array(length);
+            const numberOfChannels=buffers.length;
+            buffers.forEach((buffer,bufferNumber)=>{
+                buffer.forEach((num,sampleNumber)=>{
+                    newBuffer[(sampleNumber*numberOfChannels)+bufferNumber]=num;
+                });
+            });
+            return newBuffer;
+        }
+
         let downloadNo = 0;
         /** @param {Module} module */
         this.download=(module)=>{
@@ -93,9 +110,24 @@ class SoundDownloader{
                 a.remove();
             }
             
-            const wav = new Wav({sampleRate, channels: 1});
-            const buffer = new Float32Array(defaultModuleOutput.cachedValues);
-            wav.setBuffer(buffer);
+            let wav;
+            let channels = [];
+
+            if(module.outputs.l && module.outputs.r){
+                channels = [
+                    module.outputs.l.cachedValues,
+                    module.outputs.r.cachedValues,
+                ];
+                wav = new Wav({sampleRate, channels: 2});
+            }else{
+                channels = [
+                    module.getDefaultOutput().cachedValues,
+                ];
+                wav = new Wav({sampleRate, channels: 1});
+            }
+            
+
+            wav.setBuffer(interleave(channels));
             const link = wav.getDownload();
 
             namedDownload(link,

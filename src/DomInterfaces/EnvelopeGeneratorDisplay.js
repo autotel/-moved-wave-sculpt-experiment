@@ -1,5 +1,5 @@
 
-import { Circle } from "../scaffolding/elements";
+import { Circle } from "../scaffolding/GraphicElements";
 import Draggable from "./components/Draggable";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";

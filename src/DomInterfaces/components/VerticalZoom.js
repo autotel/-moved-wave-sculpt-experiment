@@ -1,4 +1,4 @@
-import { Path, Group, Rectangle, Text } from "../../scaffolding/elements";
+import { Path, SVGGroup, Rectangle, Text } from "../../scaffolding/GraphicElements";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
 import Draggable from "./Draggable";
 import Vector2 from "../../scaffolding/Vector2";
@@ -10,7 +10,7 @@ const zoomSettings={
     range:1200,
 }
 
-class VerticalZoom extends Group{
+class VerticalZoom extends SVGGroup{
     /** @param {ValuePixelTranslator} translator */
     constructor(translator) {
         const settings=translator.settings;

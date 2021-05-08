@@ -1,5 +1,5 @@
 
-import { Circle, Text } from "../scaffolding/elements";
+import { Circle, Text } from "../scaffolding/GraphicElements";
 import Draggable from "./components/Draggable";
 import Vector2 from "../scaffolding/Vector2";
 import round from "../utils/round";

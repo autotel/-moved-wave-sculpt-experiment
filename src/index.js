@@ -17,6 +17,8 @@ import LiveCodingInterface from "./LiveCodingInterface"
 //atches etc
 import drummaker2 from "./patches/drummaker2";
 import Ghost from "./Ghost";
+import { Div } from "./scaffolding/GraphicElements";
+import LiveCodingInterfaceGuiHelper from "./LiveCodingInterface/GuiHelper";
 
 const ghost = new Ghost();
 
@@ -34,11 +36,14 @@ drawBoard.element.classList.add("drawboard");
 const navBoard = new Canvas();
 navBoard.element.classList.add("nav");
 
-
-const webInspectorInterface = new LiveCodingInterface({
+const liveCodingInterface = new LiveCodingInterface({
     drawBoard
 });
 
+const buttonsBoard = new Div();
+const liveCodingInterfaceGuiHelper = new LiveCodingInterfaceGuiHelper({liveCodingInterface});
+buttonsBoard.add(liveCodingInterfaceGuiHelper);
+document.body.appendChild(liveCodingInterfaceGuiHelper.domElement);
 
 const patchDisplay = new PatchDisplay(drawBoard);
 
@@ -48,7 +53,7 @@ navBoard.add(timeZoomer);
 const player = new SoundPlayer();
 const downloader = new SoundDownloader();
 
-webInspectorInterface.onModuleCreated((newModule, newInterface, count) => {
+liveCodingInterface.onModuleCreated((newModule, newInterface, count) => {
     patchDisplay.appendModules(newModule);
     player.appendModule(newModule);
     downloader.appendModule(newModule);
@@ -61,8 +66,8 @@ Draggable.setCanvas();
 
 //pre-run a live-coded patch
 window.demos = {
-    "drummaker": () => pat1(webInspectorInterface),
-    "drumaker2":()=> drummaker2(webInspectorInterface),
+    "drummaker": () => pat1(liveCodingInterface),
+    "drumaker2":()=> drummaker2(liveCodingInterface),
     "harmosc":()=> harmoscPatch(),
     "harmosc2":()=> harmoscPatch2(),
     "harmosc3":()=> harmoscPatch3(),

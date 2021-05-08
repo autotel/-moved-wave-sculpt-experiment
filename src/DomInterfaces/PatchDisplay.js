@@ -1,10 +1,10 @@
 import Module from "../SoundModules/common/Module";
-import { Line, Path, Group, Component } from "../scaffolding/elements";
+import { Line, Path, SVGGroup, Component } from "../scaffolding/GraphicElements";
 import Canvas from "../scaffolding/Canvas";
 import Output from "../SoundModules/io/Output";
 import Input from "../SoundModules/io/Input";
 import Lane from "./components/Lane";
-const pathTypes = require("../scaffolding/elements");
+const pathTypes = require("../scaffolding/GraphicElements");
 
 /** @typedef {pathTypes.PathOptions} PathOptions */
 
@@ -38,7 +38,7 @@ const VectorTypedef = require("../scaffolding/Vector2");
  * @param {Input} toInput 
  */
 class PatchCord{
-    /** @param {Group} parentEl*/
+    /** @param {SVGGroup} parentEl*/
     constructor (parentEl){
         const myPath = new Path();
         parentEl.add(myPath);
@@ -74,9 +74,9 @@ class PatchCord{
 
 /** 
  * @class PatchDisplay
- * @extends Group
+ * @extends SVGGroup
  */
-class PatchDisplay extends Group{
+class PatchDisplay extends SVGGroup{
     /** 
      * @param {Canvas} drawBoard 
      * 
