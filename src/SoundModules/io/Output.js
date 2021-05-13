@@ -2,7 +2,7 @@
 import { sampleRate, maxRecursion } from "../common/vars";
 import Input from "./Input";
 import Module from "../common/Module";
-import Model from "../../scaffolding/Model";
+import Model from "../../dom-model-gui/Model";
 import getMyNameInObject from "../../utils/getMyNameInObject";
 
 /**

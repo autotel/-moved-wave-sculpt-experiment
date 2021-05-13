@@ -1,15 +1,13 @@
 
-import { Circle, Text } from "../scaffolding/GraphicElements";
-import Draggable from "./components/Draggable";
-import Vector2 from "../scaffolding/Vector2";
+import { Circle, Text, SVGCanvas }  from "../dom-model-gui/GuiComponents/SVGElements";
+import Draggable from "../dom-model-gui/Interactive/Draggable";
+
 import round from "../utils/round";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
-import Model from "../scaffolding/Model";
 import Repeater from "../SoundModules/Repeater";
-import Canvas from "../scaffolding/Canvas";
-const vectorTypes = require("../scaffolding/Vector2");
+const vectorTypes = require("../dom-model-gui/utils/Vector2");
 /** @typedef {vectorTypes.MiniVector} MiniVector
 /**
  * @namespace DomInterface.RepeaterDisplay
@@ -22,7 +20,7 @@ class RepeaterDisplay extends WaveLane{
     /**
      * @param {object} options
      * @param {Repeater} options.module
-     * @param {Canvas} options.drawBoard
+     * @param {SVGCanvas} options.drawBoard
      **/
     constructor (options){
         const {module,drawBoard} = options;

@@ -1,4 +1,4 @@
-import Model from "../scaffolding/Model";
+import Model from "../dom-model-gui/Model";
 import { sampleRate } from "../SoundModules/common/vars";
 
 /**

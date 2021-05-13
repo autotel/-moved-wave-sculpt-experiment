@@ -1,15 +1,8 @@
-import Sprite from "../scaffolding/Sprite";
-import { Circle, Line, Path, Text } from "../scaffolding/GraphicElements";
-import Lane from "./components/Lane";
-import Draggable from "./components/Draggable";
-import Vector2 from "../scaffolding/Vector2";
+import { Text }  from "../dom-model-gui/GuiComponents/SVGElements";
 import Hipparchus from "../SoundModules/Hipparchus";
-import round from "../utils/round";
-import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
-import Model from "../scaffolding/Model";
-import Canvas from "../scaffolding/Canvas";
+import {SVGCanvas} from "../dom-model-gui/GuiComponents/SVGElements";
 
 /**
  * @namespace DomInterface.HipparchusDisplay
@@ -23,7 +16,7 @@ class HipparchusDisplay extends WaveLane{
     /**
      * @param {object} options
      * @param {Hipparchus} options.module
-     * @param {Canvas} options.drawBoard
+     * @param {SVGCanvas} options.drawBoard
      **/
     constructor (options){
         const {module,drawBoard} = options;

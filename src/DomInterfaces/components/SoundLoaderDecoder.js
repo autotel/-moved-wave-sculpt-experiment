@@ -1,10 +1,9 @@
 import Module from "../../SoundModules/common/Module";
-import { SVGGroup, Text, Path } from "../../scaffolding/GraphicElements";
-import round from "../../utils/round";
-import Draggable from "./Draggable";
+import { SVGGroup, Text, Path } from "../../dom-model-gui/GuiComponents/SVGElements";
 import abbreviate from "../../utils/stringAbbreviator";
 import { audioContext } from "../../SoundModules/common/vars";
-import Clickable from "./Clickable";
+import Clickable from "../../dom-model-gui/Interactive/Clickable";
+import Model from "../../dom-model-gui/Model";
 
 let defaultSoundLoaderDecoderOptions = {
     x: 0, y:0,
@@ -82,8 +81,8 @@ class SoundLoaderDecoder extends SVGGroup{
 
         let soundLoaderDecoderShape = new Path();
         
-        soundLoaderDecoderShape.domElement.classList.add("upload");
-        soundLoaderDecoderShape.domElement.classList.add("button");
+        soundLoaderDecoderShape.addClass("upload");
+        soundLoaderDecoderShape.addClass("button");
         this.add(soundLoaderDecoderShape);
 
 
@@ -92,11 +91,11 @@ class SoundLoaderDecoder extends SVGGroup{
         clickable.clickCallback=()=>selectFile();
         clickable.mouseEnterCallback=()=>{
             valueText.set("text", fileName);
-            this.domElement.classList.add("active");
+            this.addClass("active");
         }
         clickable.mouseLeaveCallback=()=>{
             valueText.set("text", abbreviate(fileName,8));
-            this.domElement.classList.remove("active");
+            this.removeClass("active");
         }
         
         const remakePath=()=>{
@@ -170,10 +169,10 @@ class SoundLoaderDecoder extends SVGGroup{
         }
         
         /** 
-         * @param {Module} module
+         * @param {Model} module
          * @param {string} parameterName
          */
-        this.setToModuleParameter=(module,parameterName)=>{
+        this.setToModelParameter=(module,parameterName)=>{
             
             let propertyObject = {};
             propertyObject=module.settings;

@@ -1,11 +1,10 @@
 import Lane from "../components/Lane";
-import Module from "../../SoundModules/common/Module";
 import typicalLaneSettings from "../../utils/const typicalLaneSettings";
 import WaveDisplay from "../components/WaveDisplay";
 import VerticalZoom from "../components/VerticalZoom";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
-import { Circle, Line, Path, Text } from "../../scaffolding/GraphicElements";
-import Hoverable from "../components/Hoverable";
+import { Text } from "../../dom-model-gui/GuiComponents/SVGElements";
+import Hoverable from "../../dom-model-gui/Interactive/Hoverable";
 import round from "../../utils/round";
 import requireParameter from "../../utils/requireParameter";
 /**
@@ -30,16 +29,14 @@ class WaveLane extends Lane{
         Object.assign(settings,options);
         super(translator,options);
         
-
         const outputs = Object.keys(module.outputs).map((opname)=>module.outputs[opname]);        
 
         const contents=this.contents;
-
         
         const waveDisplays=outputs.map((output)=>{
             let waveDisplay=new WaveDisplay(translator);
-            waveDisplay.domElement.classList.add("wave-display");
-            waveDisplay.domElement.classList.add("no-mouse");
+            waveDisplay.addClass("wave-display");
+            waveDisplay.addClass("no-mouse");
             contents.add(waveDisplay);
             return waveDisplay;
         });
@@ -135,10 +132,10 @@ class WaveLane extends Lane{
             hoverText.update();
         }
         hoverable.mouseEnterCallback=(position)=>{
-            hoverText.domElement.classList.add("active");
+            hoverText.addClass("active");
         }
         hoverable.mouseLeaveCallback=(position)=>{
-            hoverText.domElement.classList.remove("active");
+            hoverText.removeClass("active");
         }
         contents.add(hoverText);
     }

@@ -1,10 +1,9 @@
-import { Line, Rectangle, Path, SVGGroup, Text, Component } from "../../scaffolding/GraphicElements";
-import Draggable from "./Draggable";
+import { Line, Rectangle, Path, SVGGroup, Text, Component, SVGCanvas } from "../../dom-model-gui/GuiComponents/SVGElements";
+import Draggable from "../../dom-model-gui/Interactive/Draggable";
 import typicalLaneSettings from "../../utils/const typicalLaneSettings";
 import Module from "../../SoundModules/common/Module";
-import Knob from "./Knob";
-import Toggle from "./Toggle";
-import Canvas from "../../scaffolding/Canvas";
+import Knob from "../../dom-model-gui/GuiComponents/Knob";
+import Toggle from "../../dom-model-gui/GuiComponents/Toggle";
 import placements from "../config/placement";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
 import SoundLoaderDecoder from "./SoundLoaderDecoder";
@@ -13,7 +12,7 @@ import Output from "../../SoundModules/io/Output";
 
 const sizes = placements;
 
-const VectorTypedef = require("../../scaffolding/Vector2");
+const VectorTypedef = require("../../dom-model-gui/utils/Vector2");
 
 /**
  * @typedef {VectorTypedef.MiniVector} MiniVector
@@ -27,7 +26,7 @@ const VectorTypedef = require("../../scaffolding/Vector2");
  * @property {number} [height]
  * @property {Module} module
  * @property {string} [name]
- * @property {Canvas} drawBoard
+ * @property {SVGCanvas} drawBoard
  * @exports LaneOptions
  */
 
@@ -50,7 +49,7 @@ class Lane extends SVGGroup {
         super(settings);
 
 
-        this.domElement.classList.add("lane");
+        this.addClass("lane");
 
         // this.autoZoom = () => { }
 
@@ -76,15 +75,15 @@ class Lane extends SVGGroup {
             fill: "transparent",
         });
 
-        handleRect.domElement.classList.add("lane-handle");
+        handleRect.addClass("lane-handle");
 
         //add a class to cause visual feedback while the module is processsing.
         module.onUpdate((changes)=>{
             if(changes.cacheStillValid === true){
-                this.domElement.classList.remove("working");
+                this.removeClass("working");
             }
             if(changes.cacheStillValid === false){
-                this.domElement.classList.add("working");
+                this.addClass("working");
             }
         });
 
@@ -149,7 +148,7 @@ class Lane extends SVGGroup {
         this.addKnob = (parameterName) => {
             const newControl = new Knob();
             this.appendToControlPanel(newControl);
-            newControl.setToModuleParameter(module, parameterName);
+            newControl.setToModelParameter(module, parameterName);
             controlPanel.add(newControl);
             return newControl;
         }
@@ -157,7 +156,7 @@ class Lane extends SVGGroup {
         this.addToggle = (parameterName) => {
             const newControl = new Toggle();
             this.appendToControlPanel(newControl);
-            newControl.setToModuleParameter(module, parameterName);
+            newControl.setToModelParameter(module, parameterName);
             controlPanel.add(newControl);
             return newControl;
         }
@@ -166,7 +165,7 @@ class Lane extends SVGGroup {
         this.addSoundDecoder = (parameterName) => {
             const newControl = new SoundLoaderDecoder();
             this.appendToControlPanel(newControl);
-            newControl.setToModuleParameter(module, parameterName);
+            newControl.setToModelParameter(module, parameterName);
             controlPanel.add(newControl);
             return newControl;
         }

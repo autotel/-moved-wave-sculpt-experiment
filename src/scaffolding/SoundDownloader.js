@@ -1,7 +1,6 @@
 import Module from "../SoundModules/common/Module";
 import { sampleRate, audioContext } from "../SoundModules/common/vars";
-import Lane from "../DomInterfaces/components/Lane";
-import { Rectangle, Path, SVGGroup } from "./GraphicElements";
+import { Path, SVGGroup } from "../dom-model-gui/GuiComponents/SVGElements";
 import Wav from "../utils/asanoboy-makewav";
 
 
@@ -71,12 +70,12 @@ class SoundDownloader{
             );
             
             downloadButton.domElement.addEventListener('mousedown',(evt)=>{
-                downloadButton.domElement.classList.add("active");
+                downloadButton.addClass("active");
                 this.download(module);
             });
 
             downloadButton.domElement.addEventListener('mousedown',(evt)=>{
-                downloadButton.domElement.classList.remove("active");
+                downloadButton.removeClass("active");
             });
             
         }

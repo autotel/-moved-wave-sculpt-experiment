@@ -1,6 +1,6 @@
 import Module from "../SoundModules/common/Module";
-import Canvas from "../scaffolding/Canvas";
-import Model from "../scaffolding/Model";
+import {SVGCanvas} from "../dom-model-gui/GuiComponents/SVGElements";;
+import Model from "../dom-model-gui/Model";
 
 /**
  * @typedef {import("../DomInterfaces/components/Lane").LaneOptions} LaneOptions
@@ -17,14 +17,14 @@ import Model from "../scaffolding/Model";
  * @property {number} width size horizontal
  * @property {number} height size vertical
  * @property {Module} module 
- * @property {Canvas} drawBoard 
+ * @property {SVGCanvas} drawBoard 
  * 
- * @typedef {Object<String,number|string|Module|Model|Canvas>} ExtraLaneOptions
+ * @typedef {Object<String,number|string|Module|Model|SVGCanvas>} ExtraLaneOptions
  */
 
 /**
  * @param {Module} module
- * @param {Canvas} drawBoard
+ * @param {SVGCanvas} drawBoard
  * @returns {TypicalLaneSettingsReturn}
  * */
 const typicalLaneSettings=(module,drawBoard)=>({

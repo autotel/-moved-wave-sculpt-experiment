@@ -65,7 +65,7 @@ registerModuleAndItsInterface(Sampler,false);
 
 
 //for typing
-import Canvas from "../scaffolding/Canvas";
+import {SVGCanvas} from "../dom-model-gui/GuiComponents/SVGElements";
 import abbreviate from "../utils/stringAbbreviator";
 import getMyNameInObject from "../utils/getMyNameInObject";
 import exportToBrowserGlobal from "../utils/exportToBrowserGlobal";
@@ -84,7 +84,7 @@ function giveHelp(){
 class LiveCodingInterface{
     /**
      * @param {Object} globals
-     * @param {Canvas} globals.drawBoard
+     * @param {SVGCanvas} globals.drawBoard
      */
     constructor({drawBoard}){
         let count=0;
@@ -142,6 +142,7 @@ class LiveCodingInterface{
             moduleCreationListeners.map((cb)=>cb(newModule,newInterface,count));
 
             newInterface.handyPosition(count + 3);
+            drawBoard.add(newInterface);
 
             count++;
             return newModule;

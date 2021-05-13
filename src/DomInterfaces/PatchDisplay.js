@@ -1,10 +1,9 @@
 import Module from "../SoundModules/common/Module";
-import { Line, Path, SVGGroup, Component } from "../scaffolding/GraphicElements";
-import Canvas from "../scaffolding/Canvas";
+import { Path, SVGGroup, SVGCanvas }  from "../dom-model-gui/GuiComponents/SVGElements";
 import Output from "../SoundModules/io/Output";
 import Input from "../SoundModules/io/Input";
 import Lane from "./components/Lane";
-const pathTypes = require("../scaffolding/GraphicElements");
+const pathTypes = require("../dom-model-gui/GuiComponents/SVGElements");
 
 /** @typedef {pathTypes.PathOptions} PathOptions */
 
@@ -16,7 +15,7 @@ const pathTypes = require("../scaffolding/GraphicElements");
  * TODO: interfaces should also extend model, so that changes to interface can be tracked better.
  */
 
-const VectorTypedef = require("../scaffolding/Vector2");
+const VectorTypedef = require("../dom-model-gui/utils/Vector2");
 
 /**
  * @typedef {VectorTypedef.MiniVector} MiniVector
@@ -53,11 +52,11 @@ class PatchCord{
         let displaying = true;
         this.show=()=>{
             if(displaying) return;
-            myPath.domElement.classList.remove("hidden");
+            myPath.removeClass("hidden");
         }
         this.hide=()=>{
             if(!displaying) return;
-            myPath.domElement.classList.add("hidden");
+            myPath.addClass("hidden");
         }
         this.set=(startPos,endPos)=>{
             this.show();
@@ -78,14 +77,14 @@ class PatchCord{
  */
 class PatchDisplay extends SVGGroup{
     /** 
-     * @param {Canvas} drawBoard 
+     * @param {SVGCanvas} drawBoard 
      * 
      * */
 
     constructor(drawBoard){
         super();
 
-        this.domElement.classList.add("patch-board");
+        this.addClass("patch-board");
         
         /** @type {Set<Module>}  */
         const myAppendedModules=new Set();

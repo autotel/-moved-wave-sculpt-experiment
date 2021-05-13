@@ -2,7 +2,7 @@
 import Module from "../SoundModules/common/Module";
 import { sampleRate, audioContext } from "../SoundModules/common/vars";
 import Lane from "../DomInterfaces/components/Lane";
-import { Rectangle, Path, SVGGroup } from "./GraphicElements";
+import { Rectangle, Path, SVGGroup } from "../dom-model-gui/GuiComponents/SVGElements";
 import Output from "../SoundModules/io/Output";
 
 const MagicPlayer = function(myOutput) {
@@ -182,16 +182,16 @@ class SoundPlayer{
                     this.stop();
                     
                     everyPlayButton.map((otherButton)=>{
-                        otherButton.domElement.classList.remove("active");
+                        otherButton.removeClass("active");
                     });
                 }else{
 
                     everyPlayButton.map((otherButton)=>{
-                        otherButton.domElement.classList.remove("active");
+                        otherButton.removeClass("active");
                     });
 
                     console.log("play");
-                    playButton.domElement.classList.add("active");
+                    playButton.addClass("active");
                     this.setModule(module,true);
 
                 }
@@ -206,9 +206,13 @@ class SoundPlayer{
                 magicPlayerLeft.setOutput(module.outputs.l);
                 magicPlayerRight.setOutput(module.outputs.r);
             }else{
-                let defo=module.getDefaultOutput();
-                magicPlayerLeft.setOutput(defo);
-                magicPlayerRight.setOutput(defo);
+                try{
+                    let defo=module.getDefaultOutput();
+                    magicPlayerLeft.setOutput(defo);
+                    magicPlayerRight.setOutput(defo);
+                }catch(e){
+                    console.warn("module doesn't have default output",module);
+                }
             }
             if(start){
                 magicPlayerLeft.play();

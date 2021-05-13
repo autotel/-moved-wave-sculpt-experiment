@@ -1,8 +1,5 @@
-import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
-import Hoverable from "./components/Hoverable";
-import round from "../utils/round";
 
 /**
  * @namespace DomInterface.GenericDisplay

@@ -1,7 +1,7 @@
-import { Path, SVGGroup, Rectangle, Text } from "../../scaffolding/GraphicElements";
+import {  SVGGroup, Rectangle, Text } from "../../dom-model-gui/GuiComponents/SVGElements";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
-import Draggable from "./Draggable";
-import Vector2 from "../../scaffolding/Vector2";
+import Draggable from "../../dom-model-gui/Interactive/Draggable";
+import Vector2 from "../../dom-model-gui/utils/Vector2";
 import round from "../../utils/round";
 
 const zoomSettings={

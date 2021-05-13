@@ -1,4 +1,4 @@
-import Model from "../../scaffolding/Model";
+import Model from "../../dom-model-gui/Model";
 import measureExec from "../../utils/measureExec";
 import promiseDebounce from "../../utils/promiseDebounceFunction";
 import Lane from "../../DomInterfaces/components/Lane";
@@ -71,7 +71,7 @@ class Module extends Model{
         this.getDefaultOutput = () => {
             const firstOutputName = Object.keys(this.outputs)[0];
             if(firstOutputName){
-                return this.outputs[firstOutputName]
+                return this.outputs[firstOutputName];
             }else{
                 throw new Error("Could not get first output of tis module");
             }

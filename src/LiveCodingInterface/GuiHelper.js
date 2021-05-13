@@ -1,4 +1,4 @@
-import { Div } from "../scaffolding/GraphicElements";
+import { Div }  from "../dom-model-gui/GuiComponents/DOMElements";
 import LiveCodingInterface from "./index";
 
 class LiveCodingInterfaceGuiHelper extends Div{
@@ -14,7 +14,7 @@ class LiveCodingInterfaceGuiHelper extends Div{
         ).forEach(function(modulename){
             const Constructor = liveCodingInterface.possibleModules[modulename];
             let newDiv = new Div();
-            newDiv.domElement.classList.add("button");
+            newDiv.addClass("button");
             
             let abbrname = modulename.toLowerCase().slice(0,3);
             newDiv.domElement.innerHTML="+" + modulename;

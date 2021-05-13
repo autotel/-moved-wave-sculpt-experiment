@@ -1,4 +1,4 @@
-import { Path } from "../../scaffolding/GraphicElements";
+import { Path } from  "../../dom-model-gui/GuiComponents/SVGElements";
 import ValuePixelTranslator from "../../utils/ValuePixelTranslator";
 
 

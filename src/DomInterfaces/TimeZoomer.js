@@ -1,6 +1,7 @@
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
-import { Rectangle, SVGGroup } from "../scaffolding/GraphicElements";
-import Draggable from "./components/Draggable";
+import { Rectangle, SVGGroup }  from "../dom-model-gui/GuiComponents/SVGElements";
+import Draggable from "../dom-model-gui/Interactive/Draggable";
+
 
 class TimeZoomer extends SVGGroup {
     constructor() {

@@ -1,10 +1,11 @@
 
-import { Circle } from "../scaffolding/GraphicElements";
-import Draggable from "./components/Draggable";
+import { Circle }  from "../dom-model-gui/GuiComponents/SVGElements";
+
+import Draggable from "../dom-model-gui/Interactive/Draggable";
 import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
-const vectorTypes = require("../scaffolding/Vector2");
+const vectorTypes = require("../dom-model-gui/utils/Vector2");
 /** @typedef {vectorTypes.MiniVector} MiniVector
 /**
  * @namespace DomInterface.EnvelopeGeneratorDisplay
