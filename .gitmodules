@@ -1,0 +1,3 @@
+[submodule "src/dom-model-gui"]
+	path = src/dom-model-gui
+	url = https://gitlab.com/autotel/autotel-model-dom-gui.git
