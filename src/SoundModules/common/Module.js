@@ -44,9 +44,11 @@ class Module extends Model{
          * @returns {Array<Promise>|Array} 
          */
         this.eachInput = (callback) => {
-            return Object.keys(this.inputs).map((inputName, index) => {
-                const input = this.inputs[inputName];
-                return callback(input, index, inputName);
+            return Object.keys(this.inputs).map((connName, index) => {
+                //a bit of an ugly fix, but: ensure it has a name
+                const input = this.inputs[connName];
+                if(!input.name) input.name = connName;
+                return callback(input, index, connName);
             }).filter((v)=>v!==undefined);
         };
 
@@ -62,9 +64,11 @@ class Module extends Model{
          * @returns {Array<Promise>|Array} 
          */
         this.eachOutput = (callback) => {
-            return Object.keys(this.outputs).map((inputName, index) => {
-                const output = this.outputs[inputName];
-                return callback(output, index, inputName);
+            return Object.keys(this.outputs).map((connName, index) => {
+                //a bit of an ugly fix, but: ensure it has a name
+                const output = this.outputs[connName];
+                if(!output.name) output.name = connName;
+                return callback(output, index, connName);
             }).filter((v)=>v!==undefined);
         }
         

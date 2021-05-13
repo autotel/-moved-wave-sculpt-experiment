@@ -19,7 +19,8 @@ class Output extends Model{
         super({});
 
         this.owner=ownerModule;
-        
+        this.name;
+
         setTimeout(()=>{
             /** @type {string} */
             this.name = getMyNameInObject(this,ownerModule.outputs)||"";

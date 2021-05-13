@@ -62,8 +62,8 @@ class PatchCord{
             this.show();
             let bez=Math.abs(startPos.y-endPos.y) / 5;
             myPath.set('d',
-                `M ${endPos.x}, ${startPos.y}
-                 C ${endPos.x + bez}, ${startPos.y}
+                `M ${startPos.x}, ${startPos.y}
+                 C ${startPos.x + bez}, ${startPos.y}
                     ${endPos.x + bez}, ${endPos.y}
                     ${endPos.x}, ${endPos.y}`
             );

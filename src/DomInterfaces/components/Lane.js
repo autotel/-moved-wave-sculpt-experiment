@@ -1,5 +1,6 @@
 import { Line, Rectangle, Path, SVGGroup, Text, Component, SVGCanvas } from "../../dom-model-gui/GuiComponents/SVGElements";
 import Draggable from "../../dom-model-gui/Interactive/Draggable";
+import Hoverable from "../../dom-model-gui/Interactive/Hoverable.js";
 import typicalLaneSettings from "../../utils/const typicalLaneSettings";
 import Module from "../../SoundModules/common/Module";
 import Knob from "../../dom-model-gui/GuiComponents/Knob";
@@ -259,24 +260,31 @@ class Lane extends SVGGroup {
             });
             return outputPositions;
         }
+
         /** @param {NodePosition} pos */
         const ConnectorGraph = function (pos, name, container) {
             const optxt = new Text();
-            container.add(optxt);
+            const showText=()=> container.add(optxt);
+            const hideText=()=> container.remove(optxt);
             const rect = new Rectangle();
+            const hoverable = new Hoverable(rect);
+            hoverable.mouseEnterCallback=()=>showText();
+            hoverable.mouseLeaveCallback=()=>hideText();
             container.add(rect);
             this.updatePosition = () =>{
                 Object.assign(rect.attributes,{
-                    x: pos.x - 15,
+                    x: pos.x - 5,
                     y: pos.y - 5,
                     width: 10,
                     height: 10,
                 });
                 rect.update();
                 Object.assign(optxt.attributes,{
-                    x: pos.x + 10, y: pos.y + 5,
-                    text: pos.name,
-                });              
+                    x: pos.x - 20, y: pos.y +3,
+                    "text-anchor":"end",
+                    transform:"rotate(90deg)",
+                    text: pos.name||"out",
+                });
                 optxt.update();  
             }
         }
