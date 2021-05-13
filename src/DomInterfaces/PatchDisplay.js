@@ -3,6 +3,7 @@ import { Path, SVGGroup, SVGCanvas }  from "../dom-model-gui/GuiComponents/SVGEl
 import Output from "../SoundModules/io/Output";
 import Input from "../SoundModules/io/Input";
 import Lane from "./components/Lane";
+import debounce from "../utils/debounceFunction";
 const pathTypes = require("../dom-model-gui/GuiComponents/SVGElements");
 
 /** @typedef {pathTypes.PathOptions} PathOptions */
@@ -148,7 +149,7 @@ class PatchDisplay extends SVGGroup{
 
         }
 
-        const updatePatchLines=()=>{
+        const updatePatchLines= debounce(()=>{
             let coordinates = getListOfConnectionCoordinates();
 
             hidePatchCordsFrom(coordinates.length);
@@ -156,7 +157,7 @@ class PatchDisplay extends SVGGroup{
             coordinates.forEach(({startPos,endPos},index)=>{
                 drawPatchCord(startPos,endPos,index);
             });
-        }
+        },10);
 
         // client functions
         this.appendModules=(...modules)=>{
@@ -168,7 +169,7 @@ class PatchDisplay extends SVGGroup{
             myAppendedModules.add(module);
             
             module.onUpdate((changes)=>{
-                if(changes.outputs){
+                if(changes.outputs||changes.inputs){
                     updatePatchLines();
                 }
             });

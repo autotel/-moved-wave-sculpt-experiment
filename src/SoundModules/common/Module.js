@@ -86,6 +86,7 @@ class Module extends Model{
          * @param {Input} to */
         this.connectTo = (to) => {
             this.getDefaultOutput().connectTo(to);
+            this.changed({outputs:true});
         };
 
         /** 
@@ -96,6 +97,7 @@ class Module extends Model{
         this.disconnect = (output = false, fromInput=false) => {
             if(output){
                 output.disconnect(fromInput);
+                this.changed({outputs:true});
             }else{
                 this.eachOutput((output)=>{
                     if(!output){

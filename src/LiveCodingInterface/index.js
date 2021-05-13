@@ -170,7 +170,17 @@ class LiveCodingInterface{
             });
 
             modulesList.sort((a,b)=>{
-                return a.getInterface().attributes.y - b.getInterface().attributes.y;
+
+                let inta = a.getInterface();
+                let intb = b.getInterface();
+                
+                let ya = 0;
+                let yb = 0;
+
+                if(inta) ya = inta.attributes.y;
+                if(intb) yb = intb.attributes.y;
+                
+                return ya - yb;
             });
 
             const getAccessNameOfModule=(module)=>{
