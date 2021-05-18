@@ -18,6 +18,7 @@ import Module from "../SoundModules/common/Module";
 import Repeater from "../SoundModules/Repeater";
 import Hipparchus from "../SoundModules/Hipparchus";
 import Sampler from "../SoundModules/Sampler";
+import HarmonicsOscillator2 from "../SoundModules/HarmonicsOscillator2";
 
 //for interfaces
 import GenericDisplay from "../DomInterfaces/GenericDisplay";
@@ -32,6 +33,7 @@ import HipparchusDisplay from "../DomInterfaces/HipparchusDisplay";
 import WaveFolderDisplay from "../DomInterfaces/WaveFolderDisplay";
 import RustCombDisplay from "../DomInterfaces/RustCombDisplay";
 import FilterDisplay from "../DomInterfaces/FilterDisplay";
+import HarmonicsOscillator2Display from "../DomInterfaces/HarmonicsOscillator2Display";
 
 
 const modulesAndTheirInterfaces = {}
@@ -44,6 +46,7 @@ function registerModuleAndItsInterface (ModuleProto,InterfaceProto){
 
 registerModuleAndItsInterface(Oscillator,false);
 registerModuleAndItsInterface(HarmonicsOscillator,false);
+registerModuleAndItsInterface(HarmonicsOscillator2,HarmonicsOscillator2Display);
 registerModuleAndItsInterface(Mixer,false);
 registerModuleAndItsInterface(Delay,DelayDisplay);
 registerModuleAndItsInterface(DelayWithFilter,DelayWithFilterDisplay);

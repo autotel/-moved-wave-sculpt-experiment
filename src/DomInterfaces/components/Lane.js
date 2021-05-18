@@ -150,7 +150,6 @@ class Lane extends SVGGroup {
             const newControl = new Knob();
             this.appendToControlPanel(newControl);
             newControl.setToModelParameter(module, parameterName);
-            controlPanel.add(newControl);
             return newControl;
         }
         /** @param {string} parameterName */
@@ -158,7 +157,6 @@ class Lane extends SVGGroup {
             const newControl = new Toggle();
             this.appendToControlPanel(newControl);
             newControl.setToModelParameter(module, parameterName);
-            controlPanel.add(newControl);
             return newControl;
         }
 
@@ -167,7 +165,6 @@ class Lane extends SVGGroup {
             const newControl = new SoundLoaderDecoder();
             this.appendToControlPanel(newControl);
             newControl.setToModelParameter(module, parameterName);
-            controlPanel.add(newControl);
             return newControl;
         }
 
