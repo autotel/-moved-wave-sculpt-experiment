@@ -1,6 +1,6 @@
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
-import { SVGElementsArrayComponent, ElementsArray } from "../dom-model-gui/GuiComponents/ElementsArray";
+import { SVGElementsArray, SVGListElement } from "../dom-model-gui/GuiComponents/ElementsArray";
 import { Line, Text } from "../dom-model-gui/GuiComponents/SVGElements";
 import HarmonicsOscillator2 from "../SoundModules/HarmonicsOscillator2";
 import times from "../utils/times";
@@ -21,7 +21,8 @@ const posXToFrequency = (posx) => {
     return Math.pow(2,posx);
 }
 
-class HarmonicLine extends SVGElementsArrayComponent{
+let c = 0;
+class HarmonicLine extends SVGListElement{
     /**
      * @param {Object} props
      * @param {HarmonicsOscillator2} props.module
@@ -43,6 +44,7 @@ class HarmonicLine extends SVGElementsArrayComponent{
             this.remove(line);
             this.remove(text);
         }
+
         this.show = () => {
             if(shown) return;
             shown=true;
@@ -55,8 +57,10 @@ class HarmonicLine extends SVGElementsArrayComponent{
             const frequency = module.getHarmonicFrequencyMultiplier(
                 number, module.settings.distance
             );
-            let x = halfWidth + (Math.log2(frequency) * width * 5);
+            let x = halfWidth + (Math.log2(frequency) * width / 5);
             let x1=x;
+
+            console.log({x,number,width});
 
             let y1=height - HarmonicsOscillator2.falloffFunction(
                 number / module.settings.harmonics,
@@ -78,7 +82,7 @@ class HarmonicLine extends SVGElementsArrayComponent{
     }
 }
 
-class FrequencyLine extends SVGElementsArrayComponent{
+class FrequencyLine extends SVGListElement{
     constructor({width,height}){
         super();
         const line = new Line();
@@ -100,7 +104,7 @@ class FrequencyLine extends SVGElementsArrayComponent{
         }
     }
 }
- 
+
 /** 
  * @class HarmonicsOscillator2Display
  * @extends WaveLane
@@ -142,8 +146,8 @@ class HarmonicsOscillator2Display extends WaveLane{
             };
         });
 
-        let harmonicLines = new ElementsArray(
-            HarmonicLine,this,
+        let harmonicLines = new SVGElementsArray(
+            HarmonicLine,
             {   
                 module,
                 width:settings.width,
@@ -166,16 +170,16 @@ class HarmonicsOscillator2Display extends WaveLane{
             }
         });
 
-
-
-        let referenceLines = new ElementsArray(
-            FrequencyLine,this,
+        let referenceLines = new SVGElementsArray(
+            FrequencyLine,
             {   
                 module,
                 width:options.width,
                 height:options.height
             }
         );
+
+        this.add(harmonicLines,referenceLines);
 
         module.onUpdate((changes)=>{
             if(

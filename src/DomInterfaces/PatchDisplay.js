@@ -113,23 +113,23 @@ class PatchDisplay extends SVGGroup{
             }];
 
             /** @type {Array<NodePosition>} */
-            const outputPositions = [];
+            const outputInfo = [];
 
             /** @type {Array<NodePosition>} */
-            const inputPositions = [];
+            const inputInfo = [];
             
             myAppendedInterfaces.forEach((lane)=>{
-                outputPositions.push(... lane.getOutputPositions());
-                inputPositions.push(... lane.getInputPositions());
+                outputInfo.push(... lane.getOutputInfo());
+                inputInfo.push(... lane.getInputInfo());
             });
 
             /** @param {Input} input */
             const getPositionOfInput = (input)=> {
-                return inputPositions.filter((position)=>{
+                return inputInfo.filter((position)=>{
                     return position.input==input;
                 })[0];
             }
-            outputPositions.forEach((outputPosition)=>{
+            outputInfo.forEach((outputPosition)=>{
                 const outputNode = outputPosition.output;
                 outputNode.forEachConnectedInput((input)=>{
                     const inputPos = getPositionOfInput(input);
