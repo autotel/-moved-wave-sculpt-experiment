@@ -1,6 +1,5 @@
-import { Line, Rectangle, Path, SVGGroup, Text, Component, SVGCanvas } from "../../dom-model-gui/GuiComponents/SVGElements";
+import { Line, Rectangle, Path, SVGGroup, Text, SVGCanvas } from "../../dom-model-gui/GuiComponents/SVGElements";
 import Draggable from "../../dom-model-gui/Interactive/Draggable";
-import Hoverable from "../../dom-model-gui/Interactive/Hoverable.js";
 import typicalLaneSettings from "../../utils/const typicalLaneSettings";
 import Module from "../../SoundModules/common/Module";
 import Knob from "../../dom-model-gui/GuiComponents/Knob";
@@ -11,7 +10,8 @@ import SoundLoaderDecoder from "./SoundLoaderDecoder";
 import Input from "../../SoundModules/io/Input";
 import Output from "../../SoundModules/io/Output";
 import ConnectorGraph from "./ConnectorGraph";
-import { ElementsArray, SVGElementsArray } from "../../dom-model-gui/GuiComponents/ElementsArray";
+import { SVGElementsArray } from "../../dom-model-gui/GuiComponents/ElementsArray";
+import Component from "../../dom-model-gui/GuiComponents/Component";
 
 const sizes = placements;
 
@@ -212,6 +212,14 @@ class Lane extends SVGGroup {
          * @property {Output} [NodePosition.output]
          **/
         
+        const outputsArrayContainer = new SVGElementsArray(
+            ConnectorGraph,{}
+        );
+
+        const inputsArrayContainer = new SVGElementsArray(
+            ConnectorGraph,{}
+        );
+        
         /** @type {Array<NodePosition>|undefined} */
 
         const inputInfo=[];
@@ -260,14 +268,11 @@ class Lane extends SVGGroup {
             return outputInfo;
         }
 
-        const outputsArrayContainer = new SVGElementsArray(
-            ConnectorGraph,{}
-        );
+        this.getConnectorGraphs = () => [
+            ... outputsArrayContainer.instancesList,
+            ... inputsArrayContainer.instancesList
+        ];
 
-        const inputsArrayContainer = new SVGElementsArray(
-            ConnectorGraph,{}
-        );
-        
         this.add(inputsArrayContainer,outputsArrayContainer);
 
         const updateSize = () => {

@@ -4,6 +4,7 @@ import Output from "../SoundModules/io/Output";
 import Input from "../SoundModules/io/Input";
 import Lane from "./components/Lane";
 import debounce from "../utils/debounceFunction";
+import ConnectorGraph from "./components/ConnectorGraph";
 const pathTypes = require("../dom-model-gui/GuiComponents/SVGElements");
 
 /** @typedef {pathTypes.PathOptions} PathOptions */
@@ -78,12 +79,15 @@ class PatchCord{
  */
 class PatchDisplay extends SVGGroup{
     /** 
-     * @param {SVGCanvas} drawBoard 
-     * 
+     * @param {SVGCanvas} drawBoard
      * */
-
     constructor(drawBoard){
         super();
+
+        const connectActionPatchCord = new PatchCord(this);
+        connectActionPatchCord.hide();
+
+        const guiConnector = ConnectorGraph.getGuiConnector();
 
         this.addClass("patch-board");
         
@@ -117,6 +121,9 @@ class PatchDisplay extends SVGGroup{
 
             /** @type {Array<NodePosition>} */
             const inputInfo = [];
+
+            /** @type {Array<ConnectorGraph>} */
+            const connectorGraphs = [];
             
             myAppendedInterfaces.forEach((lane)=>{
                 outputInfo.push(... lane.getOutputInfo());
@@ -187,6 +194,17 @@ class PatchDisplay extends SVGGroup{
 
         drawBoard.size.onChange(()=>{
             updatePatchLines();
+        });
+
+
+        guiConnector.onPatchStart(({from})=>{
+            const startPos = from.position;
+            const endPos = {x:0,y:0};
+            connectActionPatchCord.set(startPos,endPos);
+        });
+
+        guiConnector.onPatchStart(({from,to})=>{
+            connectActionPatchCord.hide();
         });
 
 
