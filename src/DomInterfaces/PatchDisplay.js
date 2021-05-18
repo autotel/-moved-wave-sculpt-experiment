@@ -1,10 +1,11 @@
 import Module from "../SoundModules/common/Module";
-import { Path, SVGGroup, SVGCanvas }  from "../dom-model-gui/GuiComponents/SVGElements";
+import { Path, SVGGroup, SVGCanvas } from "../dom-model-gui/GuiComponents/SVGElements";
 import Output from "../SoundModules/io/Output";
 import Input from "../SoundModules/io/Input";
 import Lane from "./components/Lane";
 import debounce from "../utils/debounceFunction";
 import ConnectorGraph from "./components/ConnectorGraph";
+import Mouse from "../dom-model-gui/Interactive/Mouse";
 const pathTypes = require("../dom-model-gui/GuiComponents/SVGElements");
 
 /** @typedef {pathTypes.PathOptions} PathOptions */
@@ -13,9 +14,9 @@ const pathTypes = require("../dom-model-gui/GuiComponents/SVGElements");
  * @namespace DomInterface.PatchDisplay
  */
 
- /*
- * TODO: interfaces should also extend model, so that changes to interface can be tracked better.
- */
+/*
+* TODO: interfaces should also extend model, so that changes to interface can be tracked better.
+*/
 
 const VectorTypedef = require("../dom-model-gui/utils/Vector2");
 
@@ -38,37 +39,59 @@ const VectorTypedef = require("../dom-model-gui/utils/Vector2");
  * @param {Output} fromOutput
  * @param {Input} toInput 
  */
-class PatchCord{
+class PatchCord {
     /** @param {SVGGroup} parentEl*/
-    constructor (parentEl){
+    constructor(parentEl) {
         const myPath = new Path();
         parentEl.add(myPath);
+
+        let startPos = {};
+        let endPos = {};
+
+        /** @type {Output|false} */
+        let from = false;
+        /** @type {Input|false} */
+        let to = false;
 
         myPath.domElement.classList.toggle("patchcord");
 
         myPath.domElement.addEventListener(
             'click',
-            (evt)=>myPath.domElement.classList.toggle("highlight")
+            (evt) => {
+                myPath.domElement.classList.toggle("highlight");
+                console.log(this);
+            }
         );
 
-        let displaying = true;
-        this.show=()=>{
-            if(displaying) return;
+        this.displaying = true;
+        this.show = () => {
+            if (this.displaying) return;
+            this.displaying = true;
             myPath.removeClass("hidden");
         }
-        this.hide=()=>{
-            if(!displaying) return;
+        this.hide = () => {
+            if (!this.displaying) return;
+            this.displaying = false;
             myPath.addClass("hidden");
         }
-        this.set=(startPos,endPos)=>{
+        this.set = (properties) => {
+            if (properties.start) startPos = properties.start;
+            if (properties.end) endPos = properties.end;
+            if (properties.from) from = properties.from;
+            if (properties.to) to = properties.to;
             this.show();
-            let bez=Math.abs(startPos.y-endPos.y) / 5;
+            let bez = Math.abs(startPos.y - endPos.y) / 5;
             myPath.set('d',
                 `M ${startPos.x}, ${startPos.y}
                  C ${startPos.x + bez}, ${startPos.y}
                     ${endPos.x + bez}, ${endPos.y}
                     ${endPos.x}, ${endPos.y}`
             );
+        }
+        this.disconnect = () => {
+            if(from && to){
+                from.disconnect(to);
+            };
         }
     }
 }
@@ -77,12 +100,14 @@ class PatchCord{
  * @class PatchDisplay
  * @extends SVGGroup
  */
-class PatchDisplay extends SVGGroup{
+class PatchDisplay extends SVGGroup {
     /** 
      * @param {SVGCanvas} drawBoard
      * */
-    constructor(drawBoard){
+    constructor(drawBoard) {
         super();
+
+        const mouse = Mouse.get();
 
         const connectActionPatchCord = new PatchCord(this);
         connectActionPatchCord.hide();
@@ -90,30 +115,30 @@ class PatchDisplay extends SVGGroup{
         const guiConnector = ConnectorGraph.getGuiConnector();
 
         this.addClass("patch-board");
-        
+
         /** @type {Set<Module>}  */
-        const myAppendedModules=new Set();
+        const myAppendedModules = new Set();
 
         /** @type {Set<Lane>}  */
-        const myAppendedInterfaces=new Set();
+        const myAppendedInterfaces = new Set();
 
         const patchCords = [];
 
-        const drawPatchCord=(startPos,endPos,number)=>{
-            if(!patchCords[number]) patchCords[number]=new PatchCord(this);
-            patchCords[number].set(startPos,endPos);
+        const drawPatchCord = (passObj, number) => {
+            if (!patchCords[number]) patchCords[number] = new PatchCord(this);
+            patchCords[number].set(passObj);
         }
 
-        const hidePatchCordsFrom=(from)=>{
-            for(let index=from; index<patchCords.length; index++){
+        const hidePatchCordsFrom = (from) => {
+            for (let index = from; index < patchCords.length; index++) {
                 patchCords[index].hide();
             }
         }
 
         const getListOfConnectionCoordinates = () => {
             const coords = [{
-                startPos:{x:0,y:0},
-                endPos:{x:0,y:0},
+                start: { x: 0, y: 0 },
+                end: { x: 0, y: 0 },
             }];
 
             /** @type {Array<NodePosition>} */
@@ -124,30 +149,34 @@ class PatchDisplay extends SVGGroup{
 
             /** @type {Array<ConnectorGraph>} */
             const connectorGraphs = [];
-            
-            myAppendedInterfaces.forEach((lane)=>{
-                outputInfo.push(... lane.getOutputInfo());
-                inputInfo.push(... lane.getInputInfo());
+
+            myAppendedInterfaces.forEach((lane) => {
+                outputInfo.push(...lane.getOutputInfo());
+                inputInfo.push(...lane.getInputInfo());
             });
 
             /** @param {Input} input */
-            const getPositionOfInput = (input)=> {
-                return inputInfo.filter((position)=>{
-                    return position.input==input;
+            const getPositionOfInput = (input) => {
+                return inputInfo.filter((position) => {
+                    return position.input == input;
                 })[0];
             }
-            outputInfo.forEach((outputPosition)=>{
+            outputInfo.forEach((outputPosition) => {
                 const outputNode = outputPosition.output;
-                outputNode.forEachConnectedInput((input)=>{
+                outputNode.forEachConnectedInput((input) => {
                     const inputPos = getPositionOfInput(input);
-                    if(inputPos){
-                        const startPos=outputPosition.absolute;
-                        const endPos=inputPos.absolute;
+                    if (inputPos) {
+                        const start = outputPosition.absolute;
+                        const end = inputPos.absolute;
+                        const from = outputPosition.output;
+                        const to = inputPos.input;
                         coords.push({
-                            startPos,
-                            endPos
+                            start,
+                            end,
+                            from,
+                            to,
                         });
-                    }else{
+                    } else {
                         console.error("input position found to draw patch cable");
                     }
                 });
@@ -156,34 +185,34 @@ class PatchDisplay extends SVGGroup{
 
         }
 
-        const updatePatchLines= debounce(()=>{
+        const updatePatchLines = debounce(() => {
             let coordinates = getListOfConnectionCoordinates();
 
             hidePatchCordsFrom(coordinates.length);
 
-            coordinates.forEach(({startPos,endPos},index)=>{
-                drawPatchCord(startPos,endPos,index);
+            coordinates.forEach((coord, index) => {
+                drawPatchCord(coord,index);
             });
-        },10);
+        }, 10);
 
         // client functions
-        this.appendModules=(...modules)=>{
+        this.appendModules = (...modules) => {
             modules.map(this.appendModule);
         }
-        
+
         /** @param {Module} module */
-        this.appendModule=(module)=>{
+        this.appendModule = (module) => {
             myAppendedModules.add(module);
-            
-            module.onUpdate((changes)=>{
-                if(changes.outputs||changes.inputs){
+
+            module.onUpdate((changes) => {
+                if (changes.outputs || changes.connections) {
                     updatePatchLines();
                 }
             });
 
-            const modInterface=module.getInterface();
+            const modInterface = module.getInterface();
 
-            if(modInterface){
+            if (modInterface) {
                 modInterface.onMoved(updatePatchLines);
                 myAppendedInterfaces.add(modInterface);
             }
@@ -192,18 +221,23 @@ class PatchDisplay extends SVGGroup{
         }
         //event callbacks
 
-        drawBoard.size.onChange(()=>{
+        drawBoard.size.onChange(() => {
             updatePatchLines();
         });
 
-
-        guiConnector.onPatchStart(({from})=>{
-            const startPos = from.position;
-            const endPos = {x:0,y:0};
-            connectActionPatchCord.set(startPos,endPos);
+        mouse.onMove(mouse => {
+            if (connectActionPatchCord.displaying) {
+                connectActionPatchCord.set(false, mouse);
+            }
         });
 
-        guiConnector.onPatchStart(({from,to})=>{
+        guiConnector.onPatchStart(({ from }) => {
+            const startPos = from.position;
+            connectActionPatchCord.set(startPos);
+        });
+
+        guiConnector.onPatchEnd(({ from, to }) => {
+            console.log("patch end");
             connectActionPatchCord.hide();
         });
 

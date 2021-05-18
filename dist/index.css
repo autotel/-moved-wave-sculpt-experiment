@@ -148,4 +148,9 @@ svg .working .handle-rect {
   animation: dash-working 3s linear infinite;
 }
 
+.hidden {
+  opacity: 0 !important;
+  transition: 0.2s opacity;
+}
+
 /*# sourceMappingURL=index.css.map */

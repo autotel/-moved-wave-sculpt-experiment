@@ -45,6 +45,7 @@ class Output extends Model{
             if(to instanceof Input){
                 myInputs.add(to);
                 to.myConnectedOutput=this;
+                ownerModule.changed({connections:true});
                 return;
             }else if(to.inputs && to.inputs.main instanceof Input){
                 this.connectTo(to.inputs.main);

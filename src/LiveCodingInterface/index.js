@@ -118,7 +118,7 @@ class LiveCodingInterface{
             if(!intendedName) intendedName=protoname+" "+count;
             let nameForAccess = (
                 intendedName
-            ).match(/[A-Za-z0-9]/gi).join("").toLowerCase();
+            ).match(/[A-Za-z0-9_]/gi).join("").toLowerCase();
 
             if(this.modules[nameForAccess]) nameForAccess = nameForAccess+count;
             

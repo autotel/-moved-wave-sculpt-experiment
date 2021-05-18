@@ -6,6 +6,7 @@ import { SVGListElement } from "../../dom-model-gui/GuiComponents/ElementsArray"
 import Output from "../../SoundModules/io/Output";
 import Input from "../../SoundModules/io/Input";
 import Clickable from "../../dom-model-gui/Interactive/Clickable";
+import Mouse from "../../dom-model-gui/Interactive/Mouse";
 
 /**
  * @callback PatchStartCallback
@@ -27,11 +28,16 @@ class GuiConnector {
         const patchEndListeners = [];
         /** @type {ConnectorGraph|undefined} */
         let connectionActionStartOutputGraph = undefined;
+        
 
         /** @param {ConnectorGraph} connectorGraph */
         this.startPatchAction = connectorGraph => {
             console.log("connect ",connectorGraph.output.name,"...");
+            if(connectionActionStartOutputGraph){
+                connectionActionStartOutputGraph.removeClass("active");
+            }
             connectionActionStartOutputGraph=connectorGraph;
+            connectionActionStartOutputGraph.addClass("active");
 
             patchStartListeners.map(callback=>callback({
                 from:connectionActionStartOutputGraph,
@@ -39,18 +45,21 @@ class GuiConnector {
         };
 
         this.endPatchAction = connectorGraph => {
-            console.log("... to",connectorGraph.input.name);
             if(
-                connectionActionStartOutputGraph
-                && connectionActionStartOutputGraph.output
+                connectorGraph 
                 && connectorGraph.input
+                && connectionActionStartOutputGraph
+                && connectionActionStartOutputGraph.output
             ){
                 connectionActionStartOutputGraph.output.connectTo(connectorGraph.input);
 
-                patchEndListeners.map(callback=>callback({
+                connectionActionStartOutputGraph.removeClass("active");
+                connectionActionStartOutputGraph = undefined;
+
+                patchEndListeners.forEach(callback=>callback({
                     from:connectionActionStartOutputGraph,
                     to:connectorGraph
-                }));                
+                }));
             }
         };
 
@@ -58,6 +67,7 @@ class GuiConnector {
         this.onPatchStart = (callback) => patchStartListeners.push(callback);
         /**@param {PatchEndCallback} callback */
         this.onPatchEnd = (callback) => patchEndListeners.push(callback);
+
     }
 }
 
@@ -70,6 +80,7 @@ class ConnectorGraph extends SVGListElement {
         ConnectorGraph.getGuiConnector();
 
         this.position = {};
+        this.absolute = {};
 
         this.input = undefined;
         this.output = undefined;
@@ -97,15 +108,17 @@ class ConnectorGraph extends SVGListElement {
            * @param {Object} props
            * @param {number} props.x
            * @param {number} props.y
+           * @param {import("../../dom-model-gui/utils/Vector2").MiniVector} props.absolute
            * @param {string} props.name
            * @param {Output|undefined} props.output
            * @param {Input|undefined} props.input
            */
-        this.set = ({ x, y, name, output, input }) => {
+        this.set = ({ x, y, name, output, input, absolute }) => {
             this.position.x=x;
             this.position.y=y;
             this.input=input;
             this.output=output;
+            this.absolute=absolute;
             Object.assign(rect.attributes, {
                 x: x - 5,
                 y: y - 5,
