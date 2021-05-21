@@ -104,7 +104,7 @@ class Module extends Model{
                         console.warn(this.outputs);
                         throw new Error("For some reason an input is of wrong type: "+output);
                     }
-                    this.disconnect(output)
+                    this.disconnect(output);
                 });
             }
         };
@@ -123,7 +123,6 @@ class Module extends Model{
             this.changed({
                 cacheStillValid:this.cacheStillValid
             });
-            
             this.requestRecalculation();
         }
 
@@ -179,6 +178,14 @@ class Module extends Model{
         this.triggerInitialState = () => {
             this.cacheObsolete();
         };
+
+        this.onUpdate((changes)=>{
+            //every change done through "set" method will trigger a recalculation
+            //some events are set using "update" and the recalculation mark needs to be added here
+            if(changes.connections){
+                this.cacheObsolete();
+            }
+        });
     }
 }
 export default Module;

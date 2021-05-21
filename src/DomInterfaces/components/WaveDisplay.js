@@ -17,14 +17,15 @@ class WaveDisplay extends Path{
         
 
         const superSet = this.set;
+        let theWave = [];
         /** 
-         * @param {String} what
-         * @param {any} value
+         * @param {Object} changes
          */
-        this.set = (what,value) => {
+        this.set = (changes) => {
             
-            if (what == "wave" || what == "width") {
-                const theWave = value;
+            if (changes.wave || changes.width) {
+                if(changes.wave) theWave = changes.wave;
+                if(!theWave) return;
                 let str = `M ${0},${settings.height / 2}`;
                 
                 let end = Math.min(
@@ -45,7 +46,7 @@ class WaveDisplay extends Path{
                 str += `L ${0},${translator.amplitudeToY(0)} `;
                 str += `z`;
 
-                superSet('d',str);
+                superSet({'d':str});
             }
         };
     }

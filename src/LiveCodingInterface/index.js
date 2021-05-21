@@ -145,7 +145,7 @@ class LiveCodingInterface{
             moduleCreationListeners.map((cb)=>cb(newModule,newInterface,count));
 
             newInterface.handyPosition(count + 3);
-            drawBoard.add(newInterface);
+            // drawBoard.add(newInterface);
 
             count++;
             return newModule;

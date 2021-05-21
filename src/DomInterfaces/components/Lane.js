@@ -175,7 +175,7 @@ class Lane extends SVGGroup {
         draggable.setPosition(settings);
         draggable.positionChanged = (newPosition) => {
             settings.y = newPosition.y;
-            this.set("y", newPosition.y);
+            this.set({"y": newPosition.y});
             handleMoved();
             return;
 
@@ -227,9 +227,10 @@ class Lane extends SVGGroup {
         /** @returns {Array<NodePosition>} */
         
         this.getInputInfo = () => {
+            const cols = 5;
             module.eachInput((input, index) => {
-                let col = index % 6;
-                let row = Math.floor(index / 6)
+                let col = index % cols;
+                let row = Math.floor(index / cols)
                 const newInputPosition = {
                     x: settings.width + (col * 20) + 30,
                     y: row * 20 + 15,
@@ -251,9 +252,10 @@ class Lane extends SVGGroup {
         /** @returns {Array<NodePosition>} */
         
         this.getOutputInfo = () => {
+            const cols = 5;
             module.eachOutput((output, index) => {
-                let col = index % 6;
-                let row = Math.floor(index / 6)
+                let col = index % cols;
+                let row = Math.floor(index / cols)
                 const newInputPosition = {
                     x: settings.width + (col * 20) + 30,
                     y: settings.height - row * 20 - 10,
@@ -294,12 +296,12 @@ class Lane extends SVGGroup {
 
         translator.onChange(()=>{
             const newWidth=translator.settings.width;
-            handleRect.set("width",newWidth);
+            handleRect.set({"width":newWidth});
 
-            controlPanel.set(
-                "x",
+            controlPanel.set({
+                "x":
                 newWidth - controlPanelWidth - controlPanelRight
-            );
+            });
         });
 
         drawBoard.size.onChange(()=>updateSize());

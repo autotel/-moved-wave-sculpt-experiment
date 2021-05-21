@@ -59,24 +59,24 @@ class WaveLane extends Lane{
 
         translator.onChange((changes)=>{
             waveDisplays.forEach((waveDisplay,index)=>{
-                waveDisplay.set("wave",
-                    outputs[index].cachedValues
-                );
+                waveDisplay.set({
+                    "wave":outputs[index].cachedValues
+                });
             });
         });
 
         module.onUpdate((changes)=>{
             if(changes.cacheStillValid == true){
                 waveDisplays.forEach((waveDisplay,index)=>{
-                    waveDisplay.set("wave",
-                        outputs[index].cachedValues
-                    );
+                    waveDisplay.set({
+                        "wave":outputs[index].cachedValues
+                    });
                 });
             }
         });
 
         // drawBoard.size.onChange(()=>{
-            // waveDisplay.set("width",drawBoard.size.width);
+            // waveDisplay.set({"width":drawBoard.size.width});
         // });
 
         /**

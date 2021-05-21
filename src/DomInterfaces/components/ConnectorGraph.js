@@ -1,12 +1,13 @@
 /** @typedef {import("../PatchDisplay").NodePosition} NodePosition */
 
-import { Rectangle, Text } from "../../dom-model-gui/GuiComponents/SVGElements";
+import { Rectangle, Text, Path } from "../../dom-model-gui/GuiComponents/SVGElements";
 import Hoverable from "../../dom-model-gui/Interactive/Hoverable";
 import { SVGListElement } from "../../dom-model-gui/GuiComponents/ElementsArray";
 import Output from "../../SoundModules/io/Output";
 import Input from "../../SoundModules/io/Input";
 import Clickable from "../../dom-model-gui/Interactive/Clickable";
 import Mouse from "../../dom-model-gui/Interactive/Mouse";
+import Draggable from "../../dom-model-gui/Interactive/Draggable";
 
 /**
  * @callback PatchStartCallback
@@ -27,46 +28,72 @@ class GuiConnector {
         /** @type {Array<PatchEndCallback>} */
         const patchEndListeners = [];
         /** @type {ConnectorGraph|undefined} */
-        let connectionActionStartOutputGraph = undefined;
-        
+        let patchFromOnRelease = undefined;
+        /** @type {ConnectorGraph|undefined} */
+        let patchToOnRelease = undefined;
+
+        const mouse = Mouse.get();
 
         /** @param {ConnectorGraph} connectorGraph */
         this.startPatchAction = connectorGraph => {
-            console.log("connect ",connectorGraph.output.name,"...");
-            if(connectionActionStartOutputGraph){
-                connectionActionStartOutputGraph.removeClass("active");
+            if (!connectorGraph.output) return;
+            console.log("connect ", connectorGraph.output.name, "...");
+            if (patchFromOnRelease) {
+                patchFromOnRelease.removeClass("active");
             }
-            connectionActionStartOutputGraph=connectorGraph;
-            connectionActionStartOutputGraph.addClass("active");
+            patchFromOnRelease = connectorGraph;
+            patchFromOnRelease.addClass("active");
 
-            patchStartListeners.map(callback=>callback({
-                from:connectionActionStartOutputGraph,
+            patchStartListeners.map(callback => callback({
+                from: patchFromOnRelease,
             }));
         };
 
-        this.endPatchAction = connectorGraph => {
-            if(
-                connectorGraph 
-                && connectorGraph.input
-                && connectionActionStartOutputGraph
-                && connectionActionStartOutputGraph.output
-            ){
-                connectionActionStartOutputGraph.output.connectTo(connectorGraph.input);
+        this.hover = connectorGraph => {
+            console.log("... to ", connectorGraph.input.name, "? ...");
+            patchToOnRelease = connectorGraph;
+        }
 
-                connectionActionStartOutputGraph.removeClass("active");
-                connectionActionStartOutputGraph = undefined;
+        this.unhover = connectorGraph => {
+            console.log("... nope, not ", connectorGraph.input.name, " ...");
+            if (connectorGraph === patchToOnRelease) patchToOnRelease = undefined;
+        }
 
-                patchEndListeners.forEach(callback=>callback({
-                    from:connectionActionStartOutputGraph,
-                    to:connectorGraph
+        this.release = () => {
+            if (
+                patchFromOnRelease
+                && patchFromOnRelease.output
+                && patchToOnRelease
+                && patchToOnRelease.input
+            ) {
+                patchFromOnRelease.output.connectTo(patchToOnRelease.input);
+
+                patchEndListeners.forEach(callback => callback({
+                    from: patchFromOnRelease,
+                    to: patchToOnRelease
                 }));
+                console.log("... ah, to ", patchToOnRelease ? patchToOnRelease.input.name : patchToOnRelease, " ...");
+                console.log("connected");
+            } else {
+                console.log("connection cancelled");
             }
+
+            if (patchFromOnRelease) {
+                patchFromOnRelease.removeClass("active");
+                patchFromOnRelease = undefined;
+            }
+
+            patchToOnRelease = undefined;
         };
 
         /**@param {PatchStartCallback} callback */
         this.onPatchStart = (callback) => patchStartListeners.push(callback);
         /**@param {PatchEndCallback} callback */
         this.onPatchEnd = (callback) => patchEndListeners.push(callback);
+
+        mouse.onUp(() => {
+            this.release();
+        });
 
     }
 }
@@ -77,7 +104,7 @@ class ConnectorGraph extends SVGListElement {
     constructor() {
         super();
 
-        ConnectorGraph.getGuiConnector();
+        const guiConnector = ConnectorGraph.getGuiConnector();
 
         this.position = {};
         this.absolute = {};
@@ -91,17 +118,26 @@ class ConnectorGraph extends SVGListElement {
         const rect = new Rectangle();
         const hoverable = new Hoverable(rect);
 
-        hoverable.mouseEnterCallback = () => showText();
-        hoverable.mouseLeaveCallback = () => hideText();
+        hoverable.mouseEnterCallback = () => {
+            showText();
+            if (this.input) {
+                guiConnector.hover(this);
+            }
+        }
+
+        hoverable.mouseLeaveCallback = () => {
+            hideText();
+            if (this.input) {
+                guiConnector.unhover(this);
+            }
+        }
 
         const clickable = new Clickable(rect);
-        clickable.clickCallback = () => {
-            if (this.output) {
-                ConnectorGraph.guiConnector.startPatchAction(this);
-            } else {
-                ConnectorGraph.guiConnector.endPatchAction(this);
-            }
-        };
+
+        clickable.mouseDownCallback = () => {
+            guiConnector.startPatchAction(this);
+        }
+
 
         this.add(rect);
         /**
@@ -114,11 +150,11 @@ class ConnectorGraph extends SVGListElement {
            * @param {Input|undefined} props.input
            */
         this.set = ({ x, y, name, output, input, absolute }) => {
-            this.position.x=x;
-            this.position.y=y;
-            this.input=input;
-            this.output=output;
-            this.absolute=absolute;
+            this.position.x = x;
+            this.position.y = y;
+            this.input = input;
+            this.output = output;
+            this.absolute = absolute;
             Object.assign(rect.attributes, {
                 x: x - 5,
                 y: y - 5,

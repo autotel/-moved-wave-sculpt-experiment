@@ -6,7 +6,8 @@ body {
 svg.nav {
   position: fixed;
   bottom: 0px;
-  height: 30px;
+  height: 15px;
+  background-color: #3939396e;
 }
 
 svg {
@@ -117,6 +118,10 @@ svg .control-panel .button.play.active.active > path {
 svg .control-panel text {
   fill: #6f8493;
 }
+.small-delete-button.clickable {
+  fill: #6c022a;
+  stroke: black;
+}
 svg .control-panel .knob.active .knob-value-arc {
   stroke: #0099ff;
   stroke-width: 3px;
@@ -133,6 +138,7 @@ svg .lane {
 svg .lane:hover, svg .lane.active {
   overflow: initial;
 }
+
 @keyframes dash-working {
   to {
     stroke-dashoffset: 6px;

@@ -89,12 +89,14 @@ class SoundLoaderDecoder extends SVGGroup{
         const clickable = new Clickable(this.domElement);
 
         clickable.clickCallback=()=>selectFile();
+
         clickable.mouseEnterCallback=()=>{
-            valueText.set("text", fileName);
+            valueText.set({"text": fileName});
             this.addClass("active");
         }
+
         clickable.mouseLeaveCallback=()=>{
-            valueText.set("text", abbreviate(fileName,8));
+            valueText.set({"text": abbreviate(fileName,8)});
             this.removeClass("active");
         }
         
@@ -123,8 +125,8 @@ class SoundLoaderDecoder extends SVGGroup{
             let c8=`${innerLeftLine}, ${topLine}`;
 
 
-            soundLoaderDecoderShape.set(
-                "d",
+            soundLoaderDecoderShape.set({
+                "d":
                 `M ${c1}
                 L ${c2} 
                 L ${c3} 
@@ -133,8 +135,8 @@ class SoundLoaderDecoder extends SVGGroup{
                 L ${c6}
                 L ${c7}
                 L ${c8}
-                z`,
-            );
+                z`
+            });
         }
 
         remakePath();
@@ -147,10 +149,10 @@ class SoundLoaderDecoder extends SVGGroup{
             if(!options.abbreviatedName){
                 options.abbreviatedName=abbreviate(options.name);
             }
-            nameText.set("text",options.abbreviatedName+"[load]");
+            nameText.set({"text":options.abbreviatedName+"[load]"});
         }
         const deAbbreviateText=()=>{
-            nameText.set("text",`[${options.name}]`);
+            nameText.set({"text":`[${options.name}]`});
         }
         
         abbreviateText();
@@ -165,7 +167,7 @@ class SoundLoaderDecoder extends SVGGroup{
         
         this.updateGraphic=()=>{
             fileName = filePath.split("/").pop();
-            valueText.set("text", abbreviate(fileName,8));
+            valueText.set({"text": abbreviate(fileName,8)});
         }
         
         /** 

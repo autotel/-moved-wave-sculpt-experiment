@@ -7,6 +7,7 @@ import ValuePixelTranslator from "../utils/ValuePixelTranslator";
 import typicalLaneSettings from "../utils/const typicalLaneSettings";
 import WaveLane from "./LaneTypes/WaveLane";
 import Repeater from "../SoundModules/Repeater";
+import Button from "../dom-model-gui/GuiComponents/Button";
 const vectorTypes = require("../dom-model-gui/utils/Vector2");
 /** @typedef {vectorTypes.MiniVector} MiniVector
 /**
@@ -35,6 +36,15 @@ class RepeaterDisplay extends WaveLane{
         const lengthKnob = this.addKnob("length");
         const monophonicToggle = this.addToggle("monophonic");
         this.addKnob("gain");
+        
+        const addPointButton = new Button({name:"add rep."});
+        this.appendToControlPanel(addPointButton);
+
+        addPointButton.onPush(()=>{
+            console.log("pushed");
+            module.addPoint();
+        });
+
 
         //lane has a contents sprite.
         const contents=this.contents;
@@ -158,14 +168,16 @@ class RepeaterDisplay extends WaveLane{
                 changes.frequency!==undefined ||
                 changes.amplitude!==undefined
             ){
-                readoutText.set("text",
-                    `${
-                        round(module.settings.frequency,4)
-                    }Hz; ${
-                        round(module.settings.amplitude,4)
-                    }U ${
-                        module.settings.frequency>(settings.rangeSamples/10)?"(ALIASED)":""
-                    }`);
+                readoutText.set({
+                    "text":
+                        `${
+                            round(module.settings.frequency,4)
+                        }Hz; ${
+                            round(module.settings.amplitude,4)
+                        }U ${
+                            module.settings.frequency>(settings.rangeSamples/10)?"(ALIASED)":""
+                        }`
+                    });
             }
             if(changes.points){
                 updatePointsPositions(changes.points);

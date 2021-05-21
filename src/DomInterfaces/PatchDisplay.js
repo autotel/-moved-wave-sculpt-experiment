@@ -6,6 +6,7 @@ import Lane from "./components/Lane";
 import debounce from "../utils/debounceFunction";
 import ConnectorGraph from "./components/ConnectorGraph";
 import Mouse from "../dom-model-gui/Interactive/Mouse";
+import SmallDeleteButton from "./components/SmallDeleteButton";
 const pathTypes = require("../dom-model-gui/GuiComponents/SVGElements");
 
 /** @typedef {pathTypes.PathOptions} PathOptions */
@@ -43,7 +44,8 @@ class PatchCord {
     /** @param {SVGGroup} parentEl*/
     constructor(parentEl) {
         const myPath = new Path();
-        parentEl.add(myPath);
+        
+        const myDeleteButton = new SmallDeleteButton();
 
         let startPos = {};
         let endPos = {};
@@ -53,46 +55,61 @@ class PatchCord {
         /** @type {Input|false} */
         let to = false;
 
-        myPath.domElement.classList.toggle("patchcord");
+        myPath.addClass("hidden patchcord");
+        parentEl.add(myPath);
 
         myPath.domElement.addEventListener(
             'click',
             (evt) => {
                 myPath.domElement.classList.toggle("highlight");
-                console.log(this);
             }
         );
 
-        this.displaying = true;
+        this.displaying = false;
         this.show = () => {
             if (this.displaying) return;
             this.displaying = true;
             myPath.removeClass("hidden");
+            parentEl.add(myDeleteButton);
         }
         this.hide = () => {
             if (!this.displaying) return;
             this.displaying = false;
-            myPath.addClass("hidden");
+            myPath.addClass("hidden");//not deleted, thus color order is preserved.. or not?
+            parentEl.remove(myDeleteButton);
         }
         this.set = (properties) => {
             if (properties.start) startPos = properties.start;
             if (properties.end) endPos = properties.end;
             if (properties.from) from = properties.from;
             if (properties.to) to = properties.to;
+
             this.show();
             let bez = Math.abs(startPos.y - endPos.y) / 5;
-            myPath.set('d',
-                `M ${startPos.x}, ${startPos.y}
+            
+            myPath.set({'d':
+                `M ${startPos.x + 5}, ${startPos.y}
                  C ${startPos.x + bez}, ${startPos.y}
                     ${endPos.x + bez}, ${endPos.y}
-                    ${endPos.x}, ${endPos.y}`
-            );
+                    ${endPos.x + 5}, ${endPos.y}`
+            });
+            if (properties.end){
+                // myDeleteButton.set({
+                //     x: bez * 0.76 + (startPos.x + endPos.x)/2,
+                //     y: (startPos.y + endPos.y)/2,
+                // });
+
+                myDeleteButton.set(endPos);
+            }
         }
-        this.disconnect = () => {
-            if(from && to){
+        myDeleteButton.onClick(()=>{
+            try{
+                if(!from) throw new Error("from is "+from);
                 from.disconnect(to);
-            };
-        }
+            }catch(e){
+                console.warn(e);
+            }
+        });
     }
 }
 
@@ -108,6 +125,9 @@ class PatchDisplay extends SVGGroup {
         super();
 
         const mouse = Mouse.get();
+
+
+
 
         const connectActionPatchCord = new PatchCord(this);
         connectActionPatchCord.hide();

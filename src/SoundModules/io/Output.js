@@ -72,9 +72,11 @@ class Output extends Model{
             if(input){
                 input.myConnectedOutput=false;
                 myInputs.delete(input);
-                this.changed({
-                    connections:myInputs,
-                });
+                // this.changed({
+                //     connections:myInputs,
+                // });
+                input.owner.changed({connections:true});
+                // ownerModule.changed({connections:true});
             }else{
                 if(!input){
                     console.warn(myInputs);

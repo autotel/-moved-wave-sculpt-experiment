@@ -1,7 +1,7 @@
 //DOM gui
 import Draggable from "./dom-model-gui/Interactive/Draggable";
 import PatchDisplay from "./DomInterfaces/PatchDisplay";
-import {SVGCanvas} from "./dom-model-gui/GuiComponents/SVGElements";
+import {SVGCanvas, SVGGroup} from "./dom-model-gui/GuiComponents/SVGElements";
 import TimeZoomer from "./DomInterfaces/TimeZoomer";
 import SoundDownloader from "./scaffolding/SoundDownloader";
 import RustProcessor from "./rust/RustProcessor";
@@ -52,14 +52,17 @@ navBoard.add(timeZoomer);
 const player = new SoundPlayer();
 const downloader = new SoundDownloader();
 
+const lanesGroup = new SVGGroup();
+lanesGroup.addClass("lanes-group");
+
 liveCodingInterface.onModuleCreated((newModule, newInterface, count) => {
     patchDisplay.appendModules(newModule);
     player.appendModule(newModule);
     downloader.appendModule(newModule);
-    drawBoard.add(newInterface);
+    lanesGroup.add(newInterface);
 });
 
-drawBoard.add(patchDisplay);
+drawBoard.add(lanesGroup,patchDisplay);
 
 Draggable.setCanvas();
 
