@@ -2,7 +2,6 @@ node_modules
 doc
 /upload.sh
 /dist/*
-!/dist/index.html
 src/rust/target/*
 pkg/*
 pkg

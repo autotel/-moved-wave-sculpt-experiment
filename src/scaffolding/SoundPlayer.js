@@ -3,98 +3,14 @@ import Module from "../SoundModules/common/Module";
 import { sampleRate, audioContext } from "../SoundModules/common/vars";
 import Lane from "../DomInterfaces/components/Lane";
 import { Rectangle, Path, SVGGroup } from "../dom-model-gui/GuiComponents/SVGElements";
-import Output from "../SoundModules/io/Output";
-
-const MagicPlayer = function(myOutput) {
-    //playing position in the original module, from where we source sound
-    let sourcePlayhead=0;
-    //how long each period
-    var bufferSize = 2048;
-
-    let playing = false;
-
-    this.play=()=>playing=true;
-    this.stop=()=>playing=false;
-
-    //get a curve to fade in/out old and new "peeked" buffer (click prevention)
-    const fadeCurveFunction = (v) => {
-        return (1-Math.cos(Math.PI * v))/2;
-    }
-    this.setOutput=(newOutput)=>{
-        myOutput=newOutput;
-    }
-    //makes a slice from the module's buffer in a circular way
-    const getCircularSlice=(start,length)=>{
-        let returnBuffer = [];
-        if(myOutput){
-            start %= myOutput.cachedValues.length;
-            let sliceStart = start;
-            let sliceEnd = (start+length) % myOutput.cachedValues.length
-
-            returnBuffer = Array.from(
-                myOutput.cachedValues
-            ).slice(
-                start,
-                start+length
-            );
-
-            //if the current period will reach beyond the length of audio loop
-            if(sliceEnd<sliceStart){
-                let append = Array.from(
-                    myOutput.cachedValues
-                ).slice(
-                    0,
-                    sliceStart-sliceEnd
-                );
-                returnBuffer = returnBuffer.concat(append);
-            }
-        }
-        return returnBuffer;
-    }
-    //the foreseen period, in the state it was on the last period
-    /** @type {false|Array<number>} */
-    let peekedPeriod = false;
-    let interpolationSpls = bufferSize;
-
-    var node = audioContext.createScriptProcessor(bufferSize, 1, 1);
-    node.channelInterpretation
-    node.onaudioprocess = function(e) {
-        
-        //make a copy of the buffer for this period. This will let us interpolate,
-        //preventing the clicks caused by buffer changes while playing.
-        //note that the frequency response of the interpolation changes 
-        //in function of the bufferSize selection.
-        let currentBuffer = getCircularSlice(sourcePlayhead,bufferSize);
-        // var input = e.inputBuffer.getChannelData(0);
-        var output = e.outputBuffer.getChannelData(0);
-
-        for (var i = 0; i < bufferSize; i++) {
-            
-            if(playing && myOutput){
-                let nowWeight = fadeCurveFunction(i/interpolationSpls);
-                if(nowWeight>1) nowWeight=1;
-                let nextWeight = 1-nowWeight;
-                //current sonic contents fading in...
-                output[i] = currentBuffer[i] * nowWeight;
-                if(peekedPeriod){
-                    //and the previously expected sonic contents fading out.
-                    //clipped, for security.
-                    output[i] += Math.min(1,peekedPeriod[i] * nextWeight);
-                }
-            }else{
-                output[i]=0;
-            }
-        }
-        sourcePlayhead += bufferSize;
-        if(myOutput) sourcePlayhead %= myOutput.cachedValues.length;
-
-        //peek into next period, so that in next lap we interpolate
-        peekedPeriod = getCircularSlice(sourcePlayhead,bufferSize);
-    }
-    this.node=node;
-};
 
 
+/**
+ * the bit where module is passed meaninglessly all around needs to be refactored
+
+ actually, I fukd up because I forgot how it was suposed to work.
+ there is one player for every module, but now the last module created is the only one that can be played :P
+ */
 class SoundPlayer{
     constructor(){
         /** @type {AudioBufferSourceNode|false} */
@@ -103,21 +19,27 @@ class SoundPlayer{
         myGain.gain.value=1;
         myGain.connect(audioContext.destination);
 
-        const pannerLeft = audioContext.createStereoPanner();
-        const pannerRight = audioContext.createStereoPanner();
+        /** @type {AudioWorkletNode|false} */
+        let magicPlayer = false;
 
-        pannerLeft.pan.value=-1;
-        pannerRight.pan.value=1;
+        audioContext.audioWorklet.addModule('MagicPlayer.js').then(()=>{
+            console.log("MaqicPlayer audio worklet");
+            magicPlayer = new AudioWorkletNode(audioContext, 'magic-player');
 
-        pannerLeft.connect(myGain);
-        pannerRight.connect(myGain);
-
-        const magicPlayerLeft = new MagicPlayer(false);
-        const magicPlayerRight = new MagicPlayer(false);
-
-        magicPlayerLeft.node.connect(pannerLeft);
-        magicPlayerRight.node.connect(pannerRight);
-
+            // setInterval(() => magicPlayer.port.postMessage('yuiim'), 1000);
+            magicPlayer.port.onmessage = (e) => console.log(e.data)
+            magicPlayer.connect(myGain);
+        });
+        /*
+        audioContext.audioWorklet.addModule("ping-pong-processor.js").then(()=>{
+            const pingPongNode = new AudioWorkletNode(audioContext, 'ping-pong-processor')
+            // send the message containing 'ping' string
+            // to the AudioWorkletProcessor from the AudioWorkletNode every second
+            setInterval(() => pingPongNode.port.postMessage('ping-pong-processor'), 1000)
+            pingPongNode.port.onmessage = (e) => console.log(e.data)
+            // pingPongNode.connect(audioContext.destination)
+        });
+        */
         let position={
             x:-15,
             y:-10,
@@ -170,9 +92,10 @@ class SoundPlayer{
             );
             
             module.onUpdate((changes)=>{
-                if(changes.cachedValues){
-                    // this.updateBuffer();
-                }
+                console.log(changes);
+                // if(changes.cachedValues){
+                    this.updateBuffer();
+                // }
             });
             
             playButton.domElement.addEventListener('mousedown',(evt)=>{
@@ -192,46 +115,63 @@ class SoundPlayer{
 
                     console.log("play");
                     playButton.addClass("active");
-                    this.setModule(module,true);
 
+                    this.play();
                 }
 
             });
+
+            myModule=module;
+            this.updateBuffer(false);
             
         }
 
-        /** @param {Module} module */
-        this.setModule = (module,start=false)=>{
-            if(module.outputs.l && module.outputs.r){
-                magicPlayerLeft.setOutput(module.outputs.l);
-                magicPlayerRight.setOutput(module.outputs.r);
+        /** @type {Module|false} module */
+        let myModule = false;
+
+
+        this.updateBuffer = (start=false)=>{
+            if(!myModule) return;
+            if(!magicPlayer) return;
+
+            if(myModule.outputs.l && myModule.outputs.r){
+                
+                magicPlayer.port.postMessage({
+                    audio:[
+                        Array.from(myModule.outputs.l.cachedValues),
+                        Array.from(myModule.outputs.r.cachedValues),
+                    ]
+                });
             }else{
                 try{
-                    let defo=module.getDefaultOutput();
-                    magicPlayerLeft.setOutput(defo);
-                    magicPlayerRight.setOutput(defo);
+                    let defOutput=myModule.getDefaultOutput();
+
+                    magicPlayer.port.postMessage({
+                        audio:[
+                            Array.from(defOutput.cachedValues),
+                            Array.from(defOutput.cachedValues),
+                        ]
+                    });
                 }catch(e){
-                    console.warn("module doesn't have default output",module);
+                    console.warn("module doesn't have default output",myModule);
                 }
             }
             if(start){
-                magicPlayerLeft.play();
-                magicPlayerRight.play();
+                this.play();
             }
         }
 
-        // this.updateBuffer = ()=>{
-        //     if(!buffer) return;
-        //     if(!myOutput) return;
-        //     //not possible for now
-        // }
-
-        // /** @type {AudioBuffer|false} */
-        // let buffer=false;
-
+        this.play = ()=> {
+            if(!magicPlayer) return;
+            magicPlayer.port.postMessage({
+                play:true
+            });
+        }
         this.stop = ()=>{
-            magicPlayerLeft.stop();
-            magicPlayerRight.stop();
+            if(!magicPlayer) return;
+            magicPlayer.port.postMessage({
+                stop:true
+            });
         }
     }
 }

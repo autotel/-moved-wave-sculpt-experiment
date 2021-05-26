@@ -1,3 +1,6 @@
+//css
+// import "./index.scss";//won't work
+
 //DOM gui
 import Draggable from "./dom-model-gui/Interactive/Draggable";
 import PatchDisplay from "./DomInterfaces/PatchDisplay";
@@ -28,7 +31,7 @@ rustProcessor.onReady((rustProcessor) => {
 });
 
 const drawBoard = new SVGCanvas({width:"100%",height:"10000px"});
-const navBoard = new SVGCanvas({width:"100%",height:"10000px"});
+const navBoard = new SVGCanvas({width:"100%"});
 drawBoard.addClass("drawboard");
 navBoard.addClass("nav");
 document.body.appendChild(drawBoard.domElement);

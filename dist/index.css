@@ -2,159 +2,154 @@ body {
   margin: 0px;
   background-color: #010c08;
 }
-
-svg.nav {
-  position: fixed;
-  bottom: 0px;
-  height: 15px;
-  background-color: #3939396e;
-}
-
-svg {
-  position: absolute;
-  width: 100%;
-  stroke: #474109;
-  stroke-width: 1;
-  fill: transparent;
-  /* stroke-linecap: butt; */
-  /* stroke-dasharray: 2 2; */
-  transition: fill, stroke 0.1s;
-}
-svg .time-pan.draggable {
-  fill: white;
-  stroke: transparent;
-  cursor: col-resize;
-}
-svg .time-zoom.draggable {
-  stroke: white;
-  fill: transparent;
-  cursor: e-resize;
-}
-svg .active {
-  stroke: white;
-  fill: rgba(175, 175, 168, 0.377);
-  stroke-width: 1;
-  transition: fill, stroke 0.1s;
-}
-svg .no-mouse {
-  pointer-events: none;
-}
-svg .button :hover {
-  fill: rgba(248, 248, 248, 0.055);
-  stroke: #afafa8;
-}
-svg .button.active, svg .button :hover {
-  fill: rgba(248, 248, 248, 0.452);
-  /* stroke: rgb(175, 175, 168); */
-}
-svg text {
-  font: 10px sans-serif;
-  fill: #bfddf1;
-  stroke-width: 0;
-  pointer-events: none;
-}
-svg .wave-display {
-  stroke: #bfddf1;
-}
-svg .lane-handle {
-  fill: rgba(9, 22, 34, 0.56);
-  stroke-width: 0;
-  cursor: grab;
-}
-svg .lane-handle.dragging {
-  cursor: grabbing;
-}
-svg .hover-text {
-  pointer-events: none;
-  /* opacity: 0; */
-}
-svg .hover-text.active {
-  opacity: 1;
-}
-svg .patchcord {
-  stroke-width: 3px;
-  opacity: 0.3;
-  transition: opacity 0.2s;
-  fill: none;
-}
-svg .patchcord:hover, svg .patchcord.highlight {
-  opacity: 1;
-  transition: opacity 0.2s;
-}
-svg .patchcord:nth-child(5n+0) {
-  stroke: #0099ff;
-}
-svg .patchcord:nth-child(5n+1) {
-  stroke: #4c00ff;
-}
-svg .patchcord:nth-child(5n+2) {
-  stroke: #d0ff00;
-}
-svg .patchcord:nth-child(5n+3) {
-  stroke: #ff7300;
-}
-svg .patchcord:nth-child(5n+4) {
-  stroke: #ff00c8;
-}
-svg .control-panel {
-  opacity: 0.2;
-  transition: 0.2s opacity;
-  overflow: visible;
-}
-svg .control-panel:active, svg .control-panel:hover {
-  opacity: 1;
-}
-svg .control-panel .background {
-  stroke: none;
-  fill: #000000c9;
-}
-svg .control-panel path, svg .control-panel rect, svg .control-panel .button, svg .control-panel svg {
-  stroke: #6f8493;
-}
-svg .control-panel .button.play.active.active > path {
-  stroke: #0099ff;
-  fill: transparent;
-}
-svg .control-panel text {
-  fill: #6f8493;
-}
-.small-delete-button.clickable {
-  fill: #6c022a;
-  stroke: black;
-}
-svg .control-panel .knob.active .knob-value-arc {
-  stroke: #0099ff;
-  stroke-width: 3px;
-}
-svg .control-panel .knob {
-  cursor: row-resize;
-}
-svg svg {
-  overflow: visible;
-}
-svg .lane {
-  overflow: hidden;
-}
-svg .lane:hover, svg .lane.active {
-  overflow: initial;
-}
-
 @keyframes dash-working {
   to {
     stroke-dashoffset: 6px;
   }
 }
-svg .working .wave-display {
+body svg {
+  position: absolute;
+  width: 100%;
+  stroke: #474109;
+  stroke-width: 1;
+  fill: transparent;
+  transition: fill, stroke 0.1s;
+}
+body svg .nav {
+  position: fixed;
+  bottom: 0px;
+  height: 15px;
+  background-color: #3939396e;
+}
+body svg .time-pan.draggable {
+  fill: white;
+  stroke: transparent;
+  cursor: col-resize;
+}
+body svg .time-zoom.draggable {
+  stroke: white;
+  fill: transparent;
+  cursor: e-resize;
+}
+body svg .active {
+  stroke: white;
+  fill: rgba(175, 175, 168, 0.377);
+  stroke-width: 1;
+  transition: fill, stroke 0.1s;
+}
+body svg .no-mouse {
+  pointer-events: none;
+}
+body svg .button:hover {
+  fill: rgba(248, 248, 248, 0.055);
+  stroke: #afafa8;
+}
+body svg .button.active, body svg .button :hover {
+  fill: rgba(248, 248, 248, 0.452);
+}
+body svg text {
+  font: 10px sans-serif;
+  fill: #bfddf1;
+  stroke-width: 0;
+  pointer-events: none;
+}
+body svg .wave-display {
+  stroke: #bfddf1;
+}
+body svg .lane-handle {
+  fill: rgba(9, 22, 34, 0.56);
+  stroke-width: 0;
+  cursor: grab;
+}
+body svg .lane-handle.dragging {
+  cursor: grabbing;
+}
+body svg .hover-text {
+  pointer-events: none;
+}
+body svg .hover-text.active {
+  opacity: 1;
+}
+body svg .patchcord {
+  stroke-width: 3px;
+  opacity: 0.3;
+  transition: opacity 0.2s;
+  fill: none;
+}
+body svg .patchcord:hover, body svg .patchcord.highlight {
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+body svg .patchcord:nth-child(5n+0) {
+  stroke: #0099ff;
+}
+body svg .patchcord:nth-child(5n+1) {
+  stroke: #4c00ff;
+}
+body svg .patchcord:nth-child(5n+2) {
+  stroke: #d0ff00;
+}
+body svg .patchcord:nth-child(5n+3) {
+  stroke: #ff7300;
+}
+body svg .patchcord:nth-child(5n+4) {
+  stroke: #ff00c8;
+}
+body svg .control-panel {
+  opacity: 0.2;
+  transition: 0.2s opacity;
+  overflow: visible;
+}
+body svg .control-panel:active, body svg .control-panel:hover {
+  opacity: 1;
+}
+body svg .control-panel .background {
+  stroke: none;
+  fill: #000000c9;
+}
+body svg .control-panel path,
+body svg .control-panel rect,
+body svg .control-panel .button,
+body svg .control-panel svg {
+  stroke: #6f8493;
+}
+body svg .control-panel .button.play.active.active > path {
+  stroke: #0099ff;
+  fill: transparent;
+}
+body svg .control-panel text {
+  fill: #6f8493;
+}
+body svg .control-panel .knob.active .knob-value-arc {
+  stroke: #0099ff;
+  stroke-width: 3px;
+}
+body svg .control-panel .knob {
+  cursor: row-resize;
+}
+body svg .small-delete-button.clickable {
+  fill: #6c022a;
+  stroke: black;
+}
+body svg svg {
+  overflow: visible;
+}
+body svg .lane {
+  overflow: hidden;
+}
+body svg .lane:hover, body svg .lane.active {
+  overflow: initial;
+}
+body svg .lane .working .wave-display {
   stroke-dasharray: 3px;
   animation: dash-working 3s linear infinite;
 }
-svg .working .handle-rect {
+body svg .lane .working .handle-rect {
   stroke-dasharray: 3px;
   stroke-width: 1px;
   animation: dash-working 3s linear infinite;
 }
-
-.hidden {
+body .hidden {
   opacity: 0 !important;
   transition: 0.2s opacity;
 }

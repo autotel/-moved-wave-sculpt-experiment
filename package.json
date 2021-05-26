@@ -2,28 +2,30 @@
   "name": "fields",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack -w --mode development",
     "dev": "webpack -w --mode development",
     "compile": "webpack",
     "build": "webpack",
-    "sass": "sass src-scss/index.scss dist/index.css --watch",
+    "sass": "sass src/index.scss dist/index.css --watch",
     "doc": "jsdoc -d ./doc -r ./src/ -c ./jsdoc.json",
     "serve": "light-server -s ./dist -b localhost"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@wasm-tool/wasm-pack-plugin": "^1.3.3",
+    "@wasm-tool/wasm-pack-plugin": "^1.4.0",
+    "copy-webpack-plugin": "^9.0.0",
     "fili": "^2.0.3",
-    "jsdoc": "^3.6.6",
+    "jsdoc": "^3.6.7",
     "light-server": "^2.9.1",
-    "sass": "^1.32.7",
+    "sass": "^1.34.0",
+    "sass-loader": "^11.1.1",
     "seedrandom": "^3.0.5",
-    "webpack": "^5.27.2",
-    "webpack-cli": "^4.5.0"
+    "webpack": "^5.37.1",
+    "webpack-cli": "^4.7.0"
   },
   "dependencies": {
     "perlin-noise": "0.0.1"
