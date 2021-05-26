@@ -19,6 +19,7 @@ import Repeater from "../SoundModules/Repeater";
 import Hipparchus from "../SoundModules/Hipparchus";
 import Sampler from "../SoundModules/Sampler";
 import HarmonicsOscillator2 from "../SoundModules/HarmonicsOscillator2";
+import VoltsPerOctaveToHertz from "../SoundModules/VoltsPerOctaveToHertz";
 
 //for interfaces
 import GenericDisplay from "../DomInterfaces/GenericDisplay";
@@ -65,6 +66,7 @@ registerModuleAndItsInterface(Repeater,RepeaterDisplay);
 registerModuleAndItsInterface(Filter,FilterDisplay);
 registerModuleAndItsInterface(Hipparchus,HipparchusDisplay);
 registerModuleAndItsInterface(Sampler,false);
+registerModuleAndItsInterface(VoltsPerOctaveToHertz,false);
 
 
 //for typing

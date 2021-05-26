@@ -949,6 +949,69 @@ function demoLibrary() {
             wav.getInterface().autoZoom();
             rus.getInterface().autoZoom();
         },
+        "seceretcumbia": ()=>{
+            let osc2 = create(possibleModules.Oscillator,'osc2');
+        let fil = create(possibleModules.Filter,'fil');
+        let rus = create(possibleModules.RustFreeverb,'rus');
+        let rus7 = create(possibleModules.RustComb,'rus7');
+        let vol = create(possibleModules.VoltsPerOctaveToHertz,'vol');
+        let osc = create(possibleModules.Oscillator,'osc');
+        osc2.outputs.main.connectTo(fil.inputs.main);
+        fil.outputs.main.connectTo(rus.inputs.main);
+        rus.outputs.main.connectTo(rus7.inputs.main);
+        rus7.outputs.main.connectTo(vol.inputs.main);
+        rus7.outputs.main.connectTo(osc.inputs.amplitude);
+        vol.outputs.main.connectTo(osc.inputs.frequency);
+        osc2.set({
+          'amplitude': 1.35,
+          'bias': 1.8900000000000003,
+          'length': 1,
+          'frequency': 2,
+          'phase': 0,
+          'shape': 'square'
+        });
+        fil.set({
+          'gain': 0.75,
+          'reso': 3.38,
+          'type': 'LpMoog',
+          'order': 3,
+          'frequency': 408.44444444444423,
+          'saturate': false
+        });
+        rus.set({
+          'dampening': 0.9999999999999999,
+          'freeze': true,
+          'wet': -0.3100000000000003,
+          'width': 1.7100000000000002,
+          'dry': 1.1900000000000002,
+          'roomSize': 0.6000000000000001,
+          'LROffset': 1.85
+        });
+        rus7.set({
+          'frequency': 59.55555555555556,
+          'dampening_inverse': 0.6199999999999999,
+          'dampening': 0.52,
+          'feedback': -0.6400000000000001
+        });
+        vol.set({
+          'preamp': 1,
+          'center': 146.78000000000003
+        });
+        osc.set({
+          'amplitude': -8.673617379884035e-18,
+          'bias': 0,
+          'length': 1,
+          'frequency': 2,
+          'phase': 0,
+          'shape': 'sin'
+        });
+        osc2.getInterface().autoZoom();
+        fil.getInterface().autoZoom();
+        rus.getInterface().autoZoom();
+        rus7.getInterface().autoZoom();
+        vol.getInterface().autoZoom();
+        osc.getInterface().autoZoom();
+        },
         "wiwu": () => {
             create(possibleModules.HarmonicsOscillator, 'harmosc');
             create(possibleModules.EnvelopeGenerator, 'timbrenv');
