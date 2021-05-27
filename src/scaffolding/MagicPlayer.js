@@ -14,9 +14,6 @@ registerProcessor('magic-player', class extends AudioWorkletProcessor {
     //playing position in the original module, from where we source sound
     sourcePlayhead = 0;
 
-    //the foreseen period, in the state it was on the last period
-    /** @type {Array<Array<number>>} */
-    peekedPeriod = [];
     interpolationSpls = 128;
 
     /** @type {Array<Array<number>>} */
@@ -76,16 +73,16 @@ registerProcessor('magic-player', class extends AudioWorkletProcessor {
 
 
     //makes a slice from the module's buffer in a circular way
-    getCircularSliceFromChannel = (start, length, chanNo = 0) => {
+    getCircularSliceFromChannel = (audioSource, start, length, chanNo = 0) => {
         /** @type {Array<number>} */
         let returnBuffer = [];
-        if (this.audio[chanNo]) {
-            start %= this.audio[chanNo].length;
+        if (audioSource[chanNo]) {
+            start %= audioSource[chanNo].length;
             let sliceStart = start;
-            let sliceEnd = (start + length) % this.audio[chanNo].length
+            let sliceEnd = (start + length) % audioSource[chanNo].length
 
             returnBuffer = (
-                this.audio[chanNo]
+                audioSource[chanNo]
             ).slice(
                 start,
                 start + length
@@ -94,7 +91,7 @@ registerProcessor('magic-player', class extends AudioWorkletProcessor {
             //if the current period will reach beyond the length of audio loop
             if (sliceEnd < sliceStart) {
                 let append = (
-                    this.audio[chanNo]
+                    audioSource[chanNo]
                 ).slice(
                     0,
                     sliceStart - sliceEnd
@@ -105,18 +102,16 @@ registerProcessor('magic-player', class extends AudioWorkletProcessor {
         return returnBuffer;
     }
 
-    getCircularSlice = (start, length) => {
+    getCircularSlice = (audioSource,start, length) => {
         return this.audio.map((channel, channelNo) => {
-            return this.getCircularSliceFromChannel(start, length, channelNo);
+            return this.getCircularSliceFromChannel(audioSource,start, length, channelNo);
         });
     }
 
+    fadeInProgress = 0;
+
     process(inputs, outputs, parameters) {
 
-        if (this.incomingAudio) {
-            this.audio = this.incomingAudio.map((chan) => [...chan]);
-            this.incomingAudio = false;
-        }
         // var input = e.inputBuffer.getChannelData(0);
         // var output = e.outputBuffer.getChannelData(0);
         const output = outputs[0];
@@ -124,17 +119,73 @@ registerProcessor('magic-player', class extends AudioWorkletProcessor {
 
         let audioLength = this.getAudioLengthSamples();
 
-        output.forEach((channel, channelNo) => {
-            let bufferSize = channel.length;
-            //make a copy of the audio for this period. This will let us interpolate,
-            //preventing the clicks caused by buffer changes while playing.
-            //note that the frequency response of the interpolation changes 
-            //in function of the bufferSize selection.
-            let currentAudio = this.getCircularSlice(
+        let bufferSize = output[0].length;
+        //make a copy of the audio for this period. This will let us interpolate,
+        //preventing the clicks caused by buffer changes while playing.
+        //note that the frequency response of the interpolation changes 
+        //in function of the bufferSize selection.
+        let currentAudio = this.getCircularSlice(
+            this.audio,
+            this.sourcePlayhead,
+            bufferSize
+        );
+
+        /**
+         * precise way, couldnt get it to work;
+         * 
+        // this way we know that we are fading in to new audio
+        if (this.incomingAudio) {
+            let fadingInAudio = this.getCircularSlice(
+                this.incomingAudio,
                 this.sourcePlayhead,
                 bufferSize
             );
 
+            currentAudio = fadingInAudio.map((chan,chanN)=>chan.map((spl,splN)=>{
+                this.fadeInProgress += this.fadeInStep;
+                spl *= this.fadeInProgress;
+                spl += (1-this.fadeInProgress) * currentAudio[chanN][splN];
+                //detect whether fade in is ready, in which case delete incoming audio
+                if(this.fadeInProgress>=1){
+                    if(this.incomingAudio){ //redundant but ok
+                        this.incomingAudio.forEach((channel,chanN)=>channel.forEach((spl,n)=>{
+                            if(!this.audio[chanN]) this.audio[chanN]
+                            this.audio[chanN][n]=spl;
+                        }));
+                    }
+                    this.incomingAudio=false;
+                    this.fadeInProgress=0;
+                }
+                return spl;
+            }));
+        }
+        */
+
+        // imprecise fade in: it will keep looping the "fade in" sequence
+        // I couldn't discern a difference by listening though.
+        if (this.incomingAudio) {
+
+            this.fadeInProgress += 1/this.interpolationSpls;
+
+            this.audio = this.incomingAudio.map((chan,chanN) => {
+                if(!this.audio[chanN])this.audio[chanN]=[];
+                return chan.map((sample,sampleN)=>{
+                    if(sampleN > this.interpolationSpls){
+                        return sample;
+                    }else{
+                        const newWeight = sampleN / this.interpolationSpls;
+                        const oldWeight = 1-newWeight;
+                        let spl=sample * newWeight + this.audio[chanN][sampleN] * oldWeight;
+                        if(isNaN(spl)) spl=sample;
+                        return spl;
+                    }
+                });
+            });
+            this.incomingAudio = false;
+        }
+
+        output.forEach((channel, channelNo) => {
+            
             if (!currentAudio[channelNo]) return;
             let ownPlayhead = 0;
             for (var bufferPlayhead = 0; bufferPlayhead < bufferSize; bufferPlayhead++) {
@@ -144,22 +195,13 @@ registerProcessor('magic-player', class extends AudioWorkletProcessor {
                     // const theSample = currentAudio[channelNo][bufferPlayhead];
                     const theSample = this.audio[channelNo][this.sourcePlayhead + bufferPlayhead];
                     if (theSample === undefined) {
-                        // channel[bufferPlayhead] = (Math.random() - 0.5) * 0.05;
+                        channel[bufferPlayhead] = (Math.random() - 0.5) * 0.05;
                     } else {
                         channel[bufferPlayhead] = theSample;
                     }
-                    let nowWeight = fadeCurveFunction(
-                        ownPlayhead / this.interpolationSpls
-                    );
-                    if (nowWeight > 1) nowWeight = 1;
-                    let nextWeight = 1 - nowWeight;
-                    //current sonic contents fading in...
-                    channel[bufferPlayhead] = currentAudio[channelNo][bufferPlayhead] * nowWeight;
-                    if (this.peekedPeriod[channelNo]) {
-                        //and the previously expected sonic contents fading out.
-                        //clipped, for security.
-                        channel[bufferPlayhead] += this.peekedPeriod[channelNo][bufferPlayhead] * nextWeight;
-                    }
+                    // let nowWeight = fadeCurveFunction(
+                    //     ownPlayhead / this.interpolationSpls
+                    // );
 
                 } else {
                     channel[bufferPlayhead] = 0;
@@ -168,11 +210,6 @@ registerProcessor('magic-player', class extends AudioWorkletProcessor {
 
             this.sourcePlayhead = ownPlayhead;
 
-            //peek into next period, so that in next lap we interpolate
-            this.peekedPeriod = this.getCircularSlice(
-                this.sourcePlayhead,
-                bufferSize,
-            );
         });
 
         return true;

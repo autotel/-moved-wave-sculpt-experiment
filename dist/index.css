@@ -141,11 +141,11 @@ body svg .lane {
 body svg .lane:hover, body svg .lane.active {
   overflow: initial;
 }
-body svg .lane .working .wave-display {
+body svg .lane.working .wave-display {
   stroke-dasharray: 3px;
   animation: dash-working 3s linear infinite;
 }
-body svg .lane .working .handle-rect {
+body svg .lane.working .handle-rect {
   stroke-dasharray: 3px;
   stroke-width: 1px;
   animation: dash-working 3s linear infinite;

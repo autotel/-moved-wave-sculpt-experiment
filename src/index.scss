@@ -151,7 +151,7 @@ body {
 			&.active {
 				overflow: initial;
 			}
-			.working {
+			&.working {
 				.wave-display {
 					stroke-dasharray: 3px;
 					animation: dash-working 3s linear infinite;
