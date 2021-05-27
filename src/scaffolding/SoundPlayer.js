@@ -7,11 +7,10 @@ import { Rectangle, Path, SVGGroup } from "../dom-model-gui/GuiComponents/SVGEle
 
 /**
  * the bit where module is passed meaninglessly all around needs to be refactored
-
  actually, I fukd up because I forgot how it was suposed to work.
  there is one player for every module, but now the last module created is the only one that can be played :P
  */
-class SoundPlayer{
+class SoundPlayer {
     constructor(){
         /** @type {AudioBufferSourceNode|false} */
         var source=false;
@@ -47,6 +46,9 @@ class SoundPlayer{
             height:20,
             spacing:5,
         }
+
+        /** @type {Module|false} module */
+        let currentlyPlayingModule = false;
 
         const everyPlayButton=[];
         /** @param {Module} module */
@@ -91,12 +93,12 @@ class SoundPlayer{
                 position.width + 10
             );
             
-            module.onUpdate((changes)=>{
-                console.log(changes);
-                // if(changes.cachedValues){
-                    this.updateBuffer();
-                // }
-            });
+            // module.onUpdate((changes)=>{
+            //     console.log(changes);
+            //     // if(changes.cachedValues){
+            //         this.updateBuffer();
+            //     // }
+            // });
             
             playButton.domElement.addEventListener('mousedown',(evt)=>{
                 if(playButton.domElement.classList.contains("active")){
@@ -113,38 +115,37 @@ class SoundPlayer{
                         otherButton.removeClass("active");
                     });
 
-                    console.log("play");
+
+                    currentlyPlayingModule=module;
+
+                    console.log("play",currentlyPlayingModule.name);
                     playButton.addClass("active");
 
+                    this.updateBuffer();
                     this.play();
                 }
 
             });
 
-            myModule=module;
-            this.updateBuffer(false);
             
         }
 
-        /** @type {Module|false} module */
-        let myModule = false;
 
-
-        this.updateBuffer = (start=false)=>{
-            if(!myModule) return;
+        this.updateBuffer = ()=>{
+            if(!currentlyPlayingModule) return;
             if(!magicPlayer) return;
 
-            if(myModule.outputs.l && myModule.outputs.r){
+            if(currentlyPlayingModule.outputs.l && currentlyPlayingModule.outputs.r){
                 
                 magicPlayer.port.postMessage({
                     audio:[
-                        Array.from(myModule.outputs.l.cachedValues),
-                        Array.from(myModule.outputs.r.cachedValues),
+                        Array.from(currentlyPlayingModule.outputs.l.cachedValues),
+                        Array.from(currentlyPlayingModule.outputs.r.cachedValues),
                     ]
                 });
             }else{
                 try{
-                    let defOutput=myModule.getDefaultOutput();
+                    let defOutput=currentlyPlayingModule.getDefaultOutput();
 
                     magicPlayer.port.postMessage({
                         audio:[
@@ -153,11 +154,8 @@ class SoundPlayer{
                         ]
                     });
                 }catch(e){
-                    console.warn("module doesn't have default output",myModule);
+                    console.warn("module doesn't have default output",currentlyPlayingModule);
                 }
-            }
-            if(start){
-                this.play();
             }
         }
 
