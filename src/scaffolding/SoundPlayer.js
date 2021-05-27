@@ -162,6 +162,7 @@ class SoundPlayer {
 
         this.play = () => {
             if (!magicPlayer) return;
+            this.updateBuffer();
             magicPlayer.port.postMessage({
                 play: true
             });

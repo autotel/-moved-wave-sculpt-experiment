@@ -21,6 +21,8 @@ registerProcessor('magic-player', class extends AudioWorkletProcessor {
 
     /** @type {Array<Array<number>>} */
     audio = [];
+    /** @type {false|Array<Array<number>>} */
+    incomingAudio = false;
 
     isPlaying = false;
 
@@ -29,22 +31,23 @@ registerProcessor('magic-player', class extends AudioWorkletProcessor {
 
         this.port.onmessage = (event) => {
             if (event.data.audio) {
+                if (!this.incomingAudio) this.incomingAudio = [];
                 //just so the error happens here instead of in the process
                 //perhaps sample by sample is too much, revise later.
                 event.data.audio.forEach((channel, channelNo) => {
-                    channel.forEach((sample,sampleNo)=>{
-                        if(!this.audio[channelNo]) this.audio[channelNo] = [];
-                        this.audio[channelNo][sampleNo] = (sample);
+                    channel.forEach((sample, sampleNo) => {
+                        if (!this.incomingAudio[channelNo]) this.incomingAudio[channelNo] = [];
+                        this.incomingAudio[channelNo][sampleNo] = (sample);
                     });
                 });
 
-                this.port.postMessage(
-                    [
-                        '(new audio)',
-                        event.data.audio.length,
-                        typeof event.data.audio,
-                        event.data.audio[0].length
-                    ]);
+                // this.port.postMessage(
+                //     [
+                //         '(new audio)',
+                //         event.data.audio.length,
+                //         typeof event.data.audio,
+                //         event.data.audio[0].length
+                //     ]);
             }
             if (event.data.play !== undefined) {
                 this.isPlaying = event.data.play;
@@ -54,9 +57,10 @@ registerProcessor('magic-player', class extends AudioWorkletProcessor {
             if (event.data.stop) {
                 this.isPlaying = false;
 
+                this.port.postMessage('(stop)');
             }
 
-            this.port.postMessage(Object.keys(event.data).join());
+            // this.port.postMessage(Object.keys(event.data).join());
 
         };
 
@@ -109,6 +113,10 @@ registerProcessor('magic-player', class extends AudioWorkletProcessor {
 
     process(inputs, outputs, parameters) {
 
+        if (this.incomingAudio) {
+            this.audio = this.incomingAudio.map((chan) => [...chan]);
+            this.incomingAudio = false;
+        }
         // var input = e.inputBuffer.getChannelData(0);
         // var output = e.outputBuffer.getChannelData(0);
         const output = outputs[0];

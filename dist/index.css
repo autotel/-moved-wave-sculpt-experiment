@@ -15,11 +15,12 @@ body svg {
   fill: transparent;
   transition: fill, stroke 0.1s;
 }
-body svg .nav {
+body svg.nav {
   position: fixed;
   bottom: 0px;
-  height: 15px;
-  background-color: #3939396e;
+  left: 0px;
+  height: 10px;
+  background-color: #FFF4;
 }
 body svg .time-pan.draggable {
   fill: white;

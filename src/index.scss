@@ -18,11 +18,12 @@ body {
 		fill: transparent;
 		transition: fill, stroke 0.1s;
 
-		.nav {
+		&.nav {
 			position: fixed;
 			bottom: 0px;
-			height: 15px;
-			background-color: #3939396e;
+			left: 0px;
+			height: 10px;
+			background-color: #FFF4;
 		}
 
 		.time-pan.draggable {
