@@ -11,17 +11,17 @@ import { Rectangle, Path, SVGGroup } from "../dom-model-gui/GuiComponents/SVGEle
  there is one player for every module, but now the last module created is the only one that can be played :P
  */
 class SoundPlayer {
-    constructor(){
+    constructor() {
         /** @type {AudioBufferSourceNode|false} */
-        var source=false;
+        var source = false;
         const myGain = audioContext.createGain();
-        myGain.gain.value=1;
+        myGain.gain.value = 1;
         myGain.connect(audioContext.destination);
 
         /** @type {AudioWorkletNode|false} */
         let magicPlayer = false;
 
-        audioContext.audioWorklet.addModule('MagicPlayer.js').then(()=>{
+        audioContext.audioWorklet.addModule('MagicPlayer.js').then(() => {
             console.log("MaqicPlayer audio worklet");
             magicPlayer = new AudioWorkletNode(audioContext, 'magic-player');
 
@@ -39,34 +39,37 @@ class SoundPlayer {
             // pingPongNode.connect(audioContext.destination)
         });
         */
-        let position={
-            x:-15,
-            y:-10,
-            width:30,
-            height:20,
-            spacing:5,
+        let position = {
+            x: -15,
+            y: -10,
+            width: 30,
+            height: 20,
+            spacing: 5,
+        }
+        const updateBufferIfCurrentModuleIs = (module) => {
+            if(currentlyPlayingModule===module) this.updateBuffer();
         }
 
         /** @type {Module|false} module */
         let currentlyPlayingModule = false;
 
-        const everyPlayButton=[];
+        const everyPlayButton = [];
         /** @param {Module} module */
-        this.appendModule = (module)=>{
+        this.appendModule = (module) => {
             console.log("module appended to player");
             //rect
-            let c1=`${position.x}, ${position.y}`;
-            let c2=`${position.x + position.width}, ${position.y}`;
-            let c3=`${position.x + position.width}, ${position.y + position.height}`;
-            let c4=`${position.x}, ${position.y + position.height}`;
+            let c1 = `${position.x}, ${position.y}`;
+            let c2 = `${position.x + position.width}, ${position.y}`;
+            let c3 = `${position.x + position.width}, ${position.y + position.height}`;
+            let c4 = `${position.x}, ${position.y + position.height}`;
             let triW = position.width / 5;
             let triH = position.width / 5;
-            let triStartX = position.x + position.width/2 - triW/2;
-            let triStartY = position.y + position.height/2 - triH/2;
+            let triStartX = position.x + position.width / 2 - triW / 2;
+            let triStartY = position.y + position.height / 2 - triH / 2;
             //tri
-            let c5=`${triStartX}, ${triStartY}`;
-            let c6=`${triStartX + triW}, ${triStartY + triH / 2}`;
-            let c7=`${triStartX}, ${triStartY + triH}`;
+            let c5 = `${triStartX}, ${triStartY}`;
+            let c6 = `${triStartX + triW}, ${triStartY + triH / 2}`;
+            let c7 = `${triStartX}, ${triStartY + triH}`;
 
             const playButton = new SVGGroup();
 
@@ -85,40 +88,38 @@ class SoundPlayer {
 
             playButton.add(path);
 
-            playButton.domElement.setAttribute("class","button play");
+            playButton.domElement.setAttribute("class", "button play");
             everyPlayButton.push(playButton);
 
             module.getInterface().appendToControlPanel(
                 playButton,
                 position.width + 10
             );
-            
-            // module.onUpdate((changes)=>{
-            //     console.log(changes);
-            //     // if(changes.cachedValues){
-            //         this.updateBuffer();
-            //     // }
-            // });
-            
-            playButton.domElement.addEventListener('mousedown',(evt)=>{
-                if(playButton.domElement.classList.contains("active")){
+
+            module.onUpdate((changes) => {
+                console.log(changes);
+                updateBufferIfCurrentModuleIs(module);
+            });
+
+            playButton.domElement.addEventListener('mousedown', (evt) => {
+                if (playButton.domElement.classList.contains("active")) {
 
                     console.log("stop");
                     this.stop();
-                    
-                    everyPlayButton.map((otherButton)=>{
+
+                    everyPlayButton.map((otherButton) => {
                         otherButton.removeClass("active");
                     });
-                }else{
+                } else {
 
-                    everyPlayButton.map((otherButton)=>{
+                    everyPlayButton.map((otherButton) => {
                         otherButton.removeClass("active");
                     });
 
 
-                    currentlyPlayingModule=module;
+                    currentlyPlayingModule = module;
 
-                    console.log("play",currentlyPlayingModule.name);
+                    console.log("play", currentlyPlayingModule.name);
                     playButton.addClass("active");
 
                     this.updateBuffer();
@@ -127,48 +128,48 @@ class SoundPlayer {
 
             });
 
-            
+
         }
 
 
-        this.updateBuffer = ()=>{
-            if(!currentlyPlayingModule) return;
-            if(!magicPlayer) return;
+        this.updateBuffer = () => {
+            if (!currentlyPlayingModule) return;
+            if (!magicPlayer) return;
 
-            if(currentlyPlayingModule.outputs.l && currentlyPlayingModule.outputs.r){
-                
+            if (currentlyPlayingModule.outputs.l && currentlyPlayingModule.outputs.r) {
+
                 magicPlayer.port.postMessage({
-                    audio:[
+                    audio: [
                         Array.from(currentlyPlayingModule.outputs.l.cachedValues),
                         Array.from(currentlyPlayingModule.outputs.r.cachedValues),
                     ]
                 });
-            }else{
-                try{
-                    let defOutput=currentlyPlayingModule.getDefaultOutput();
+            } else {
+                try {
+                    let defOutput = currentlyPlayingModule.getDefaultOutput();
 
                     magicPlayer.port.postMessage({
-                        audio:[
+                        audio: [
                             Array.from(defOutput.cachedValues),
                             Array.from(defOutput.cachedValues),
                         ]
                     });
-                }catch(e){
-                    console.warn("module doesn't have default output",currentlyPlayingModule);
+                } catch (e) {
+                    console.warn("module doesn't have default output", currentlyPlayingModule);
                 }
             }
         }
 
-        this.play = ()=> {
-            if(!magicPlayer) return;
+        this.play = () => {
+            if (!magicPlayer) return;
             magicPlayer.port.postMessage({
-                play:true
+                play: true
             });
         }
-        this.stop = ()=>{
-            if(!magicPlayer) return;
+        this.stop = () => {
+            if (!magicPlayer) return;
             magicPlayer.port.postMessage({
-                stop:true
+                stop: true
             });
         }
     }
