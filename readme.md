@@ -3,11 +3,10 @@ It provides a more intuitive ontrol of timing, as it doesn't run on realtime.
 
 <img src="./showoff/current.png"/>
 
-http://autotel.co/sound-sculpt/
-
 ## available uses
-
-* open ./dist/index.html to play
+* run `npm run serve` and visit localhost:4000
+* download nw and run `(path to)/nw ./` on the project's root. For example, if you download nw and place it in the project's root directory, just run `./nw ./`. I like to have nw in ~/apps, thus I run `~/apps/nw ./`. 
+* open ./dist/index.html to play (workers will be unavailable)
     * open developer console to change things with the patch (experimental)
     * type `modules.` and press "tab" key to get a list of available modules
     * type `let mymodule = create(`... and a module name, to create a module and make it appear in the window.
