@@ -16,7 +16,7 @@ class WaveDisplay extends Path{
         });
         
 
-        const superSet = this.set;
+        const superSetAttributes = this.setAttributes;
         let theWave = [];
         /** 
          * @param {Object} changes
@@ -46,7 +46,7 @@ class WaveDisplay extends Path{
                 str += `L ${0},${translator.amplitudeToY(0)} `;
                 str += `z`;
 
-                superSet({'d':str});
+                superSetAttributes({'d':str});
             }
         };
     }

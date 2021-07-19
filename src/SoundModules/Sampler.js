@@ -2,6 +2,7 @@ import Module from "./common/Module";
 import {sampleRate} from "./common/vars";
 import voz from "../utils/valueOrZero";
 import Input from "./io/Input";
+import Output from "./io/Output";
 /**
  * @namespace SoundModules.Sampler
  */
@@ -22,7 +23,7 @@ const defaultSettings={
  * @property {number} [originalFrequency]
  * @property {number} [frequency]
  * @property {number} [startOffset]
- * @property {Float32Array} [sample]
+ * @property {Array<Float32Array>} [sample]
  */
 /**
  * @class Sampler 
@@ -42,6 +43,9 @@ class Sampler extends Module{
 
         this.inputs.frequency = new Input(this);
         this.inputs.amplitude = new Input(this);
+
+        const left = this.outputs.l = new Output(this);
+        const right = this.outputs.r = new Output(this);
 
 
         /** @param {number} to */
@@ -65,7 +69,7 @@ class Sampler extends Module{
             });
         };
         
-        /** @param {Float32Array} to */
+        /** @param {Array<Float32Array>} to */
         this.setSample = (to) => {
             return this.set({
                 sample: to,
@@ -94,22 +98,24 @@ class Sampler extends Module{
                 //     )
                 // })
             }else if(changes.sample!==undefined){
+                console.log("sample change");
                 this.set({
                     length:calculateLength(
                         settings.frequency,
                         settings.originalFrequency,
-                        changes.sample.length
+                        changes.sample[0].length
                     )
                 })
             }
         });
 
-        const getSample = (floatIndex)=>{
+        const getSample = (floatIndex,channelNo=0)=>{
+            if(!this.settings.sample[channelNo]) return 0;
             let integerPart = Math.floor(floatIndex);
             let floatPart = floatIndex - integerPart;
             let inverseFloatPart = 1-floatPart;
-            let nextSample = voz(this.settings.sample[integerPart+1]);
-            let nowSample = voz(this.settings.sample[integerPart]);
+            let nextSample = voz(settings.sample[channelNo][integerPart+1]);
+            let nowSample = voz(settings.sample[channelNo][integerPart]);
             return nowSample * inverseFloatPart + nextSample * floatPart;
         }
 
@@ -130,7 +136,10 @@ class Sampler extends Module{
 
             let samplePositionAccumulator = settings.startOffset * sampleRate;
             
-            this.cachedValues=new Float32Array(Math.max(0,lengthSamples));
+            const maxLen = Math.max(0,lengthSamples);
+
+            left.cachedValues = new Float32Array(maxLen);
+            right.cachedValues = new Float32Array(maxLen);
 
             for (let a = 0; a < lengthSamples; a++) {
                 const freq = (freqInputValues[a] || lastFrequencyValue) + settings.frequency;
@@ -138,7 +147,8 @@ class Sampler extends Module{
 
                 samplePositionAccumulator +=  freq / settings.originalFrequency;
 
-                this.cachedValues[a] = getSample(samplePositionAccumulator) * amp;
+                left.cachedValues[a] = getSample(samplePositionAccumulator,0) * amp;
+                right.cachedValues[a] = getSample(samplePositionAccumulator,1) * amp;
             }
         };
     }

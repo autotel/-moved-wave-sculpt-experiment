@@ -11,6 +11,7 @@
     "build": "webpack",
     "sass": "sass src/index.scss dist/index.css --watch",
     "doc": "jsdoc -d ./doc -r ./src/ -c ./jsdoc.json",
+    "native": "nw ./dist/index.html",
     "serve": "light-server -s ./dist -b localhost"
   },
   "author": "",

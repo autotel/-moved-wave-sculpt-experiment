@@ -69,7 +69,7 @@ class VerticalZoom extends SVGGroup{
                 rangeAmplitude:yToRange(newPosition.y)
             });
 
-            handleRect.set({"y":newPosition.y});
+            handleRect.setAttributes({"y":newPosition.y});
 
             Object.assign(readoutText.attributes,{
                 y:handleRect.attributes.y + 5,
@@ -83,7 +83,7 @@ class VerticalZoom extends SVGGroup{
         translator.onChange((changes)=>{
             if(changes.rangeAmplitude){
                 const ypos=rangeToY(changes.rangeAmplitude);
-                handleRect.set({"y":ypos});
+                handleRect.setAttributes({"y":ypos});
                 draggable.setPosition({y:ypos},false)
                 Object.assign(readoutText.attributes,{
                     y:ypos + 5,
@@ -92,15 +92,15 @@ class VerticalZoom extends SVGGroup{
 
             }
             if(changes.width){
-                readoutText.set({"x":settings.width + 5});
-                handleRect.set({"x": settings.width-zoomSettings.width});
+                readoutText.setAttributes({"x":settings.width + 5});
+                handleRect.setAttributes({"x": settings.width-zoomSettings.width});
             }
         });
 
-        const superSet = this.set;
+        const superSetAttributes = this.setAttributes;
 
         this.set = (...p) => {
-            superSet(...p);
+            superSetAttributes(...p);
         };
     }
 }

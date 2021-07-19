@@ -4,6 +4,7 @@ import abbreviate from "../../utils/stringAbbreviator";
 import { audioContext } from "../../SoundModules/common/vars";
 import Clickable from "../../dom-model-gui/Interactive/Clickable";
 import Model from "../../dom-model-gui/Model";
+import createMapArray from "../../dom-model-gui/utils/createMapArray";
 
 let defaultSoundLoaderDecoderOptions = {
     x: 0, y:0,
@@ -38,10 +39,14 @@ class SoundLoaderDecoder extends SVGGroup{
                     if(typeof arrayBuffer != "string"){
                         audioContext.decodeAudioData(arrayBuffer, function (audioBuffer) {
                             const numberOfChannels = audioBuffer.numberOfChannels;
-                            //TODO: not just discarding other channels
-                            const channelData = audioBuffer.getChannelData(0);
+                            /** @type {Array<Float32Array>} */
+                            const channelData = createMapArray(
+                                (n)=>audioBuffer.getChannelData(n),
+                                numberOfChannels
+                            );
                             
                             filePath=file.name;
+
                             handleChanged({
                                 sampleArray:channelData,
                                 filePath
@@ -51,7 +56,7 @@ class SoundLoaderDecoder extends SVGGroup{
                         throw new Error("file decoding problem: expected arrayBuffer but got string");
                     }
                 };
-                reader.readAsArrayBuffer(file)
+                reader.readAsArrayBuffer(file);
             }else{
                 throw new Error("no files[0]");
             }
@@ -91,12 +96,12 @@ class SoundLoaderDecoder extends SVGGroup{
         clickable.clickCallback=()=>selectFile();
 
         clickable.mouseEnterCallback=()=>{
-            valueText.set({"text": fileName});
+            valueText.setAttributes({"text": fileName});
             this.addClass("active");
         }
 
         clickable.mouseLeaveCallback=()=>{
-            valueText.set({"text": abbreviate(fileName,8)});
+            valueText.setAttributes({"text": abbreviate(fileName,8)});
             this.removeClass("active");
         }
         
@@ -125,7 +130,7 @@ class SoundLoaderDecoder extends SVGGroup{
             let c8=`${innerLeftLine}, ${topLine}`;
 
 
-            soundLoaderDecoderShape.set({
+            soundLoaderDecoderShape.setAttributes({
                 "d":
                 `M ${c1}
                 L ${c2} 
@@ -149,10 +154,10 @@ class SoundLoaderDecoder extends SVGGroup{
             if(!options.abbreviatedName){
                 options.abbreviatedName=abbreviate(options.name);
             }
-            nameText.set({"text":options.abbreviatedName+"[load]"});
+            nameText.setAttributes({"text":options.abbreviatedName+"[load]"});
         }
         const deAbbreviateText=()=>{
-            nameText.set({"text":`[${options.name}]`});
+            nameText.setAttributes({"text":`[${options.name}]`});
         }
         
         abbreviateText();
@@ -167,7 +172,7 @@ class SoundLoaderDecoder extends SVGGroup{
         
         this.updateGraphic=()=>{
             fileName = filePath.split("/").pop();
-            valueText.set({"text": abbreviate(fileName,8)});
+            valueText.setAttributes({"text": abbreviate(fileName,8)});
         }
         
         /** 
@@ -195,39 +200,9 @@ class SoundLoaderDecoder extends SVGGroup{
                     this.updateGraphic();
                 }
             });
-            switch (parameterName){
-                case "frequency":
-                    this.setDeltaCurve("frequency");
-                    this.setMinMax(0,22000);
-                break;
-                case "order":
-                    this.setDeltaCurve("integer");
-                    this.setMinMax(0,10);
-                break;
-
-                case "time":
-                case "length":
-                    this.setMinMax(0,5);
-                break;
-            }
-
             this.updateGraphic();
         }
 
-        this.setMinMax=(min,max)=>{
-            if(max<=min) console.warn("max<=min",min,max);
-            options.min=min;
-            options.max=max;
-            remakePath();
-            return this;
-        }
-        /**
-         * @param {"integer"|"frequency"|"gain"|"channelvol"|"integer"|"periodseconds"} deltaCurve
-         **/
-        this.setDeltaCurve=(deltaCurve)=>{
-            options.deltaCurve=deltaCurve;
-            return this;
-        }
     }
 }
 

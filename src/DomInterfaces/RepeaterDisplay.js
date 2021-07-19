@@ -168,7 +168,7 @@ class RepeaterDisplay extends WaveLane{
                 changes.frequency!==undefined ||
                 changes.amplitude!==undefined
             ){
-                readoutText.set({
+                readoutText.setAttributes({
                     "text":
                         `${
                             round(module.settings.frequency,4)

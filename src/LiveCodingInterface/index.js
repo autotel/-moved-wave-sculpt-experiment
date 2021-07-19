@@ -231,9 +231,12 @@ class LiveCodingInterface{
             return [instanceStrings,connectionStrings,settingStrings,autozoomStrings].flat().join("\n").replace(/\"/g,"'");
         }
 
+        
+
         //export stuff to window, so that you can call it from webinspector
 
         this.possibleModules = {};
+        
         Object.keys(
             modulesAndTheirInterfaces
         ).forEach((modName)=>{
@@ -241,6 +244,17 @@ class LiveCodingInterface{
         });
         
         exportToBrowserGlobal(this.possibleModules,"possibleModules");
+
+
+        exportToBrowserGlobal(function (callback) {
+
+            Object.keys(
+                window.modules
+            ).forEach((modName)=>{
+                callback(window.modules[modName]);
+            });
+        
+        },"eachModule");
 
         Object.keys(this.possibleModules).map((mname)=>{
             if(window[mname]===undefined) window[mname]=this.possibleModules[mname];

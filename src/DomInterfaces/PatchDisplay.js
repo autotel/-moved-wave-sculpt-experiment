@@ -87,19 +87,14 @@ class PatchCord {
             this.show();
             let bez = Math.abs(startPos.y - endPos.y) / 5;
             
-            myPath.set({'d':
+            myPath.setAttributes({'d':
                 `M ${startPos.x + 5}, ${startPos.y}
                  C ${startPos.x + bez}, ${startPos.y}
                     ${endPos.x + bez}, ${endPos.y}
                     ${endPos.x + 5}, ${endPos.y}`
             });
             if (properties.end){
-                // myDeleteButton.set({
-                //     x: bez * 0.76 + (startPos.x + endPos.x)/2,
-                //     y: (startPos.y + endPos.y)/2,
-                // });
-
-                myDeleteButton.set(endPos);
+                myDeleteButton.setAttributes(endPos);
             }
         }
         myDeleteButton.onClick(()=>{

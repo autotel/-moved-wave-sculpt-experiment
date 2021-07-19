@@ -175,7 +175,7 @@ class Lane extends SVGGroup {
         draggable.setPosition(settings);
         draggable.positionChanged = (newPosition) => {
             settings.y = newPosition.y;
-            this.set({"y": newPosition.y});
+            this.setAttributes({"y": newPosition.y});
             handleMoved();
             return;
 
@@ -283,8 +283,8 @@ class Lane extends SVGGroup {
             translator.change({
                 width:newWidth
             });
-            this.set({width:newWidth});
-            this.contents.set({width:newWidth});
+            this.setAttributes({width:newWidth});
+            this.contents.setAttributes({width:newWidth});
 
             this.domElement.setAttribute("width", (newWidth+sizes.patcher.width)+"px");
 
@@ -296,9 +296,9 @@ class Lane extends SVGGroup {
 
         translator.onChange(()=>{
             const newWidth=translator.settings.width;
-            handleRect.set({"width":newWidth});
+            handleRect.setAttributes({"width":newWidth});
 
-            controlPanel.set({
+            controlPanel.setAttributes({
                 "x":
                 newWidth - controlPanelWidth - controlPanelRight
             });

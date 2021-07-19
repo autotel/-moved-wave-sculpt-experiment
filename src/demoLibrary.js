@@ -4,6 +4,121 @@ function demoLibrary() {
 
     //pre-run a live-coded patch
     const demos = window.demos = {
+        "tone maker": () => {
+            let osc4 = create(possibleModules.Oscillator, 'osc4');
+            let osc3 = create(possibleModules.Oscillator, 'osc3');
+            let osc = create(possibleModules.Oscillator, 'osc');
+            let osc1 = create(possibleModules.Oscillator, 'osc1');
+            let mix = create(possibleModules.MixerTesselator, 'mix');
+            let osc7 = create(possibleModules.Oscillator, 'osc7');
+            let osc8 = create(possibleModules.Oscillator, 'osc8');
+            let mix6 = create(possibleModules.MixerTesselator, 'mix6');
+            let mix5 = create(possibleModules.MixerTesselator, 'mix5');
+            let rus = create(possibleModules.RustFreeverb, 'rus');
+            osc4.outputs.main.connectTo(mix.inputs.d);
+            osc3.outputs.main.connectTo(mix.inputs.c);
+            osc.outputs.main.connectTo(mix.inputs.a);
+            osc1.outputs.main.connectTo(mix.inputs.b);
+            mix.outputs.main.connectTo(mix5.inputs.a);
+            osc7.outputs.main.connectTo(mix6.inputs.a);
+            osc8.outputs.main.connectTo(mix6.inputs.b);
+            mix6.outputs.main.connectTo(mix5.inputs.b);
+            mix5.outputs.main.connectTo(rus.inputs.main);
+            osc4.set({
+                'amplitude': 0.15999999999999992,
+                'bias': 0,
+                'length': 1,
+                'frequency': 350.4444444444445,
+                'phase': 0,
+                'shape': 'sin'
+            });
+            osc3.set({
+                'amplitude': 0.6799999999999999,
+                'bias': 0,
+                'length': 1,
+                'frequency': 171,
+                'phase': 0,
+                'shape': 'sin'
+            });
+            osc.set({
+                'amplitude': 0.9299999999999999,
+                'bias': 0,
+                'length': 1,
+                'frequency': 84.8888888888889,
+                'phase': 0,
+                'shape': 'sin'
+            });
+            osc1.set({
+                'amplitude': 0.92,
+                'bias': 0,
+                'length': 1,
+                'frequency': 104.44444444444447,
+                'phase': 0,
+                'shape': 'sin'
+            });
+            mix.set({
+                'amplitude': 1,
+                'window': true,
+                'normalize': true,
+                'levela': 0.56,
+                'levelb': 0.5700000000000001,
+                'levelc': 0.5,
+                'leveld': 0.5
+            });
+            osc7.set({
+                'amplitude': 0.09999999999999988,
+                'bias': 0,
+                'length': 1,
+                'frequency': 338.2222222222223,
+                'phase': 0,
+                'shape': 'sin'
+            });
+            osc8.set({
+                'amplitude': 0.36,
+                'bias': 0,
+                'length': 1,
+                'frequency': 405.00000000000006,
+                'phase': 0,
+                'shape': 'sin'
+            });
+            mix6.set({
+                'amplitude': 1,
+                'window': true,
+                'normalize': false,
+                'levela': 0.5,
+                'levelb': 0.5,
+                'levelc': 0.5,
+                'leveld': 0.5
+            });
+            mix5.set({
+                'amplitude': 1,
+                'window': true,
+                'normalize': false,
+                'levela': 0.5,
+                'levelb': 0.5,
+                'levelc': 0.5,
+                'leveld': 0.5
+            });
+            rus.set({
+                'dampening': 1.61,
+                'freeze': false,
+                'wet': 1.02,
+                'width': 0.85,
+                'dry': 0.2699999999999999,
+                'roomSize': 0.5599999999999998,
+                'LROffset': 0.6000000000000001
+            });
+            osc4.getInterface().autoZoom();
+            osc3.getInterface().autoZoom();
+            osc.getInterface().autoZoom();
+            osc1.getInterface().autoZoom();
+            mix.getInterface().autoZoom();
+            osc7.getInterface().autoZoom();
+            osc8.getInterface().autoZoom();
+            mix6.getInterface().autoZoom();
+            mix5.getInterface().autoZoom();
+            rus.getInterface().autoZoom();
+        },
         "drummaker": () => {
             create(possibleModules.Oscillator, 'oscillator1');
             create(possibleModules.Oscillator, 'oscillator2');
@@ -913,19 +1028,11 @@ function demoLibrary() {
 
         },
         "wushiu": () => {
-            let env = create(possibleModules.EnvelopeGenerator, 'env');
             let env1 = create(possibleModules.EnvelopeAttackRelease, 'env1');
             let wav = create(possibleModules.WaveFolder, 'wav');
             let rus = create(possibleModules.RustComb, 'rus');
             env1.outputs.main.connectTo(wav.inputs.main);
             wav.outputs.main.connectTo(rus.inputs.main);
-            env.set({
-                'amplitude': 1,
-                'bias': 0,
-                'length': 1,
-                'points': [],
-                'loop': false
-            });
             env1.set({
                 'attack': 0.31267573696145123,
                 'release': 0.35176870748299316,
@@ -944,73 +1051,72 @@ function demoLibrary() {
                 'dampening': 0.77,
                 'feedback': 0.9
             });
-            env.getInterface().autoZoom();
             env1.getInterface().autoZoom();
             wav.getInterface().autoZoom();
             rus.getInterface().autoZoom();
         },
-        "seceretcumbia": ()=>{
-            let osc2 = create(possibleModules.Oscillator,'osc2');
-        let fil = create(possibleModules.Filter,'fil');
-        let rus = create(possibleModules.RustFreeverb,'rus');
-        let rus7 = create(possibleModules.RustComb,'rus7');
-        let vol = create(possibleModules.VoltsPerOctaveToHertz,'vol');
-        let osc = create(possibleModules.Oscillator,'osc');
-        osc2.outputs.main.connectTo(fil.inputs.main);
-        fil.outputs.main.connectTo(rus.inputs.main);
-        rus.outputs.main.connectTo(rus7.inputs.main);
-        rus7.outputs.main.connectTo(vol.inputs.main);
-        rus7.outputs.main.connectTo(osc.inputs.amplitude);
-        vol.outputs.main.connectTo(osc.inputs.frequency);
-        osc2.set({
-          'amplitude': 1.35,
-          'bias': 1.8900000000000003,
-          'length': 1,
-          'frequency': 2,
-          'phase': 0,
-          'shape': 'square'
-        });
-        fil.set({
-          'gain': 0.75,
-          'reso': 3.38,
-          'type': 'LpMoog',
-          'order': 3,
-          'frequency': 408.44444444444423,
-          'saturate': false
-        });
-        rus.set({
-          'dampening': 0.9999999999999999,
-          'freeze': true,
-          'wet': -0.3100000000000003,
-          'width': 1.7100000000000002,
-          'dry': 1.1900000000000002,
-          'roomSize': 0.6000000000000001,
-          'LROffset': 1.85
-        });
-        rus7.set({
-          'frequency': 59.55555555555556,
-          'dampening_inverse': 0.6199999999999999,
-          'dampening': 0.52,
-          'feedback': -0.6400000000000001
-        });
-        vol.set({
-          'preamp': 1,
-          'center': 146.78000000000003
-        });
-        osc.set({
-          'amplitude': -8.673617379884035e-18,
-          'bias': 0,
-          'length': 1,
-          'frequency': 2,
-          'phase': 0,
-          'shape': 'sin'
-        });
-        osc2.getInterface().autoZoom();
-        fil.getInterface().autoZoom();
-        rus.getInterface().autoZoom();
-        rus7.getInterface().autoZoom();
-        vol.getInterface().autoZoom();
-        osc.getInterface().autoZoom();
+        "seceretcumbia": () => {
+            let osc2 = create(possibleModules.Oscillator, 'osc2');
+            let fil = create(possibleModules.Filter, 'fil');
+            let rus = create(possibleModules.RustFreeverb, 'rus');
+            let rus7 = create(possibleModules.RustComb, 'rus7');
+            let vol = create(possibleModules.VoltsPerOctaveToHertz, 'vol');
+            let osc = create(possibleModules.Oscillator, 'osc');
+            osc2.outputs.main.connectTo(fil.inputs.main);
+            fil.outputs.main.connectTo(rus.inputs.main);
+            rus.outputs.main.connectTo(rus7.inputs.main);
+            rus7.outputs.main.connectTo(vol.inputs.main);
+            rus7.outputs.main.connectTo(osc.inputs.amplitude);
+            vol.outputs.main.connectTo(osc.inputs.frequency);
+            osc2.set({
+                'amplitude': 1.35,
+                'bias': 1.8900000000000003,
+                'length': 1,
+                'frequency': 2,
+                'phase': 0,
+                'shape': 'square'
+            });
+            fil.set({
+                'gain': 0.75,
+                'reso': 3.38,
+                'type': 'LpMoog',
+                'order': 3,
+                'frequency': 408.44444444444423,
+                'saturate': false
+            });
+            rus.set({
+                'dampening': 0.9999999999999999,
+                'freeze': true,
+                'wet': -0.3100000000000003,
+                'width': 1.7100000000000002,
+                'dry': 1.1900000000000002,
+                'roomSize': 0.6000000000000001,
+                'LROffset': 1.85
+            });
+            rus7.set({
+                'frequency': 59.55555555555556,
+                'dampening_inverse': 0.6199999999999999,
+                'dampening': 0.52,
+                'feedback': -0.6400000000000001
+            });
+            vol.set({
+                'preamp': 1,
+                'center': 146.78000000000003
+            });
+            osc.set({
+                'amplitude': -8.673617379884035e-18,
+                'bias': 0,
+                'length': 1,
+                'frequency': 2,
+                'phase': 0,
+                'shape': 'sin'
+            });
+            osc2.getInterface().autoZoom();
+            fil.getInterface().autoZoom();
+            rus.getInterface().autoZoom();
+            rus7.getInterface().autoZoom();
+            vol.getInterface().autoZoom();
+            osc.getInterface().autoZoom();
         },
         "wiwu": () => {
             create(possibleModules.HarmonicsOscillator, 'harmosc');
@@ -1219,7 +1325,7 @@ function demoLibrary() {
     }
 
     const appendTo = document.getElementById("demo-buttons");
-    if(!appendTo) throw new Error("div with id 'demo-buttons' missing");
+    if (!appendTo) throw new Error("div with id 'demo-buttons' missing");
 
     let hashBefore = window.location.hash;
 
@@ -1229,8 +1335,8 @@ function demoLibrary() {
             if (demos[hashval]) {
                 console.log("trying load of", hashval);
                 demos[hashval]();
-            }else{
-                console.log("nonexisting demo named",hashval);
+            } else {
+                console.log("nonexisting demo named", hashval);
             }
         } else {
             if (hashBefore) {
@@ -1244,9 +1350,9 @@ function demoLibrary() {
     window.addEventListener("hashchange", hashchange);
 
     window.onpopstate = () => window.location.reload();
-    
-    Object.keys(demos).forEach((name)=>{
-        appendTo.innerHTML+=(`<a class="tag" href="#${name}">${name}</a>`);
+
+    Object.keys(demos).forEach((name) => {
+        appendTo.innerHTML += (`<a class="button" href="#${name}">${name}</a>`);
     });
 }
 

@@ -1,0 +1,75 @@
+@import "roboto";
+
+body {
+    /**hotfix title invisible*/
+    font-size: 20px;
+    color: #3d3d3d;
+    margin: 0px;
+    padding: 0px;
+    font-weight: 400;
+    font-family: serif;
+}
+strong {
+    font-weight: 900;
+}
+a {
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.712);
+}
+h1,
+h2,
+h3,
+h4,
+h5 {
+    font-weight: 500;
+    font-family: "Roboto", sans-serif;
+}
+h1 {
+    font-weight: 100;
+    color: #1984d2;
+}
+.button {
+    cursor: pointer;
+    padding: 6px 10px;
+    background-color: #f8f8f8;
+    display: inline-block;
+    margin: 4px;
+    margin-left: 4px;
+    margin-left: 1px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 100;
+}
+.button:hover.black {
+    background-color: #3d3d3d;
+}
+.button:hover.blue {
+    background-color: #1984d2;
+}
+.button:hover.yellow {
+    background-color: #ffd20e;
+}
+.button:hover.orange {
+    background-color: #ff9b18;
+}
+.button:hover.green {
+    background-color: #3cd45d;
+}
+.button:hover.purple {
+    background-color: #8301c6;
+}
+.button:hover.red {
+    background-color: crimson;
+}
+.expanded .button-expand {
+    background-color: crimson;
+    transform: rotate(360deg);
+    transition: 0.3s transform;
+}
+.prettyprint .button-expand * {
+    color: #3d3d3d !important;
+}
+.button-expand {
+    position: relative;
+    float: right;
+    transition: 0.3s transform;
+}
