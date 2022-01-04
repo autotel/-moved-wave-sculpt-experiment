@@ -1,3 +1,5 @@
+--- moved to https://gitlab.com/autotel/wave-fields ---
+
 A gui to experiment with shound generation. 
 It provides a more intuitive ontrol of timing, as it doesn't run on realtime.
 
